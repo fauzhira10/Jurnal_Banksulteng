@@ -1,17 +1,16 @@
 @extends('layouts.app')
 
-@section('title', 'Form Jurnal Keluhan')
-@section('page_title', 'Input Jurnal Keluhan Nasabah')
-@section('page_subtitle', 'Pencatatan, validasi anti-duplikat, dan penanganan keluhan transaksi nasabah Bank Sulteng')
+@section('title', 'Edit Jurnal Keluhan')
+@section('page_title', 'Edit Data Jurnal Keluhan')
+@section('page_subtitle', 'Pembaruan dan koreksi data keluhan transaksi nasabah Bank Sulteng')
 
 @section('topbar_action')
     <a href="{{ route('jurnal.index') }}" class="btn btn-secondary btn-sm" style="height: 38px; padding: 0 14px;">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-            <line x1="3" y1="9" x2="21" y2="9"></line>
-            <line x1="9" y1="21" x2="9" y2="9"></line>
+            <line x1="19" y1="12" x2="5" y2="12"></line>
+            <polyline points="12 19 5 12 12 5"></polyline>
         </svg>
-        <span>Lihat Data Keluhan</span>
+        <span>Kembali ke Data Keluhan</span>
     </a>
 @endsection
 
@@ -133,12 +132,10 @@
         <div class="card-header">
             <div class="card-title">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                    <polyline points="14 2 14 8 20 8"></polyline>
-                    <line x1="12" y1="18" x2="12" y2="12"></line>
-                    <line x1="9" y1="15" x2="15" y2="15"></line>
+                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
                 </svg>
-                <span>Formulir Pengaduan & Jurnal Transaksi</span>
+                <span>Edit Rincian Jurnal Keluhan #{{ $jurnal->id }} ({{ $jurnal->nama_nasabah }})</span>
             </div>
             <span style="font-size: 12px; color: var(--bs-gray-500);">
                 Semua Input Bertanda (<span style="color: var(--bs-danger); font-weight: bold;">*</span>) Wajib Diisi
@@ -146,8 +143,9 @@
         </div>
 
         <div class="card-body">
-            <form action="{{ route('jurnal.store') }}" method="POST">
+            <form action="{{ route('jurnal.update', $jurnal->id) }}" method="POST">
                 @csrf
+                @method('PUT')
 
                 <div class="form-grid">
                     <!-- SECTION 1: IDENTITAS NASABAH -->
@@ -162,31 +160,31 @@
                     <!-- Nama Nasabah -->
                     <div class="form-group">
                         <label>Nama Nasabah <span class="required">*</span></label>
-                        <input type="text" name="nama_nasabah" value="{{ old('nama_nasabah') }}" required placeholder="Contoh: Budi Santoso">
+                        <input type="text" name="nama_nasabah" value="{{ old('nama_nasabah', $jurnal->nama_nasabah) }}" required placeholder="Contoh: Budi Santoso">
                     </div>
 
                     <!-- No. Rekening -->
                     <div class="form-group">
                         <label>No. Rekening <span class="required">*</span></label>
-                        <input type="text" name="no_rekening" value="{{ old('no_rekening') }}" required placeholder="Contoh: 00900000">
+                        <input type="text" name="no_rekening" value="{{ old('no_rekening', $jurnal->no_rekening) }}" required placeholder="Contoh: 00900000">
                     </div>
 
                     <!-- No. Resi / Trace Number -->
                     <div class="form-group">
                         <label>No. Resi / Trace Number <span class="required">*</span></label>
-                        <input type="text" name="no_resi" value="{{ old('no_resi') }}" required placeholder="Contoh: 00000000">
+                        <input type="text" name="no_resi" value="{{ old('no_resi', $jurnal->no_resi) }}" required placeholder="Contoh: 00000000">
                     </div>
 
                     <!-- Nomor Kartu -->
                     <div class="form-group">
                         <label>Nomor Kartu ATM/Debit <span class="required">*</span></label>
-                        <input type="text" name="no_kartu" value="{{ old('no_kartu') }}" required placeholder="Contoh: 6019xxxxxxxxxxxx">
+                        <input type="text" name="no_kartu" value="{{ old('no_kartu', $jurnal->no_kartu) }}" required placeholder="Contoh: 6019xxxxxxxxxxxx">
                     </div>
 
                     <!-- Nomor Tiket -->
                     <div class="form-group full-width">
                         <label>Nomor Tiket CS <span class="required">*</span></label>
-                        <input type="text" name="no_tiket" value="{{ old('no_tiket') }}" required placeholder="Contoh: TKT-2026-0001">
+                        <input type="text" name="no_tiket" value="{{ old('no_tiket', $jurnal->no_tiket) }}" required placeholder="Contoh: TKT-2026-0001">
                     </div>
 
                     <!-- SECTION 2: DETAIL TRANSAKSI & KANTOR CABANG -->
@@ -204,7 +202,7 @@
                         <select name="master_cabang_id" required>
                             <option value="">-- Pilih Kantor Cabang --</option>
                             @foreach($cabangs as $c)
-                                <option value="{{ $c->id }}" {{ old('master_cabang_id') == $c->id ? 'selected' : '' }}>
+                                <option value="{{ $c->id }}" {{ old('master_cabang_id', $jurnal->master_cabang_id) == $c->id ? 'selected' : '' }}>
                                     {{ $c->kode_cabang }} - {{ $c->nama_cabang }}
                                 </option>
                             @endforeach
@@ -217,7 +215,7 @@
                         <select name="master_transaksi_id" id="transaksi_id" required>
                             <option value="">-- Pilih Jenis Transaksi --</option>
                             @foreach($transaksis as $t)
-                                <option value="{{ $t->id }}" {{ old('master_transaksi_id') == $t->id ? 'selected' : '' }}>
+                                <option value="{{ $t->id }}" {{ old('master_transaksi_id', $jurnal->master_transaksi_id) == $t->id ? 'selected' : '' }}>
                                     {{ $t->jenis_transaksi }}
                                 </option>
                             @endforeach
@@ -227,25 +225,25 @@
                     <!-- Channel Transaksi (Auto-fill) -->
                     <div class="form-group">
                         <label>Channel Transaksi (Otomatis)</label>
-                        <input type="text" id="channel" readonly placeholder="Akan terisi otomatis...">
+                        <input type="text" id="channel" readonly value="{{ $jurnal->masterTransaksi->channel ?? '' }}" placeholder="Akan terisi otomatis...">
                     </div>
 
                     <!-- Biaya Admin (Auto-fill) -->
                     <div class="form-group">
                         <label>Biaya Admin (Otomatis)</label>
-                        <input type="text" id="biaya_admin" readonly placeholder="Akan terisi otomatis...">
+                        <input type="text" id="biaya_admin" readonly value="Rp {{ number_format($jurnal->masterTransaksi->biaya_admin ?? 0, 0, ',', '.') }}" placeholder="Akan terisi otomatis...">
                     </div>
 
                     <!-- Nominal Transaksi -->
                     <div class="form-group">
                         <label>Biaya / Nominal Transaksi (Rp) <span class="required">*</span></label>
-                        <input type="number" name="nominal_transaksi" value="{{ old('nominal_transaksi') }}" required placeholder="Contoh: 1000000" min="0" step="any">
+                        <input type="number" name="nominal_transaksi" value="{{ old('nominal_transaksi', $jurnal->nominal_transaksi) }}" required placeholder="Contoh: 1000000" min="0" step="any">
                     </div>
 
                     <!-- Terminal Transaksi -->
                     <div class="form-group">
                         <label>Terminal Transaksi / Mesin <span class="required">*</span></label>
-                        <input type="text" name="terminal_transaksi" value="{{ old('terminal_transaksi') }}" required placeholder="Contoh: ATM-001 / EDC-PL">
+                        <input type="text" name="terminal_transaksi" value="{{ old('terminal_transaksi', $jurnal->terminal_transaksi) }}" required placeholder="Contoh: ATM-001 / EDC-PL">
                     </div>
 
                     <!-- SECTION 3: WAKTU, STATUS & KRONOLOGI -->
@@ -260,54 +258,50 @@
                     <!-- Tanggal Transaksi -->
                     <div class="form-group">
                         <label>Tanggal Transaksi Bermasalah <span class="required">*</span></label>
-                        <input type="date" name="tgl_transaksi" value="{{ old('tgl_transaksi') }}" required>
+                        <input type="date" name="tgl_transaksi" value="{{ old('tgl_transaksi', $jurnal->tgl_transaksi) }}" required>
                     </div>
 
                     <!-- Tanggal Terima -->
                     <div class="form-group">
                         <label>Tanggal Terima Keluhan <span class="required">*</span></label>
-                        <input type="date" name="tgl_terima" value="{{ old('tgl_terima', date('Y-m-d')) }}" required>
+                        <input type="date" name="tgl_terima" value="{{ old('tgl_terima', $jurnal->tgl_terima) }}" required>
                     </div>
 
                     <!-- Tanggal Selesai -->
                     <div class="form-group">
                         <label>Tanggal Selesai Penanganan <span class="required">*</span></label>
-                        <input type="date" name="tgl_selesai" value="{{ old('tgl_selesai') }}" required>
+                        <input type="date" name="tgl_selesai" value="{{ old('tgl_selesai', $jurnal->tgl_selesai) }}" required>
                     </div>
 
                     <!-- Status -->
                     <div class="form-group">
                         <label>Status Keluhan <span class="required">*</span></label>
                         <select name="status" required>
-                            <option value="Menunggu" {{ old('status', 'Menunggu') == 'Menunggu' ? 'selected' : '' }}>Menunggu</option>
-                            <option value="Success" {{ old('status') == 'Success' ? 'selected' : '' }}>Success</option>
-                            <option value="Done" {{ old('status') == 'Done' ? 'selected' : '' }}>Done</option>
-                            <option value="Rejected" {{ old('status') == 'Rejected' ? 'selected' : '' }}>Rejected</option>
+                            <option value="Menunggu" {{ old('status', $jurnal->status) == 'Menunggu' ? 'selected' : '' }}>Menunggu</option>
+                            <option value="Success" {{ old('status', $jurnal->status) == 'Success' ? 'selected' : '' }}>Success</option>
+                            <option value="Done" {{ old('status', $jurnal->status) == 'Done' ? 'selected' : '' }}>Done</option>
+                            <option value="Rejected" {{ old('status', $jurnal->status) == 'Rejected' ? 'selected' : '' }}>Rejected</option>
                         </select>
                     </div>
 
                     <!-- Keterangan Log -->
                     <div class="form-group full-width">
                         <label>Keterangan Log / Catatan Kronologi Keluhan <span class="required">*</span></label>
-                        <textarea name="keterangan_log" required placeholder="Tuliskan catatan, kronologi masalah, atau tindak lanjut petugas di sini...">{{ old('keterangan_log') }}</textarea>
+                        <textarea name="keterangan_log" required placeholder="Tuliskan catatan, kronologi masalah, atau tindak lanjut petugas di sini...">{{ old('keterangan_log', $jurnal->keterangan_log) }}</textarea>
                     </div>
                 </div>
 
                 <div class="form-actions">
-                    <button type="reset" class="btn btn-secondary">
-                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
-                            <path d="M3 3v5h5"></path>
-                        </svg>
-                        <span>Reset Form</span>
-                    </button>
+                    <a href="{{ route('jurnal.index') }}" class="btn btn-secondary">
+                        <span>Batal</span>
+                    </a>
                     <button type="submit" class="btn btn-primary">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
                             <polyline points="17 21 17 13 7 13 7 21"></polyline>
                             <polyline points="7 3 7 8 15 8"></polyline>
                         </svg>
-                        <span>Simpan Jurnal Keluhan</span>
+                        <span>Simpan Perubahan</span>
                     </button>
                 </div>
             </form>
@@ -338,14 +332,6 @@
 
     document.getElementById('transaksi_id').addEventListener('change', function() {
         loadDetailTransaksi(this.value);
-    });
-
-    // Jalankan saat load pertama kali jika jenis transaksi sudah terpilih sebelumnya (misal saat reload karena error)
-    window.addEventListener('DOMContentLoaded', function() {
-        let initialId = document.getElementById('transaksi_id').value;
-        if(initialId) {
-            loadDetailTransaksi(initialId);
-        }
     });
 </script>
 @endpush

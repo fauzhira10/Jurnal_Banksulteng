@@ -100,17 +100,17 @@ class JurnalController extends Controller
             'nama_nasabah'       => 'required|string|max:255',
             'no_resi'            => 'required|string|max:255|unique:jurnals,no_resi,NULL,id,nama_nasabah,' . $request->nama_nasabah . ',tgl_transaksi,' . $request->tgl_transaksi,
             'no_rekening'        => 'required|string|max:255',
-            'tgl_terima'         => 'required|date',
-            'tgl_transaksi'      => 'required|date',
-            'tgl_selesai'        => 'nullable|date',
-            'no_tiket'           => 'nullable|string|max:255',
-            'no_kartu'           => 'nullable|string|max:255',
+            'no_kartu'           => 'required|string|max:255',
+            'no_tiket'           => 'required|string|max:255',
             'master_cabang_id'   => 'required|exists:master_cabangs,id',
             'master_transaksi_id'=> 'required|exists:master_transaksis,id',
-            'terminal_transaksi' => 'nullable|string|max:255',
+            'terminal_transaksi' => 'required|string|max:255',
             'nominal_transaksi'  => 'required|numeric|min:0',
-            'keterangan_log'     => 'nullable|string',
-            'status'             => 'required|string|in:Menunggu,Done,Rejected,Success'
+            'tgl_transaksi'      => 'required|date',
+            'tgl_terima'         => 'required|date',
+            'tgl_selesai'        => 'required|date',
+            'status'             => 'required|string|in:Menunggu,Done,Rejected,Success',
+            'keterangan_log'     => 'required|string'
         ], [
             'no_resi.unique' => 'Gagal! Keluhan atas nama nasabah ini dengan No. Resi dan Tanggal tersebut sudah pernah dijurnal.'
         ]);
@@ -136,6 +136,49 @@ class JurnalController extends Controller
     {
         $jurnal = Jurnal::with(['masterCabang', 'masterTransaksi'])->find($id);
         return response()->json($jurnal);
+    }
+
+    /**
+     * Menampilkan formulir edit data jurnal keluhan
+     */
+    public function edit($id)
+    {
+        $jurnal = Jurnal::with(['masterCabang', 'masterTransaksi'])->findOrFail($id);
+        $cabangs = MasterCabang::orderBy('kode_cabang')->get();
+        $transaksis = MasterTransaksi::orderBy('jenis_transaksi')->get();
+
+        return view('jurnal_edit', compact('jurnal', 'cabangs', 'transaksis'));
+    }
+
+    /**
+     * Memperbarui data jurnal keluhan nasabah
+     */
+    public function update(Request $request, $id)
+    {
+        $jurnal = Jurnal::findOrFail($id);
+
+        $request->validate([
+            'nama_nasabah'       => 'required|string|max:255',
+            'no_resi'            => 'required|string|max:255|unique:jurnals,no_resi,' . $id . ',id,nama_nasabah,' . $request->nama_nasabah . ',tgl_transaksi,' . $request->tgl_transaksi,
+            'no_rekening'        => 'required|string|max:255',
+            'no_kartu'           => 'required|string|max:255',
+            'no_tiket'           => 'required|string|max:255',
+            'master_cabang_id'   => 'required|exists:master_cabangs,id',
+            'master_transaksi_id'=> 'required|exists:master_transaksis,id',
+            'terminal_transaksi' => 'required|string|max:255',
+            'nominal_transaksi'  => 'required|numeric|min:0',
+            'tgl_transaksi'      => 'required|date',
+            'tgl_terima'         => 'required|date',
+            'tgl_selesai'        => 'required|date',
+            'status'             => 'required|string|in:Menunggu,Done,Rejected,Success',
+            'keterangan_log'     => 'required|string'
+        ], [
+            'no_resi.unique' => 'Gagal! Keluhan atas nama nasabah ini dengan No. Resi dan Tanggal tersebut sudah pernah dijurnal.'
+        ]);
+
+        $jurnal->update($request->all());
+
+        return redirect()->route('jurnal.index')->with('success', "Perubahan data jurnal keluhan {$jurnal->nama_nasabah} berhasil disimpan!");
     }
 
     /**

@@ -292,7 +292,7 @@
         margin: 0 auto 16px;
     }
 
-    /* Modal Detail */
+    /* Modal Backdrop & Content */
     .modal-backdrop {
         display: none;
         position: fixed;
@@ -329,7 +329,7 @@
     }
 
     .modal-header {
-        padding: 20px 24px;
+        padding: 24px 26px 18px;
         border-bottom: 1px solid var(--bs-gray-200);
         display: flex;
         justify-content: space-between;
@@ -338,26 +338,34 @@
     }
 
     .modal-header h3 {
-        font-size: 17px;
+        font-size: 17.5px;
         font-weight: 700;
         color: var(--bs-navy);
         display: flex;
         align-items: center;
-        gap: 8px;
+        gap: 10px;
+        margin: 0;
+        line-height: 1.3;
     }
 
     .btn-close-modal {
-        background: transparent;
-        border: none;
+        background: var(--bs-gray-100);
+        border: 1px solid var(--bs-gray-300);
         cursor: pointer;
-        color: var(--bs-gray-400);
-        padding: 4px;
-        border-radius: 4px;
-        transition: color 0.2s;
+        color: var(--bs-gray-500);
+        padding: 6px;
+        border-radius: var(--radius-sm);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s;
+        flex-shrink: 0;
     }
 
     .btn-close-modal:hover {
-        color: var(--bs-gray-700);
+        background: var(--bs-gray-200);
+        color: var(--bs-gray-800);
+        border-color: var(--bs-gray-400);
     }
 
     .modal-body {
@@ -642,15 +650,16 @@
                             <th style="width: 50px; text-align: center;">No</th>
                             <th>Tanggal</th>
                             <th>Data Nasabah</th>
-                            <th>Cabang & Transaksi</th>
-                            <th>Nominal</th>
+                            <th>Kantor Cabang</th>
+                            <th>Jenis Transaksi</th>
+                            <th>Nominal Transaksi</th>
                             <th>Status</th>
-                            <th style="text-align: center; width: 140px;">Aksi</th>
+                            <th style="text-align: center; width: 75px;">Aksi</th>
                         </tr>
                     </thead>
                     <tbody id="jurnalTbody">
                         @foreach($jurnals as $index => $jurnal)
-                            <tr class="jurnal-row" data-search="{{ strtolower($jurnal->nama_nasabah . ' ' . $jurnal->no_resi . ' ' . $jurnal->no_rekening . ' ' . $jurnal->no_kartu . ' ' . $jurnal->no_tiket . ' ' . ($jurnal->masterCabang->nama_cabang ?? '') . ' ' . ($jurnal->masterTransaksi->jenis_transaksi ?? '') . ' ' . ($jurnal->masterTransaksi->channel ?? '') . ' ' . $jurnal->status . ' ' . $jurnal->terminal_transaksi) }}">
+                            <tr class="jurnal-row" data-search="{{ strtolower($jurnal->nama_nasabah . ' ' . $jurnal->no_resi . ' ' . $jurnal->no_rekening . ' ' . $jurnal->no_kartu . ' ' . $jurnal->no_tiket . ' ' . ($jurnal->masterCabang->nama_cabang ?? '') . ' ' . ($jurnal->masterCabang->kode_cabang ?? '') . ' ' . ($jurnal->masterTransaksi->jenis_transaksi ?? '') . ' ' . ($jurnal->masterTransaksi->channel ?? '') . ' ' . $jurnal->status . ' ' . $jurnal->terminal_transaksi) }}">
                                 <td style="text-align: center; font-weight: 600; color: var(--bs-gray-500);">
                                     {{ ($jurnals->currentPage() - 1) * $jurnals->perPage() + $loop->iteration }}
                                 </td>
@@ -676,23 +685,28 @@
                                     @endif
                                 </td>
                                 <td>
-                                    <div class="highlightable" style="font-weight: 600; color: var(--bs-gray-800);">
-                                        {{ $jurnal->masterTransaksi->jenis_transaksi ?? '-' }}
+                                    <div class="highlightable" style="font-weight: 700; color: var(--bs-gray-800);">
+                                        {{ $jurnal->masterCabang->nama_cabang ?? '-' }}
                                     </div>
-                                    <div style="margin-top: 4px; display: flex; align-items: center; gap: 6px;">
-                                        <span class="badge badge-channel highlightable">
-                                            {{ $jurnal->masterTransaksi->channel ?? 'UMUM' }}
-                                        </span>
-                                        <span class="highlightable" style="font-size: 12px; color: var(--bs-gray-500);">
-                                            {{ $jurnal->masterCabang->nama_cabang ?? '-' }}
-                                        </span>
+                                    <div class="highlightable" style="font-size: 11.5px; color: var(--bs-gray-500); margin-top: 2px;">
+                                        Kode: {{ $jurnal->masterCabang->kode_cabang ?? '-' }}
                                     </div>
                                 </td>
                                 <td>
-                                    <div class="nominal-badge highlightable">
+                                    <div class="highlightable" style="font-weight: 600; color: var(--bs-navy);">
+                                        {{ $jurnal->masterTransaksi->jenis_transaksi ?? '-' }}
+                                    </div>
+                                    <div style="margin-top: 4px;">
+                                        <span class="badge badge-channel highlightable">
+                                            {{ $jurnal->masterTransaksi->channel ?? 'UMUM' }}
+                                        </span>
+                                    </div>
+                                </td>
+                                <td style="white-space: nowrap;">
+                                    <div class="nominal-badge highlightable" style="font-size: 14.5px;">
                                         Rp {{ number_format($jurnal->nominal_transaksi, 0, ',', '.') }}
                                     </div>
-                                    <div style="font-size: 11px; color: var(--bs-gray-500); margin-top: 2px;">
+                                    <div style="font-size: 11.5px; color: var(--bs-gray-500); margin-top: 2px;">
                                         Admin: Rp {{ number_format($jurnal->masterTransaksi->biaya_admin ?? 0, 0, ',', '.') }}
                                     </div>
                                 </td>
@@ -710,31 +724,15 @@
                                         {{ $jurnal->status }}
                                     </span>
                                 </td>
-                                <td style="text-align: center; white-space: nowrap;">
-                                    <div style="display: inline-flex; align-items: center; gap: 6px;">
-                                        <button type="button" class="btn btn-secondary btn-sm" onclick="showDetailModal({{ json_encode($jurnal) }})" title="Lihat Rincian">
-                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                                <circle cx="12" cy="12" r="10"></circle>
-                                                <line x1="12" y1="16" x2="12" y2="12"></line>
-                                                <line x1="12" y1="8" x2="12.01" y2="8"></line>
-                                            </svg>
-                                            <span>Detail</span>
-                                        </button>
-
-                                        <form action="{{ route('jurnal.destroy', $jurnal->id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus data jurnal keluhan nasabah {{ $jurnal->nama_nasabah }} (No. Resi: {{ $jurnal->no_resi }})?')" style="display: inline; margin: 0;">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="btn btn-danger-sm" title="Hapus Data Keluhan">
-                                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                                    <polyline points="3 6 5 6 21 6"></polyline>
-                                                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-                                                    <line x1="10" y1="11" x2="10" y2="17"></line>
-                                                    <line x1="14" y1="11" x2="14" y2="17"></line>
-                                                </svg>
-                                                <span>Hapus</span>
-                                            </button>
-                                        </form>
-                                    </div>
+                                <td style="text-align: center; vertical-align: middle; white-space: nowrap;">
+                                    <button type="button" class="btn btn-secondary btn-sm" onclick="showDetailModal({{ json_encode($jurnal) }})" title="Lihat Rincian & Aksi" style="padding: 6px 12px; font-size: 12.5px; font-weight: 600; display: inline-flex; align-items: center; gap: 5px;">
+                                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <circle cx="12" cy="12" r="10"></circle>
+                                            <line x1="12" y1="16" x2="12" y2="12"></line>
+                                            <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                                        </svg>
+                                        <span>Detail</span>
+                                    </button>
                                 </td>
                             </tr>
                         @endforeach
@@ -911,16 +909,83 @@
             </div>
         </div>
 
-        <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" onclick="window.print()">
+        <div class="modal-footer" style="padding: 16px 24px; border-top: 1px solid var(--bs-gray-200); display: flex; justify-content: flex-end; align-items: center; gap: 10px; background: var(--bs-gray-50);">
+            <a id="modalBtnEdit" href="#" class="btn btn-warning" style="background-color: #f59e0b; color: #ffffff; border: 1px solid #d97706; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; font-weight: 600; padding: 8px 16px;">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <polyline points="6 9 6 2 18 2 18 9"></polyline>
-                    <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
-                    <rect x="6" y="14" width="12" height="8"></rect>
+                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
                 </svg>
-                <span>Cetak Info</span>
+                <span>Edit Data Jurnal</span>
+            </a>
+            <button type="button" id="modalBtnDelete" class="btn" style="background-color: #dc2626; color: #ffffff; border: 1px solid #b91c1c; display: inline-flex; align-items: center; gap: 6px; font-weight: 600; padding: 8px 16px; cursor: pointer;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="3 6 5 6 21 6"></polyline>
+                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                    <line x1="10" y1="11" x2="10" y2="17"></line>
+                    <line x1="14" y1="11" x2="14" y2="17"></line>
+                </svg>
+                <span>Hapus Data</span>
             </button>
-            <button type="button" class="btn btn-primary" onclick="closeDetailModal()">Tutup</button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Konfirmasi Hapus Data Ekstra Aman -->
+<div class="modal-backdrop" id="deleteConfirmModal">
+    <div class="modal-content" style="max-width: 480px; border-top: 4px solid var(--bs-danger);">
+        <div class="modal-header" style="background-color: #fff1f2; border-bottom: 1px solid #fecdd3;">
+            <h3 style="color: #991b1b; display: flex; align-items: center; gap: 8px;">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                    <line x1="12" y1="9" x2="12" y2="13"></line>
+                    <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                </svg>
+                <span>Konfirmasi Penghapusan Data</span>
+            </h3>
+            <button class="btn-close-modal" onclick="closeDeleteConfirmModal()">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+        </div>
+
+        <div class="modal-body" style="padding: 24px;">
+            <p style="font-size: 14.5px; color: var(--bs-gray-800); line-height: 1.5; margin-bottom: 16px;">
+                Apakah Anda <strong>benar-benar yakin</strong> ingin menghapus data jurnal keluhan nasabah ini?
+            </p>
+
+            <div style="background-color: var(--bs-gray-50); border: 1px solid var(--bs-gray-200); border-radius: var(--radius-md); padding: 14px 16px; margin-bottom: 16px; font-size: 13.5px;">
+                <div style="margin-bottom: 6px;">Nama Nasabah: <strong id="deleteNasabahName" style="color: var(--bs-navy);">-</strong></div>
+                <div style="margin-bottom: 6px;">No. Resi / Trace: <strong id="deleteNoResi" style="color: var(--bs-blue);">-</strong></div>
+                <div>Nominal Transaksi: <strong id="deleteNominal" style="color: #047857;">-</strong></div>
+            </div>
+
+            <div style="background-color: #fef2f2; border: 1px dashed #fca5a5; border-radius: var(--radius-md); padding: 10px 12px; font-size: 12.5px; color: #991b1b; display: flex; align-items: flex-start; gap: 8px;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0; margin-top: 1px;">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="8" x2="12" y2="12"></line>
+                    <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                </svg>
+                <span><strong>Perhatian:</strong> Tindakan ini bersifat permanen. Data yang telah dihapus tidak dapat dipulihkan kembali ke dalam sistem.</span>
+            </div>
+        </div>
+
+        <div class="modal-footer" style="background-color: #fafafa; border-top: 1px solid var(--bs-gray-200); padding: 16px 24px; display: flex; justify-content: flex-end; gap: 10px;">
+            <button type="button" class="btn btn-secondary" onclick="closeDeleteConfirmModal()">
+                <span>Batal</span>
+            </button>
+            <form id="deleteFormSubmit" action="" method="POST" style="margin: 0; display: inline;">
+                @csrf
+                @method('DELETE')
+                <button type="submit" class="btn" style="background-color: #dc2626; color: #ffffff; border: 1px solid #b91c1c; font-weight: 700; display: inline-flex; align-items: center; gap: 6px;">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="3 6 5 6 21 6"></polyline>
+                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                    </svg>
+                    <span>Ya, Hapus Data Sekarang</span>
+                </button>
+            </form>
         </div>
     </div>
 </div>
@@ -994,7 +1059,7 @@
             if (!emptyRow) {
                 emptyRow = document.createElement('tr');
                 emptyRow.id = 'localEmptyRow';
-                emptyRow.innerHTML = `<td colspan="7" style="text-align: center; padding: 35px 20px; color: var(--bs-gray-500);">
+                emptyRow.innerHTML = `<td colspan="8" style="text-align: center; padding: 35px 20px; color: var(--bs-gray-500);">
                     <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom: 8px; color: var(--bs-gray-400);">
                         <circle cx="11" cy="11" r="8"></circle>
                         <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
@@ -1100,32 +1165,38 @@
         const filterTglSampai = document.getElementById('filterTglSampai');
 
         // 1. Live Instant Typing on Search Input
-        searchInput.addEventListener('input', function() {
-            const query = this.value;
-            btnClear.style.display = query ? 'flex' : 'none';
-            performClientSideFilter(query);
-            triggerDebouncedServerSearch();
-        });
+        if (searchInput) {
+            searchInput.addEventListener('input', function() {
+                const query = this.value;
+                if (btnClear) btnClear.style.display = query ? 'flex' : 'none';
+                performClientSideFilter(query);
+                triggerDebouncedServerSearch();
+            });
+        }
 
         // 2. Tombol Clear Search (X)
-        btnClear.addEventListener('click', function() {
-            searchInput.value = '';
-            this.style.display = 'none';
-            searchInput.focus();
-            performClientSideFilter('');
-            fetchServerFilteredData();
-        });
+        if (btnClear) {
+            btnClear.addEventListener('click', function() {
+                searchInput.value = '';
+                this.style.display = 'none';
+                searchInput.focus();
+                performClientSideFilter('');
+                fetchServerFilteredData();
+            });
+        }
 
         // 3. Auto Filter on Dropdown & Date Changes
         [filterStatus, filterCabang, filterTglDari, filterTglSampai].forEach(el => {
-            el.addEventListener('change', function() {
-                fetchServerFilteredData();
-            });
+            if (el) {
+                el.addEventListener('change', function() {
+                    fetchServerFilteredData();
+                });
+            }
         });
 
         // 4. Inisialisasi awal highlight jika ada query default saat load
         initOriginalTextCache();
-        if (searchInput.value) {
+        if (searchInput && searchInput.value) {
             applyYellowHighlights(searchInput.value);
         }
 
@@ -1167,6 +1238,21 @@
         
         document.getElementById('modal_keterangan_log').textContent = jurnal.keterangan_log || 'Tidak ada keterangan tambahan.';
 
+        // Set Link Edit di Modal Detail
+        const editBtn = document.getElementById('modalBtnEdit');
+        if (editBtn) {
+            editBtn.href = '/jurnal/' + jurnal.id + '/edit';
+        }
+
+        // Set Handler Hapus di Modal Detail
+        const deleteBtn = document.getElementById('modalBtnDelete');
+        if (deleteBtn) {
+            deleteBtn.onclick = function() {
+                closeDetailModal();
+                openDeleteConfirmModal(jurnal.id, jurnal.nama_nasabah, jurnal.no_resi, 'Rp ' + Number(jurnal.nominal_transaksi).toLocaleString('id-ID'));
+            };
+        }
+
         document.getElementById('detailModal').classList.add('show');
     }
 
@@ -1174,15 +1260,32 @@
         document.getElementById('detailModal').classList.remove('show');
     }
 
-    document.getElementById('detailModal').addEventListener('click', function(e) {
-        if(e.target === this) {
-            closeDetailModal();
-        }
+    // Modal Konfirmasi Hapus Data Ekstra
+    function openDeleteConfirmModal(id, namaNasabah, noResi, nominal) {
+        document.getElementById('deleteNasabahName').textContent = namaNasabah || '-';
+        document.getElementById('deleteNoResi').textContent = noResi || '-';
+        document.getElementById('deleteNominal').textContent = nominal || '-';
+        document.getElementById('deleteFormSubmit').action = '/jurnal/' + id;
+        document.getElementById('deleteConfirmModal').classList.add('show');
+    }
+
+    function closeDeleteConfirmModal() {
+        document.getElementById('deleteConfirmModal').classList.remove('show');
+    }
+
+    // Close on click outside modal
+    document.addEventListener('click', function(e) {
+        const detailModal = document.getElementById('detailModal');
+        const deleteModal = document.getElementById('deleteConfirmModal');
+        if (e.target === detailModal) closeDetailModal();
+        if (e.target === deleteModal) closeDeleteConfirmModal();
     });
 
+    // Close on escape key
     document.addEventListener('keydown', function(e) {
         if(e.key === 'Escape') {
             closeDetailModal();
+            closeDeleteConfirmModal();
         }
     });
 </script>

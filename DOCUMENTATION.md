@@ -5,13 +5,18 @@ Projek **Jurnal_Banksulteng** adalah aplikasi web berbasis **Laravel 12/13** yan
 
 ### Tujuan & Manfaat Utama:
 - **Autentikasi Username Petugas**: Halaman login admin berbasis **Username** murni (`username: admin`) tanpa perlu registrasi mandiri.
+- **Tabel Data Keluhan Ultra Bersih (Single Action "Detail")**:
+  - Kolom **Aksi** di tabel utama hanya memiliki 1 tombol: **Detail**, membuat tata letak tabel sangat bersih, rapi, dan memberikan ruang maksimum bagi kolom data nasabah, cabang, transaksi, dan nominal.
+- **Pusat Aksi Terintegrasi di Modal Rincian**:
+  - Tombol **Edit Data Jurnal** (kuning/amber) dan tombol **Hapus Data** (merah) ditempatkan berdampingan secara proporsional di bagian bawah (*footer*) pop-up modal rincian.
+  - Mengklik tombol Hapus Data pada modal rincian akan membuka dialog konfirmasi hapus data permanen dengan double-confirmation.
+- **Modal Konfirmasi Hapus Data Ekstra Aman**: Dialog konfirmasi interaktif dengan rincian data nasabah dan peringatan permanen sebelum eksekusi penghapusan data.
+- **Standar Seluruh Input Wajib Diisi**: Menjamin kelengkapan data perbankan dengan mewajibkan seluruh 16 field pengaduan jurnal keluhan nasabah.
 - **Pencarian Bebas Huruf Besar/Kecil (*Case-Insensitive*)**: Pencarian instan (*live detect*) otomatis mendeteksi kata kunci baik ditulis huruf besar, kecil, maupun campuran (`budi`, `BUDI`, `Budi`) tanpa peduli kapitalisasi huruf.
 - **Penanda Teks Latar Kuning (*Yellow Highlight*)**: Kata yang cocok otomatis disorot dengan latar belakang kuning stabilo dengan tetap mempertahankan huruf besar/kecil asli data nasabah.
 - **Master Data 41 Kantor Cabang**: Mendukung seluruh jaringan kantor cabang, KCP, dan Bank Lain di seluruh wilayah Sulawesi Tengah & Jakarta.
 - **Pencatatan Terpusat**: Menggantikan pencatatan manual keluhan nasabah ke dalam sistem web yang terstruktur.
 - **Sidebar Navigasi Modern**: Memudahkan transisi antar menu "Input Jurnal Keluhan" dan "Data Keluhan", lengkap dengan info username aktif dan tombol logout.
-- **Pencarian, Rekapitulasi & Hapus Jurnal**: Menampilkan data keluhan tersimpan dengan fitur pencarian multi-field, filter status, filter cabang, filter rentang tanggal, serta tombol **Hapus Data** dengan dialog konfirmasi.
-- **Modal Rincian Interaktif**: Pop-up modal yang menampilkan 16 atribut lengkap dari setiap keluhan beserta opsi cetak ringkasan.
 - **Hard Anti-Duplikat**: Mencegah klaim ganda atas transaksi keluhan nasabah yang sama (berdasarkan kombinasi Nama Nasabah + No. Resi + Tanggal Transaksi).
 - **Otomatisasi Channel & Biaya Admin**: Mempercepat pengisian form dengan mekanisme *auto-fill* berbasis AJAX saat jenis transaksi dipilih.
 - **Keamanan & Kepatuhan**: Menyiapkan rekam jejak audit (*audit trail*) berbasis hash chaining untuk integritas data perbankan.
@@ -24,11 +29,11 @@ Projek **Jurnal_Banksulteng** adalah aplikasi web berbasis **Laravel 12/13** yan
 
 ```text
 [████████████████████] 100% - Fase 1: Basis Data & Master Data (41 Cabang & 33 Transaksi)
-[████████████████████] 100% - Fase 2: Formulir Frontend & Auto-Fill AJAX
+[████████████████████] 100% - Fase 2: Formulir Frontend (Seluruh Input Wajib Diisi) & Auto-Fill AJAX
 [████████████████████] 100% - Fase 3: Backend Controller & Validasi Hard Anti-Duplikat
 [████████████████████] 100% - Fase 4: Seeding 33 Jenis Transaksi & 10 Channel Resmi
 [████████████████████] 100% - Fase 5: Modul Autentikasi Admin (Login Berbasis Username & Logout)
-[████████████████████] 100% - Fase 6: Layout Sidebar & Modul Data Keluhan (Case-Insensitive Live Search, Highlight & Hapus)
+[████████████████████] 100% - Fase 6: Layout Sidebar & Modul Data Keluhan (Aksi Terpusat di Modal Detail, Live Search)
 ```
 
 ### Tabel Status Pengerjaan Modul:
@@ -40,13 +45,14 @@ Projek **Jurnal_Banksulteng** adalah aplikasi web berbasis **Laravel 12/13** yan
 | 3 | **Master Data 41 Cabang** | Input lengkap 41 kantor cabang, KCP, dan Bank Lain resmi Bank Sulteng | **Selesai** | **100%** |
 | 4 | **Autentikasi Username Admin** | Halaman login admin bersih berbasis username, akun default siap pakai, proteksi auth middleware | **Selesai** | **100%** |
 | 5 | **Sidebar Navigasi Bank Sulteng** | Navigasi responsif (Input Jurnal & Data Keluhan), jam real-time WITA, mobile drawer | **Selesai** | **100%** |
-| 6 | **Formulir Keluhan (UI/UX)** | Tampilan web 2-kolom responsif terintegrasi layout induk dengan 16 field input | **Selesai** | **100%** |
-| 7 | **Fitur Auto-Fill AJAX** | Auto-fill biaya admin dan channel saat memilih jenis transaksi | **Selesai** | **100%** |
-| 8 | **Validasi Hard Anti-Duplikat** | Logika penolakan klaim ganda (Nama + No. Resi + Tanggal) | **Selesai** | **100%** |
-| 9 | **Case-Insensitive Live Search & Highlight** | Pencarian instan otomatis tanpa peduli huruf besar/kecil dengan highlight kuning | **Selesai** | **100%** |
-| 10 | **Tabel Data Keluhan & Filter** | Tabel daftar jurnal tersimpan, filter status/cabang/tanggal, multi-term keyword search | **Selesai** | **100%** |
-| 11 | **Fitur Hapus Data Keluhan** | Tombol hapus data per baris di tabel dengan dialog konfirmasi aman | **Selesai** | **100%** |
-| 12 | **Modal Detail Keluhan & Print** | Pop-up modal rincian 16 field lengkap & fungsi cetak ringkasan | **Selesai** | **100%** |
+| 6 | **Formulir Keluhan (Semua Wajib)** | Tampilan web 2-kolom responsif di mana seluruh field berstatus Wajib Diisi (`*`) | **Selesai** | **100%** |
+| 7 | **Fitur Edit Data Jurnal** | Formulir edit data keluhan dengan pre-fill data, auto-fill AJAX, dan tombol edit via modal Detail | **Selesai** | **100%** |
+| 8 | **Modal Konfirmasi Hapus Data** | Dialog konfirmasi interaktif dengan rincian data nasabah sebelum penghapusan permanen | **Selesai** | **100%** |
+| 9 | **Fitur Auto-Fill AJAX** | Auto-fill biaya admin dan channel saat memilih jenis transaksi | **Selesai** | **100%** |
+| 10 | **Validasi Hard Anti-Duplikat** | Logika penolakan klaim ganda (Nama + No. Resi + Tanggal) | **Selesai** | **100%** |
+| 11 | **Case-Insensitive Live Search & Highlight** | Pencarian instan otomatis tanpa peduli huruf besar/kecil dengan highlight kuning | **Selesai** | **100%** |
+| 12 | **Tabel Data Keluhan Ultra Rapi** | Tabel daftar jurnal 8 kolom dengan single button "Detail" di kolom aksi | **Selesai** | **100%** |
+| 13 | **Pusat Aksi di Modal Detail** | Pop-up modal rincian 16 field lengkap dengan tombol Edit Data dan Hapus Data berdampingan | **Selesai** | **100%** |
 
 ---
 
@@ -89,26 +95,26 @@ Projek **Jurnal_Banksulteng** adalah aplikasi web berbasis **Laravel 12/13** yan
 
 ---
 
-## 📝 5. Rincian Field Input Formulir Jurnal
+## 📝 5. Rincian Field Input Formulir Jurnal (Semua Wajib Diisi)
 
 | No | Label Form | Nama Input | Tipe Input | Sifat | Keterangan |
 |:---|:---|:---|:---|:---|:---|
-| 1 | **Nama Nasabah** | `nama_nasabah` | Text | Wajib (`*`) | Nama lengkap nasabah pelapor. |
-| 2 | **No. Resi / Trace Number** | `no_resi` | Text | Wajib (`*`) | Nomor resi/trace transaksi ATM/EDC/Mobile. |
-| 3 | **No. Rekening** | `no_rekening` | Text | Wajib (`*`) | Nomor rekening nasabah yang didebet. |
-| 4 | **Nomor Kartu** | `no_kartu` | Text | Opsional | Nomor kartu ATM/Debit nasabah. |
-| 5 | **Nomor Tiket** | `no_tiket` | Text | Opsional | Nomor tiket referensi customer service. |
-| 6 | **Tanggal Transaksi** | `tgl_transaksi` | Date | Wajib (`*`) | Tanggal saat nasabah melakukan transaksi yang bermasalah. |
-| 7 | **Tanggal Terima** | `tgl_terima` | Date | Wajib (`*`) | Tanggal saat cabang/petugas menerima pengaduan nasabah. |
-| 8 | **Tanggal Selesai** | `tgl_selesai` | Date | Opsional | Tanggal saat keluhan selesai diproses/diselesaikan. |
-| 9 | **Cabang Transaksi / Pelapor** | `master_cabang_id` | Select | Wajib (`*`) | Dropdown 41 daftar kantor cabang Bank Sulteng. |
-| 10 | **Jenis Transaksi** | `master_transaksi_id` | Select | Wajib (`*`) | Dropdown 33 jenis transaksi (memicu auto-fill). |
-| 11 | **Biaya Admin (Otomatis)** | `biaya_admin` | Text (Readonly) | Otomatis | Terisi otomatis dari database via AJAX saat jenis transaksi dipilih. |
-| 12 | **Channel Transaksi (Otomatis)** | `channel` | Text (Readonly) | Otomatis | Terisi otomatis sesuai channel jenis transaksi. |
-| 13 | **Terminal Transaksi** | `terminal_transaksi` | Text | Opsional | ID Mesin ATM / Terminal EDC. |
-| 14 | **Biaya / Nominal Transaksi** | `nominal_transaksi` | Number | Wajib (`*`) | Jumlah nominal uang yang dikeluhkan nasabah (Rp). |
-| 15 | **Status** | `status` | Select | Wajib (`*`) | Pilihan: **Menunggu**, **Success**, **Done**, **Rejected**. |
-| 16 | **Keterangan Log** | `keterangan_log` | Textarea | Opsional | Catatan kronologi keluhan atau detail tindak lanjut. |
+| 1 | **Nama Nasabah** | `nama_nasabah` | Text | **Wajib (`*`)** | Nama lengkap nasabah pelapor. |
+| 2 | **No. Rekening** | `no_rekening` | Text | **Wajib (`*`)** | Nomor rekening nasabah yang didebet. |
+| 3 | **No. Resi / Trace Number** | `no_resi` | Text | **Wajib (`*`)** | Nomor resi/trace transaksi ATM/EDC/Mobile. |
+| 4 | **Nomor Kartu ATM/Debit** | `no_kartu` | Text | **Wajib (`*`)** | Nomor kartu ATM/Debit nasabah. |
+| 5 | **Nomor Tiket CS** | `no_tiket` | Text | **Wajib (`*`)** | Nomor tiket referensi customer service. |
+| 6 | **Cabang Transaksi / Pelapor** | `master_cabang_id` | Select | **Wajib (`*`)** | Dropdown 41 daftar kantor cabang Bank Sulteng. |
+| 7 | **Jenis Transaksi** | `master_transaksi_id` | Select | **Wajib (`*`)** | Dropdown 33 jenis transaksi (memicu auto-fill). |
+| 8 | **Channel Transaksi (Otomatis)** | `channel` | Text (Readonly) | Otomatis | Terisi otomatis sesuai channel jenis transaksi. |
+| 9 | **Biaya Admin (Otomatis)** | `biaya_admin` | Text (Readonly) | Otomatis | Terisi otomatis dari database via AJAX saat jenis transaksi dipilih. |
+| 10 | **Biaya / Nominal Transaksi** | `nominal_transaksi` | Number | **Wajib (`*`)** | Jumlah nominal uang yang dikeluhkan nasabah (Rp). |
+| 11 | **Terminal Transaksi / Mesin** | `terminal_transaksi` | Text | **Wajib (`*`)** | ID Mesin ATM / Terminal EDC. |
+| 12 | **Tanggal Transaksi Bermasalah** | `tgl_transaksi` | Date | **Wajib (`*`)** | Tanggal saat nasabah melakukan transaksi yang bermasalah. |
+| 13 | **Tanggal Terima Keluhan** | `tgl_terima` | Date | **Wajib (`*`)** | Tanggal saat cabang/petugas menerima pengaduan nasabah. |
+| 14 | **Tanggal Selesai Penanganan** | `tgl_selesai` | Date | **Wajib (`*`)** | Tanggal saat keluhan selesai diproses/diselesaikan. |
+| 15 | **Status Keluhan** | `status` | Select | **Wajib (`*`)** | Pilihan: **Menunggu**, **Success**, **Done**, **Rejected**. |
+| 16 | **Keterangan Log / Kronologi** | `keterangan_log` | Textarea | **Wajib (`*`)** | Catatan kronologi keluhan atau detail tindak lanjut. |
 
 ---
 
@@ -120,7 +126,7 @@ Jurnal_Banksulteng/
 │   ├── Http/Controllers/
 │   │   ├── AuthController.php          <-- Logika Login berbasis username, Logout, dan autentikasi admin
 │   │   ├── Controller.php            <-- Base Controller Laravel
-│   │   └── JurnalController.php        <-- Simpan, Pencarian Case-Insensitive, Hapus jurnal & API AJAX
+│   │   └── JurnalController.php        <-- Simpan, Edit, Update, Hapus, Live Search & API AJAX
 │   └── Models/
 │       ├── AuditTrail.php              <-- Model Audit Trail (hash chaining)
 │       ├── Jurnal.php                  <-- Model Jurnal Keluhan (mass-assignment protected)
@@ -139,10 +145,11 @@ Jurnal_Banksulteng/
 │       │   └── login.blade.php         <-- Tampilan Login Bersih (Username & Eye Icon)
 │       ├── layouts/
 │       │   └── app.blade.php           <-- Master Layout Blade (Sidebar & Logout Bank Sulteng)
-│       ├── jurnal_form.blade.php       <-- Tampilan Form Input Jurnal (Grid responsif + AJAX)
-│       └── jurnal_data.blade.php       <-- Tampilan Data Keluhan (Case-Insensitive Live Search, Highlights & Modal)
+│       ├── jurnal_form.blade.php       <-- Tampilan Form Input Jurnal (Semua Input Wajib Diisi *)
+│       ├── jurnal_edit.blade.php       <-- Tampilan Form Edit Jurnal Keluhan (Pre-filled + AJAX)
+│       └── jurnal_data.blade.php       <-- Tampilan Data Keluhan (Tabel Single Button Detail, Modal Edit & Hapus)
 ├── routes/
-│   └── web.php                         <-- Rute Web: '/login', '/logout', '/', '/jurnal/data', DELETE '/jurnal/{id}', API endpoints
+│   └── web.php                         <-- Rute Web: '/login', '/logout', '/', '/jurnal/data', GET/PUT '/jurnal/{id}/edit', DELETE '/jurnal/{id}'
 ├── .env                                <-- Konfigurasi Database (MySQL) & App Key
 └── DOCUMENTATION.md                    <-- Dokumen Panduan & Catatan Projek Ini
 ```

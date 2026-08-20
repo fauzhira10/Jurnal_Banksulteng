@@ -24,6 +24,10 @@ Route::middleware('auth')->group(function () {
     // Route Simpan Data Jurnal Keluhan
     Route::post('/jurnal/simpan', [JurnalController::class, 'store'])->name('jurnal.store');
 
+    // Route Edit & Update Data Jurnal Keluhan
+    Route::get('/jurnal/{id}/edit', [JurnalController::class, 'edit'])->name('jurnal.edit');
+    Route::put('/jurnal/{id}', [JurnalController::class, 'update'])->name('jurnal.update');
+
     // Route Hapus Data Jurnal Keluhan
     Route::delete('/jurnal/{id}', [JurnalController::class, 'destroy'])->name('jurnal.destroy');
 
