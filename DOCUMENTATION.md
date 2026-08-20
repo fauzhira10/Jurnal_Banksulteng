@@ -1,10 +1,17 @@
 # Dokumentasi Projek: Sistem Jurnal Keluhan Nasabah (Bank Sulteng)
 
 ## 📌 1. Deskripsi Projek
-Projek **Jurnal_Banksulteng** adalah aplikasi web berbasis **Laravel 12** yang dirancang khusus untuk memfasilitasi pencatatan, validasi, dan pengelolaan **Jurnal Keluhan Transaksi Nasabah** di lingkungan Bank Sulteng.
+Projek **Jurnal_Banksulteng** adalah aplikasi web berbasis **Laravel 12/13** yang dirancang khusus untuk memfasilitasi pencatatan, validasi, monitoring, dan pengelolaan **Jurnal Keluhan Transaksi Nasabah** di lingkungan Bank Sulteng.
 
 ### Tujuan & Manfaat Utama:
+- **Autentikasi Username Petugas**: Halaman login admin berbasis **Username** murni (`username: admin`) tanpa perlu registrasi mandiri.
+- **Pencarian Bebas Huruf Besar/Kecil (*Case-Insensitive*)**: Pencarian instan (*live detect*) otomatis mendeteksi kata kunci baik ditulis huruf besar, kecil, maupun campuran (`budi`, `BUDI`, `Budi`) tanpa peduli kapitalisasi huruf.
+- **Penanda Teks Latar Kuning (*Yellow Highlight*)**: Kata yang cocok otomatis disorot dengan latar belakang kuning stabilo dengan tetap mempertahankan huruf besar/kecil asli data nasabah.
+- **Master Data 41 Kantor Cabang**: Mendukung seluruh jaringan kantor cabang, KCP, dan Bank Lain di seluruh wilayah Sulawesi Tengah & Jakarta.
 - **Pencatatan Terpusat**: Menggantikan pencatatan manual keluhan nasabah ke dalam sistem web yang terstruktur.
+- **Sidebar Navigasi Modern**: Memudahkan transisi antar menu "Input Jurnal Keluhan" dan "Data Keluhan", lengkap dengan info username aktif dan tombol logout.
+- **Pencarian, Rekapitulasi & Hapus Jurnal**: Menampilkan data keluhan tersimpan dengan fitur pencarian multi-field, filter status, filter cabang, filter rentang tanggal, serta tombol **Hapus Data** dengan dialog konfirmasi.
+- **Modal Rincian Interaktif**: Pop-up modal yang menampilkan 16 atribut lengkap dari setiap keluhan beserta opsi cetak ringkasan.
 - **Hard Anti-Duplikat**: Mencegah klaim ganda atas transaksi keluhan nasabah yang sama (berdasarkan kombinasi Nama Nasabah + No. Resi + Tanggal Transaksi).
 - **Otomatisasi Channel & Biaya Admin**: Mempercepat pengisian form dengan mekanisme *auto-fill* berbasis AJAX saat jenis transaksi dipilih.
 - **Keamanan & Kepatuhan**: Menyiapkan rekam jejak audit (*audit trail*) berbasis hash chaining untuk integritas data perbankan.
@@ -16,54 +23,73 @@ Projek **Jurnal_Banksulteng** adalah aplikasi web berbasis **Laravel 12** yang d
 ### Ringkasan Pencapaian (Milestone Progress)
 
 ```text
-[████████████████████] 100% - Fase 1: Basis Data & Master Data
+[████████████████████] 100% - Fase 1: Basis Data & Master Data (41 Cabang & 33 Transaksi)
 [████████████████████] 100% - Fase 2: Formulir Frontend & Auto-Fill AJAX
 [████████████████████] 100% - Fase 3: Backend Controller & Validasi Hard Anti-Duplikat
 [████████████████████] 100% - Fase 4: Seeding 33 Jenis Transaksi & 10 Channel Resmi
-[████████████████████] 100% - Fase 5: Modul Autentikasi & Skema Audit Trail
-[░░░░░░░░░░░░░░░░░░░░]   0% - Fase 6 (Rencana): Dashboard Rekapitulasi & Export Laporan
+[████████████████████] 100% - Fase 5: Modul Autentikasi Admin (Login Berbasis Username & Logout)
+[████████████████████] 100% - Fase 6: Layout Sidebar & Modul Data Keluhan (Case-Insensitive Live Search, Highlight & Hapus)
 ```
 
 ### Tabel Status Pengerjaan Modul:
 
 | No | Modul / Fitur | Target Pekerjaan | Status | Progres |
 |:---|:---|:---|:---:|:---:|
-| 1 | **Skema Database & Migrasi** | Tabel `users`, `master_cabangs`, `master_transaksis`, `jurnals`, `audit_trails` | **Selesai** | **100%** |
+| 1 | **Skema Database & Migrasi** | Tabel `users` (+ kolom `username`), `master_cabangs`, `master_transaksis`, `jurnals`, `audit_trails` | **Selesai** | **100%** |
 | 2 | **Master Data Transaksi** | 33 jenis transaksi dan 10 channel resmi diinput ke database | **Selesai** | **100%** |
-| 3 | **Master Data Cabang** | Input data awal kantor cabang (KCP Tinombo, KCP Toili, Cabang Buol) | **Selesai** | **100%** |
-| 4 | **Formulir Keluhan (UI/UX)** | Tampilan web 2-kolom responsif dengan 11 field input lengkap | **Selesai** | **100%** |
-| 5 | **Fitur Auto-Fill AJAX** | Auto-fill biaya admin dan channel saat memilih jenis transaksi | **Selesai** | **100%** |
-| 6 | **Validasi Hard Anti-Duplikat** | Logika penolakan klaim ganda (Nama + No. Resi + Tanggal) | **Selesai** | **100%** |
-| 7 | **Model Eloquent & Relasi** | Mass assignment `$guarded = ['id']` dan fungsi relasi antar tabel | **Selesai** | **100%** |
-| 8 | **Autentikasi Pengguna** | Controller Login & Logout petugas perbankan | **Selesai** | **100%** |
-| 9 | **Tabel Daftar Keluhan & Export** | Menampilkan daftar seluruh jurnal, filter status, export Excel/PDF | *Rencana Lanjutan* | *0%* |
+| 3 | **Master Data 41 Cabang** | Input lengkap 41 kantor cabang, KCP, dan Bank Lain resmi Bank Sulteng | **Selesai** | **100%** |
+| 4 | **Autentikasi Username Admin** | Halaman login admin bersih berbasis username, akun default siap pakai, proteksi auth middleware | **Selesai** | **100%** |
+| 5 | **Sidebar Navigasi Bank Sulteng** | Navigasi responsif (Input Jurnal & Data Keluhan), jam real-time WITA, mobile drawer | **Selesai** | **100%** |
+| 6 | **Formulir Keluhan (UI/UX)** | Tampilan web 2-kolom responsif terintegrasi layout induk dengan 16 field input | **Selesai** | **100%** |
+| 7 | **Fitur Auto-Fill AJAX** | Auto-fill biaya admin dan channel saat memilih jenis transaksi | **Selesai** | **100%** |
+| 8 | **Validasi Hard Anti-Duplikat** | Logika penolakan klaim ganda (Nama + No. Resi + Tanggal) | **Selesai** | **100%** |
+| 9 | **Case-Insensitive Live Search & Highlight** | Pencarian instan otomatis tanpa peduli huruf besar/kecil dengan highlight kuning | **Selesai** | **100%** |
+| 10 | **Tabel Data Keluhan & Filter** | Tabel daftar jurnal tersimpan, filter status/cabang/tanggal, multi-term keyword search | **Selesai** | **100%** |
+| 11 | **Fitur Hapus Data Keluhan** | Tombol hapus data per baris di tabel dengan dialog konfirmasi aman | **Selesai** | **100%** |
+| 12 | **Modal Detail Keluhan & Print** | Pop-up modal rincian 16 field lengkap & fungsi cetak ringkasan | **Selesai** | **100%** |
 
 ---
 
-## 🕒 3. Log Riwayat Pengerjaan (Activity Changelog)
+## 🔑 3. Kredensial Administrator
 
-* **v1.2 (Pembaruan Terkini)**:
-  - ✅ Memasukkan **33 Jenis Transaksi** resmi Bank Sulteng ke dalam seeder database.
-  - ✅ Menstandarkan **10 Master Channel**: `ATM LOKAL`, `ATM BERSAMA`, `ATM LINK`, `FINNET`, `SMS BANKING`, `MOBILE BANKING`, `DEBIT`, `EDC BANK LAIN`, `LAKU PANDAI`, dan `CCTV`.
-  - ✅ Mengubah logika seeder menjadi `updateOrInsert` agar idempoten dan aman dieksekusi berulang kali.
-  - ✅ Mengeksekusi seeder ke database (33 data terverifikasi aktif di MySQL).
-
-* **v1.1**:
-  - ✅ Menambahkan seluruh field input yang diminta: Tanggal Terima (`tgl_terima`), Tanggal Selesai (`tgl_selesai`), Nomor Tiket (`no_tiket`), Nomor Kartu (`no_kartu`), Terminal Transaksi (`terminal_transaksi`), Keterangan Log (`keterangan_log`), dan Status (`status`: Menunggu, Success, Done, Rejected).
-  - ✅ Memperbarui layout form menjadi grid 2-kolom responsif modern dengan pesan error/sukses terintegrasi.
-  - ✅ Memperbarui validasi backend pada `JurnalController::store()`.
-  - ✅ Menambahkan `$guarded = ['id']` dan relasi Eloquent pada `Jurnal.php`.
-
-* **v1.0 (Inisiasi Awal)**:
-  - ✅ Struktur pondasi Laravel 12.
-  - ✅ Skema awal migrasi database tabel master, jurnal, dan audit trail.
-  - ✅ Controller autentikasi dasar (`AuthController.php`).
+| Parameter | Kredensial |
+|:---|:---|
+| **URL Login** | `http://127.0.0.1:8000/login` |
+| **Username** | `admin` |
+| **Password** | `admin123` |
+| **Hak Akses** | Administrator Penuh (Kelola Jurnal Keluhan & Data Rekapitulasi) |
 
 ---
 
-## 📝 4. Rincian Field Input Formulir Jurnal
+## 🏛️ 4. Master Data 41 Kantor Cabang & KCP Bank Sulteng
 
-Tampilan formulir pada [jurnal_form.blade.php](file:///c:/bank-sulteng/projek/projek1/Jurnal_Banksulteng/resources/views/jurnal_form.blade.php) mencakup field-field berikut:
+| No | Kode | Nama Kantor Cabang / KCP | No | Kode | Nama Kantor Cabang / KCP |
+|:---|:---:|:---|:---|:---:|:---|
+| 1 | `000` | BANK LAIN | 22 | `302` | KCP WAKAI |
+| 2 | `001` | CABANG UTAMA | 23 | `303` | KCP TENTENA |
+| 3 | `002` | CABANG TOLI TOLI | 24 | `304` | KCP PENDOLO |
+| 4 | `003` | CABANG POSO | 25 | `305` | KCP NAPU |
+| 5 | `004` | CABANG LUWUK | 26 | `401` | CABANG KOLONODALE |
+| 6 | `005` | CABANG BUNGKU | 27 | `402` | CABANG BANGGAI LAUT |
+| 7 | `006` | CABANG SALAKAN | 28 | `403` | KCP BETELEME |
+| 8 | `007` | CABANG SIGI | 29 | `404` | KCP BATUI |
+| 9 | `008` | CABANG PALU BARAT | 30 | `405` | KCP TOILI |
+| 10 | `009` | CABANG JAKARTA | 31 | `411` | KCP MAMOSALATO |
+| 11 | `101` | CABANG DONGGALA | 32 | `412` | KCP TOMATA |
+| 12 | `102` | CABANG PARIGI | 33 | `413` | KCP BATURUBE |
+| 13 | `103` | KCP LAMBUNU | 34 | `501` | KCP BAHOMOTEFE |
+| 14 | `104` | KCP LABEAN | 35 | `502` | KCP BAHODOPI |
+| 15 | `105` | KCP TOLAI | 36 | `701` | KCP KULAWI |
+| 16 | `106` | KCP TINOMBO | 37 | `801` | KCP TAWAELI |
+| 17 | `107` | KCP TINOMBALA | 38 | `406` | KCP MASAMA |
+| 18 | `201` | CABANG BUOL | 39 | `306` | KCP TAMBARANA |
+| 19 | `202` | KCP SONI | 40 | `407` | KCP BUNTA |
+| 20 | `211` | KCP PALELEH | 41 | `108` | KCP KOTARAYA |
+| 21 | `301` | CABANG AMPANA | | | |
+
+---
+
+## 📝 5. Rincian Field Input Formulir Jurnal
 
 | No | Label Form | Nama Input | Tipe Input | Sifat | Keterangan |
 |:---|:---|:---|:---|:---|:---|
@@ -75,7 +101,7 @@ Tampilan formulir pada [jurnal_form.blade.php](file:///c:/bank-sulteng/projek/pr
 | 6 | **Tanggal Transaksi** | `tgl_transaksi` | Date | Wajib (`*`) | Tanggal saat nasabah melakukan transaksi yang bermasalah. |
 | 7 | **Tanggal Terima** | `tgl_terima` | Date | Wajib (`*`) | Tanggal saat cabang/petugas menerima pengaduan nasabah. |
 | 8 | **Tanggal Selesai** | `tgl_selesai` | Date | Opsional | Tanggal saat keluhan selesai diproses/diselesaikan. |
-| 9 | **Cabang Transaksi / Pelapor** | `master_cabang_id` | Select | Wajib (`*`) | Dropdown daftar kantor cabang Bank Sulteng. |
+| 9 | **Cabang Transaksi / Pelapor** | `master_cabang_id` | Select | Wajib (`*`) | Dropdown 41 daftar kantor cabang Bank Sulteng. |
 | 10 | **Jenis Transaksi** | `master_transaksi_id` | Select | Wajib (`*`) | Dropdown 33 jenis transaksi (memicu auto-fill). |
 | 11 | **Biaya Admin (Otomatis)** | `biaya_admin` | Text (Readonly) | Otomatis | Terisi otomatis dari database via AJAX saat jenis transaksi dipilih. |
 | 12 | **Channel Transaksi (Otomatis)** | `channel` | Text (Readonly) | Otomatis | Terisi otomatis sesuai channel jenis transaksi. |
@@ -86,108 +112,56 @@ Tampilan formulir pada [jurnal_form.blade.php](file:///c:/bank-sulteng/projek/pr
 
 ---
 
-## 🏛️ 5. Master Data 10 Channel & 33 Jenis Transaksi
-
-### Daftar 10 Master Channel Resmi:
-1. `ATM LOKAL`
-2. `ATM BERSAMA`
-3. `ATM LINK`
-4. `FINNET`
-5. `SMS BANKING`
-6. `MOBILE BANKING`
-7. `DEBIT`
-8. `EDC BANK LAIN`
-9. `LAKU PANDAI`
-10. `CCTV`
-
-### Pemetaan 33 Jenis Transaksi ke Channel:
-| No | Jenis Transaksi | Channel |
-|:---|:---|:---|
-| 1 | `ATM_TARIK TUNAI ATM BANK SULTENG` | **ATM LOKAL** |
-| 2 | `ATM_TARIK TUNAI DI BANK LAIN` | **ATM BERSAMA** |
-| 3 | `CRM_SETOR TUNAI` | **ATM LOKAL** |
-| 4 | `ATM_TRANSFER MESIN BANK SULTENG` | **ATM LOKAL** |
-| 5 | `ATM_TRANSFER MESIN BANK LAIN` | **ATM BERSAMA** |
-| 6 | `ATM_TELKOM` | **FINNET** |
-| 7 | `ATM_PULSA TSEL` | **FINNET** |
-| 8 | `ATM_PULSA XL` | **FINNET** |
-| 9 | `ATM_PLN PREPAID` | **FINNET** |
-| 10 | `ATM_DANA` | **FINNET** |
-| 11 | `ATM_GOPAY` | **FINNET** |
-| 12 | `ATM_PEMBAYARAN HALO` | **FINNET** |
-| 13 | `ATM_BPJS` | **FINNET** |
-| 14 | `SMS BANKING (TRANSFER INTERNAL)` | **SMS BANKING** |
-| 15 | `SMS BANKING (TRANSFER KE BANK LAIN)` | **SMS BANKING** |
-| 16 | `SMS BANKING (PULSA TSEL)` | **SMS BANKING** |
-| 17 | `SMS BANKING (PLN PREPAID)` | **SMS BANKING** |
-| 18 | `MBANKING_TRANSFER` | **MOBILE BANKING** |
-| 19 | `MBANKING_TELKOM` | **MOBILE BANKING** |
-| 20 | `MBANKING_PULSA TSEL` | **MOBILE BANKING** |
-| 21 | `MBANKING_PULSA XL` | **MOBILE BANKING** |
-| 22 | `MBANKING_PLN PREPAID` | **MOBILE BANKING** |
-| 23 | `MBANKING_DANA` | **MOBILE BANKING** |
-| 24 | `MBANKING_PEMBAYARAN` | **MOBILE BANKING** |
-| 25 | `MBANKING_PEMBAYARAN HALO` | **MOBILE BANKING** |
-| 26 | `MBANKING_BPJS` | **MOBILE BANKING** |
-| 27 | `EDC` | **DEBIT** |
-| 28 | `EDC BANK LAIN` | **EDC BANK LAIN** |
-| 29 | `QRIS` | **MOBILE BANKING** |
-| 30 | `LAKU PANDAI` | **LAKU PANDAI** |
-| 31 | `LAINNYA_PERMINTAAN CCTV` | **CCTV** |
-| 32 | `PEMBAYARAN` | **FINNET** |
-| 33 | `PEMBELIAN` | **FINNET** |
-
----
-
 ## 📂 6. Struktur Berkas & Kode Program
 
 ```text
 Jurnal_Banksulteng/
 ├── app/
 │   ├── Http/Controllers/
-│   │   ├── AuthController.php          <-- Logika Login & Logout petugas
+│   │   ├── AuthController.php          <-- Logika Login berbasis username, Logout, dan autentikasi admin
 │   │   ├── Controller.php            <-- Base Controller Laravel
-│   │   └── JurnalController.php        <-- Simpan Jurnal (Validasi anti-duplikat) & API auto-fill
+│   │   └── JurnalController.php        <-- Simpan, Pencarian Case-Insensitive, Hapus jurnal & API AJAX
 │   └── Models/
 │       ├── AuditTrail.php              <-- Model Audit Trail (hash chaining)
 │       ├── Jurnal.php                  <-- Model Jurnal Keluhan (mass-assignment protected)
-│       ├── MasterCabang.php            <-- Model Master Kantor Cabang
+│       ├── MasterCabang.php            <-- Model Master Kantor Cabang (41 Cabang & KCP)
 │       ├── MasterTransaksi.php         <-- Model Master Jenis Transaksi & Channel
-│       └── User.php                    <-- Model Pengguna / Petugas
+│       └── User.php                    <-- Model Pengguna / Petugas (fillable: name, username, email, password)
 ├── database/
-│   ├── migrations/                     <-- Berkas Migrasi Skema Database
-│   │   ├── 2026_08_14_024901_create_master_cabangs_table.php
-│   │   ├── 2026_08_14_024911_create_master_transaksis_table.php
-│   │   ├── 2026_08_14_024926_create_jurnals_table.php
-│   │   └── 2026_08_14_024938_create_audit_trails_table.php
+│   ├── migrations/                     <-- Berkas Migrasi Skema Database (+ username)
 │   └── seeders/
-│       ├── DatabaseSeeder.php          <-- Seeder Utama pemanggil MasterSeeder
-│       └── MasterSeeder.php            <-- Seeder 33 Jenis Transaksi & Data Cabang
+│       ├── DatabaseSeeder.php          <-- Seeder Utama pemanggil MasterSeeder & UserSeeder
+│       ├── MasterSeeder.php            <-- Seeder 33 Jenis Transaksi & 41 Data Cabang
+│       └── UserSeeder.php              <-- Seeder Akun Admin Default (username: admin, pass: admin123)
 ├── resources/
 │   └── views/
-│       └── jurnal_form.blade.php       <-- Tampilan Form Jurnal (Grid responsif + AJAX)
+│       ├── auth/
+│       │   └── login.blade.php         <-- Tampilan Login Bersih (Username & Eye Icon)
+│       ├── layouts/
+│       │   └── app.blade.php           <-- Master Layout Blade (Sidebar & Logout Bank Sulteng)
+│       ├── jurnal_form.blade.php       <-- Tampilan Form Input Jurnal (Grid responsif + AJAX)
+│       └── jurnal_data.blade.php       <-- Tampilan Data Keluhan (Case-Insensitive Live Search, Highlights & Modal)
 ├── routes/
-│   └── web.php                         <-- Rute Web: '/', '/jurnal/simpan', '/api/transaksi/{id}'
+│   └── web.php                         <-- Rute Web: '/login', '/logout', '/', '/jurnal/data', DELETE '/jurnal/{id}', API endpoints
 ├── .env                                <-- Konfigurasi Database (MySQL) & App Key
 └── DOCUMENTATION.md                    <-- Dokumen Panduan & Catatan Projek Ini
 ```
 
 ---
 
-## 🚀 7. Panduan Menjalankan & Memperbarui Sistem
+## 🚀 7. Panduan Menjalankan Sistem
 
 1. Masuk ke direktori projek:
    ```powershell
    cd C:\bank-sulteng\projek\projek1\Jurnal_Banksulteng
    ```
-2. Menjalankan migrasi & data master:
-   ```powershell
-   php artisan db:seed
-   ```
-   *(Atau `php artisan migrate:fresh --seed` jika ingin membuat ulang seluruh database dari awal)*
-
-3. Menjalankan server lokal:
+2. Menjalankan server lokal:
    ```powershell
    php artisan serve
    ```
-4. Akses sistem melalui browser di: **`http://127.0.0.1:8000`**
+   *(Atau menggunakan path PHP Laragon: `& "C:\laragon\bin\php\php-8.3.16-Win32-vs16-x64\php.exe" artisan serve`)*
+
+3. Buka browser di: **`http://127.0.0.1:8000/login`**
+4. Masuk dengan kredensial:
+   - **Username**: **`admin`**
+   - **Password**: **`admin123`**

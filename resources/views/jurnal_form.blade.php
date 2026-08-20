@@ -1,279 +1,324 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Form Jurnal Keluhan Nasabah - Bank Sulteng</title>
-    <style>
-        * { box-sizing: border-box; }
-        body { 
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-            margin: 0; 
-            padding: 30px 15px; 
-            background-color: #f0f4f8; 
-            color: #333;
-        }
-        .container { 
-            max-width: 850px; 
-            margin: 0 auto; 
-            background: #ffffff; 
-            padding: 30px; 
-            border-radius: 10px; 
-            box-shadow: 0 4px 15px rgba(0,0,0,0.08); 
-        }
-        .header { 
-            border-bottom: 2px solid #0056b3; 
-            padding-bottom: 12px; 
-            margin-bottom: 25px; 
-        }
-        .header h2 { 
-            margin: 0; 
-            color: #0056b3; 
-            font-size: 24px;
-        }
-        .header p { 
-            margin: 5px 0 0; 
-            color: #666; 
-            font-size: 14px; 
-        }
-        .form-grid { 
-            display: grid; 
-            grid-template-columns: 1fr 1fr; 
-            gap: 18px; 
-        }
-        .full-width { 
-            grid-column: span 2; 
-        }
-        .form-group { 
-            display: flex; 
-            flex-direction: column; 
-        }
-        label { 
-            font-weight: 600; 
-            margin-bottom: 6px; 
-            font-size: 13px; 
-            color: #444; 
-        }
-        label .required { 
-            color: #dc3545; 
-        }
-        input, select, textarea { 
-            width: 100%; 
-            padding: 9px 12px; 
-            border: 1px solid #ced4da; 
-            border-radius: 6px; 
-            font-size: 14px; 
-            transition: border-color 0.2s; 
-        }
-        input:focus, select:focus, textarea:focus { 
-            border-color: #0056b3; 
-            outline: none; 
-            box-shadow: 0 0 0 3px rgba(0, 86, 179, 0.15); 
-        }
-        input[readonly] { 
-            background-color: #e9ecef; 
-            cursor: not-allowed; 
-        }
-        textarea { 
-            resize: vertical; 
-            min-height: 80px; 
-        }
-        .btn-submit { 
-            background-color: #0056b3; 
-            color: white; 
-            padding: 12px 20px; 
-            border: none; 
-            border-radius: 6px; 
-            cursor: pointer; 
-            font-size: 16px; 
-            font-weight: 600; 
-            width: 100%; 
-            transition: background-color 0.2s; 
-            margin-top: 10px; 
-        }
-        .btn-submit:hover { 
-            background-color: #004085; 
-        }
-        .alert { 
-            padding: 12px 16px; 
-            margin-bottom: 20px; 
-            border-radius: 6px; 
-            font-size: 14px; 
-        }
-        .alert-success { 
-            background-color: #d4edda; 
-            color: #155724; 
-            border: 1px solid #c3e6cb; 
-        }
-        .alert-danger { 
-            background-color: #f8d7da; 
-            color: #721c24; 
-            border: 1px solid #f5c6cb; 
-        }
-        .alert-danger ul { 
-            margin: 0; 
-            padding-left: 20px; 
-        }
-        @media (max-width: 650px) {
-            .form-grid { 
-                grid-template-columns: 1fr; 
-            }
-            .full-width { 
-                grid-column: span 1; 
-            }
-        }
-    </style>
-</head>
-<body>
+@extends('layouts.app')
 
-<div class="container">
-    <div class="header">
-        <h2>Form Jurnal Keluhan Nasabah</h2>
-        <p>Bank Sulteng - Pencatatan dan Manajemen Keluhan Transaksi</p>
+@section('title', 'Form Jurnal Keluhan')
+@section('page_title', 'Input Jurnal Keluhan Nasabah')
+@section('page_subtitle', 'Pencatatan, validasi anti-duplikat, dan penanganan keluhan transaksi nasabah Bank Sulteng')
+
+@section('topbar_action')
+    <a href="{{ route('jurnal.index') }}" class="btn btn-secondary btn-sm" style="height: 38px; padding: 0 14px;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+            <line x1="3" y1="9" x2="21" y2="9"></line>
+            <line x1="9" y1="21" x2="9" y2="9"></line>
+        </svg>
+        <span>Lihat Data Keluhan</span>
+    </a>
+@endsection
+
+@push('styles')
+<style>
+    .form-container {
+        max-width: 950px;
+        margin: 0 auto;
+    }
+
+    .form-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+    }
+
+    .full-width {
+        grid-column: span 2;
+    }
+
+    .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+
+    .form-group label {
+        font-weight: 600;
+        font-size: 13px;
+        color: var(--bs-gray-700);
+        display: flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    .form-group label .required {
+        color: var(--bs-danger);
+    }
+
+    .form-group input, 
+    .form-group select, 
+    .form-group textarea {
+        width: 100%;
+        padding: 10px 14px;
+        border: 1px solid var(--bs-gray-300);
+        border-radius: var(--radius-md);
+        font-size: 14px;
+        background-color: #ffffff;
+        color: var(--bs-gray-800);
+        transition: all 0.2s ease;
+        font-family: inherit;
+    }
+
+    .form-group input:focus, 
+    .form-group select:focus, 
+    .form-group textarea:focus {
+        border-color: var(--bs-blue);
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.15);
+    }
+
+    .form-group input[readonly] {
+        background-color: #f8fafc;
+        border-color: var(--bs-gray-200);
+        color: var(--bs-gray-600);
+        cursor: not-allowed;
+        font-weight: 600;
+    }
+
+    .form-group textarea {
+        resize: vertical;
+        min-height: 90px;
+    }
+
+    .form-actions {
+        margin-top: 24px;
+        padding-top: 20px;
+        border-top: 1px solid var(--bs-gray-200);
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 12px;
+    }
+
+    .section-divider {
+        grid-column: span 2;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin: 10px 0 4px;
+        color: var(--bs-blue);
+        font-size: 13px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .section-divider::after {
+        content: '';
+        flex-grow: 1;
+        height: 1px;
+        background: var(--bs-gray-200);
+    }
+
+    @media (max-width: 768px) {
+        .form-grid {
+            grid-template-columns: 1fr;
+        }
+        .full-width, .section-divider {
+            grid-column: span 1;
+        }
+    }
+</style>
+@endpush
+
+@section('content')
+<div class="form-container">
+    <div class="card">
+        <div class="card-header">
+            <div class="card-title">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                    <polyline points="14 2 14 8 20 8"></polyline>
+                    <line x1="12" y1="18" x2="12" y2="12"></line>
+                    <line x1="9" y1="15" x2="15" y2="15"></line>
+                </svg>
+                <span>Formulir Pengaduan & Jurnal Transaksi</span>
+            </div>
+            <span style="font-size: 12px; color: var(--bs-gray-500);">
+                Tanda (<span style="color: var(--bs-danger); font-weight: bold;">*</span>) Wajib Diisi
+            </span>
+        </div>
+
+        <div class="card-body">
+            <form action="{{ route('jurnal.store') }}" method="POST">
+                @csrf
+
+                <div class="form-grid">
+                    <!-- SECTION 1: IDENTITAS NASABAH -->
+                    <div class="section-divider">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="12" cy="7" r="4"></circle>
+                        </svg>
+                        <span>1. Identitas Nasabah & Rekening</span>
+                    </div>
+
+                    <!-- Nama Nasabah -->
+                    <div class="form-group">
+                        <label>Nama Nasabah <span class="required">*</span></label>
+                        <input type="text" name="nama_nasabah" value="{{ old('nama_nasabah') }}" required placeholder="Contoh: Budi Santoso">
+                    </div>
+
+                    <!-- No. Rekening -->
+                    <div class="form-group">
+                        <label>No. Rekening <span class="required">*</span></label>
+                        <input type="text" name="no_rekening" value="{{ old('no_rekening') }}" required placeholder="Contoh: 00900000">
+                    </div>
+
+                    <!-- No. Resi / Trace Number -->
+                    <div class="form-group">
+                        <label>No. Resi / Trace Number <span class="required">*</span></label>
+                        <input type="text" name="no_resi" value="{{ old('no_resi') }}" required placeholder="Contoh: 00000000">
+                    </div>
+
+                    <!-- Nomor Kartu -->
+                    <div class="form-group">
+                        <label>Nomor Kartu ATM/Debit (Opsional)</label>
+                        <input type="text" name="no_kartu" value="{{ old('no_kartu') }}" placeholder="Contoh: 6019xxxxxxxxxxxx">
+                    </div>
+
+                    <!-- Nomor Tiket -->
+                    <div class="form-group full-width">
+                        <label>Nomor Tiket CS (Opsional)</label>
+                        <input type="text" name="no_tiket" value="{{ old('no_tiket') }}" placeholder="Contoh: TKT-2026-0001">
+                    </div>
+
+                    <!-- SECTION 2: DETAIL TRANSAKSI & KANTOR CABANG -->
+                    <div class="section-divider">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="12" y1="1" x2="12" y2="23"></line>
+                            <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                        </svg>
+                        <span>2. Detail Transaksi & Lokasi</span>
+                    </div>
+
+                    <!-- Cabang Transaksi / Pelapor -->
+                    <div class="form-group">
+                        <label>Cabang Transaksi / Pelapor <span class="required">*</span></label>
+                        <select name="master_cabang_id" required>
+                            <option value="">-- Pilih Kantor Cabang --</option>
+                            @foreach($cabangs as $c)
+                                <option value="{{ $c->id }}" {{ old('master_cabang_id') == $c->id ? 'selected' : '' }}>
+                                    {{ $c->kode_cabang }} - {{ $c->nama_cabang }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <!-- Jenis Transaksi -->
+                    <div class="form-group">
+                        <label>Jenis Transaksi <span class="required">*</span></label>
+                        <select name="master_transaksi_id" id="transaksi_id" required>
+                            <option value="">-- Pilih Jenis Transaksi --</option>
+                            @foreach($transaksis as $t)
+                                <option value="{{ $t->id }}" {{ old('master_transaksi_id') == $t->id ? 'selected' : '' }}>
+                                    {{ $t->jenis_transaksi }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <!-- Channel Transaksi (Auto-fill) -->
+                    <div class="form-group">
+                        <label>Channel Transaksi (Otomatis)</label>
+                        <input type="text" id="channel" readonly placeholder="Akan terisi otomatis...">
+                    </div>
+
+                    <!-- Biaya Admin (Auto-fill) -->
+                    <div class="form-group">
+                        <label>Biaya Admin (Otomatis)</label>
+                        <input type="text" id="biaya_admin" readonly placeholder="Akan terisi otomatis...">
+                    </div>
+
+                    <!-- Nominal Transaksi -->
+                    <div class="form-group">
+                        <label>Biaya / Nominal Transaksi (Rp) <span class="required">*</span></label>
+                        <input type="number" name="nominal_transaksi" value="{{ old('nominal_transaksi') }}" required placeholder="Contoh: 1000000" min="0" step="any">
+                    </div>
+
+                    <!-- Terminal Transaksi -->
+                    <div class="form-group">
+                        <label>Terminal Transaksi / Mesin (Opsional)</label>
+                        <input type="text" name="terminal_transaksi" value="{{ old('terminal_transaksi') }}" placeholder="Contoh: ATM-001 / EDC-PL">
+                    </div>
+
+                    <!-- SECTION 3: WAKTU, STATUS & KRONOLOGI -->
+                    <div class="section-divider">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <polyline points="12 6 12 12 16 14"></polyline>
+                        </svg>
+                        <span>3. Waktu & Status Penanganan</span>
+                    </div>
+
+                    <!-- Tanggal Transaksi -->
+                    <div class="form-group">
+                        <label>Tanggal Transaksi Bermasalah <span class="required">*</span></label>
+                        <input type="date" name="tgl_transaksi" value="{{ old('tgl_transaksi') }}" required>
+                    </div>
+
+                    <!-- Tanggal Terima -->
+                    <div class="form-group">
+                        <label>Tanggal Terima Keluhan <span class="required">*</span></label>
+                        <input type="date" name="tgl_terima" value="{{ old('tgl_terima', date('Y-m-d')) }}" required>
+                    </div>
+
+                    <!-- Tanggal Selesai -->
+                    <div class="form-group">
+                        <label>Tanggal Selesai Penanganan (Opsional)</label>
+                        <input type="date" name="tgl_selesai" value="{{ old('tgl_selesai') }}">
+                    </div>
+
+                    <!-- Status -->
+                    <div class="form-group">
+                        <label>Status Keluhan <span class="required">*</span></label>
+                        <select name="status" required>
+                            <option value="Menunggu" {{ old('status', 'Menunggu') == 'Menunggu' ? 'selected' : '' }}>Menunggu</option>
+                            <option value="Success" {{ old('status') == 'Success' ? 'selected' : '' }}>Success</option>
+                            <option value="Done" {{ old('status') == 'Done' ? 'selected' : '' }}>Done</option>
+                            <option value="Rejected" {{ old('status') == 'Rejected' ? 'selected' : '' }}>Rejected</option>
+                        </select>
+                    </div>
+
+                    <!-- Keterangan Log -->
+                    <div class="form-group full-width">
+                        <label>Keterangan Log / Catatan Kronologi Keluhan</label>
+                        <textarea name="keterangan_log" placeholder="Tuliskan catatan, kronologi masalah, atau tindak lanjut petugas di sini...">{{ old('keterangan_log') }}</textarea>
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button type="reset" class="btn btn-secondary">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
+                            <path d="M3 3v5h5"></path>
+                        </svg>
+                        <span>Reset Form</span>
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+                            <polyline points="17 21 17 13 7 13 7 21"></polyline>
+                            <polyline points="7 3 7 8 15 8"></polyline>
+                        </svg>
+                        <span>Simpan Jurnal Keluhan</span>
+                    </button>
+                </div>
+            </form>
+        </div>
     </div>
-
-    <!-- Notifikasi Sukses -->
-    @if(session('success'))
-        <div class="alert alert-success">{{ session('success') }}</div>
-    @endif
-
-    <!-- Notifikasi Error / Gagal Validasi -->
-    @if ($errors->any())
-        <div class="alert alert-danger">
-            <ul>
-                @foreach ($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
-        </div>
-    @endif
-
-    <form action="/jurnal/simpan" method="POST">
-        @csrf
-        
-        <div class="form-grid">
-            <!-- Nama Nasabah -->
-            <div class="form-group">
-                <label>Nama Nasabah <span class="required">*</span></label>
-                <input type="text" name="nama_nasabah" value="{{ old('nama_nasabah') }}" required placeholder="Contoh: Budi Santoso">
-            </div>
-
-            <!-- No. Resi / Trace Number -->
-            <div class="form-group">
-                <label>No. Resi / Trace Number <span class="required">*</span></label>
-                <input type="text" name="no_resi" value="{{ old('no_resi') }}" required placeholder="Contoh: 00000000">
-            </div>
-
-            <!-- No. Rekening -->
-            <div class="form-group">
-                <label>No. Rekening <span class="required">*</span></label>
-                <input type="text" name="no_rekening" value="{{ old('no_rekening') }}" required placeholder="Contoh: 00900000">
-            </div>
-
-            <!-- Nomor Kartu -->
-            <div class="form-group">
-                <label>Nomor Kartu</label>
-                <input type="text" name="no_kartu" value="{{ old('no_kartu') }}" placeholder="Contoh: 6019xxxxxxxxxxxx">
-            </div>
-
-            <!-- Nomor Tiket -->
-            <div class="form-group">
-                <label>Nomor Tiket</label>
-                <input type="text" name="no_tiket" value="{{ old('no_tiket') }}" placeholder="Contoh: TKT-2026-0001">
-            </div>
-
-            <!-- Tanggal Transaksi -->
-            <div class="form-group">
-                <label>Tanggal Transaksi <span class="required">*</span></label>
-                <input type="date" name="tgl_transaksi" value="{{ old('tgl_transaksi') }}" required>
-            </div>
-
-            <!-- Tanggal Terima -->
-            <div class="form-group">
-                <label>Tanggal Terima <span class="required">*</span></label>
-                <input type="date" name="tgl_terima" value="{{ old('tgl_terima', date('Y-m-d')) }}" required>
-            </div>
-
-            <!-- Tanggal Selesai -->
-            <div class="form-group">
-                <label>Tanggal Selesai</label>
-                <input type="date" name="tgl_selesai" value="{{ old('tgl_selesai') }}">
-            </div>
-
-            <!-- Cabang Transaksi / Pelapor -->
-            <div class="form-group">
-                <label>Cabang Transaksi / Pelapor <span class="required">*</span></label>
-                <select name="master_cabang_id" required>
-                    <option value="">-- Pilih Cabang --</option>
-                    @foreach($cabangs as $c)
-                        <option value="{{ $c->id }}" {{ old('master_cabang_id') == $c->id ? 'selected' : '' }}>
-                            {{ $c->kode_cabang }} - {{ $c->nama_cabang }}
-                        </option>
-                    @endforeach
-                </select>
-            </div>
-
-            <!-- Jenis Transaksi -->
-            <div class="form-group">
-                <label>Jenis Transaksi <span class="required">*</span></label>
-                <select name="master_transaksi_id" id="transaksi_id" required>
-                    <option value="">-- Pilih Jenis Transaksi --</option>
-                    @foreach($transaksis as $t)
-                        <option value="{{ $t->id }}" {{ old('master_transaksi_id') == $t->id ? 'selected' : '' }}>
-                            {{ $t->jenis_transaksi }}
-                        </option>
-                    @endforeach
-                </select>
-            </div>
-
-            <!-- Biaya Admin (Auto-fill) -->
-            <div class="form-group">
-                <label>Biaya Admin (Otomatis)</label>
-                <input type="text" id="biaya_admin" readonly placeholder="Akan terisi otomatis...">
-            </div>
-
-            <!-- Channel Transaksi (Auto-fill) -->
-            <div class="form-group">
-                <label>Channel Transaksi (Otomatis)</label>
-                <input type="text" id="channel" readonly placeholder="Akan terisi otomatis...">
-            </div>
-
-            <!-- Terminal Transaksi -->
-            <div class="form-group">
-                <label>Terminal Transaksi</label>
-                <input type="text" name="terminal_transaksi" value="{{ old('terminal_transaksi') }}" placeholder="Contoh: ATM-001 / EDC-PL">
-            </div>
-
-            <!-- Biaya / Nominal Transaksi -->
-            <div class="form-group">
-                <label>Biaya / Nominal Transaksi (Rp) <span class="required">*</span></label>
-                <input type="number" name="nominal_transaksi" value="{{ old('nominal_transaksi') }}" required placeholder="Contoh: 1000000">
-            </div>
-
-            <!-- Status -->
-            <div class="form-group">
-                <label>Status <span class="required">*</span></label>
-                <select name="status" required>
-                    <option value="Menunggu" {{ old('status', 'Menunggu') == 'Menunggu' ? 'selected' : '' }}>Menunggu</option>
-                    <option value="Success" {{ old('status') == 'Success' ? 'selected' : '' }}>Success</option>
-                    <option value="Done" {{ old('status') == 'Done' ? 'selected' : '' }}>Done</option>
-                    <option value="Rejected" {{ old('status') == 'Rejected' ? 'selected' : '' }}>Rejected</option>
-                </select>
-            </div>
-
-            <!-- Keterangan -->
-            <div class="form-group full-width">
-                <label>Keterangan Log / Catatan Keluhan</label>
-                <textarea name="keterangan_log" placeholder="Tuliskan keterangan atau kronologi keluhan transaksi nasabah di sini...">{{ old('keterangan_log') }}</textarea>
-            </div>
-        </div>
-
-        <button type="submit" class="btn-submit">Simpan Jurnal Keluhan</button>
-    </form>
 </div>
+@endsection
 
+@push('scripts')
 <script>
-    // Logic Auto-fill dengan AJAX saat Jenis Transaksi dipilih
+    // Logic Auto-fill AJAX saat Jenis Transaksi dipilih
     function loadDetailTransaksi(id) {
         if(id) {
             fetch('/api/transaksi/' + id)
@@ -295,7 +340,7 @@
         loadDetailTransaksi(this.value);
     });
 
-    // Jalankan saat load pertama kali jika jenis transaksi sudah terpilih sebelumnya
+    // Jalankan saat load pertama kali jika jenis transaksi sudah terpilih sebelumnya (misal saat reload karena error)
     window.addEventListener('DOMContentLoaded', function() {
         let initialId = document.getElementById('transaksi_id').value;
         if(initialId) {
@@ -303,6 +348,4 @@
         }
     });
 </script>
-
-</body>
-</html>
+@endpush

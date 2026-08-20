@@ -7,29 +7,55 @@ use Illuminate\Support\Facades\Auth;
 
 class AuthController extends Controller
 {
-    // Proses Login
-    public function login(Request $request) 
+    /**
+     * Menampilkan halaman login admin
+     */
+    public function showLoginForm()
     {
-        $credentials = $request->only('email', 'password');
+        if (Auth::check()) {
+            return redirect()->route('jurnal.create');
+        }
 
-        if (Auth::attempt($credentials)) {
+        return view('auth.login');
+    }
+
+    /**
+     * Memproses autentikasi login berbasis Username
+     */
+    public function login(Request $request)
+    {
+        $credentials = $request->validate([
+            'username' => 'required|string',
+            'password' => 'required|string',
+        ], [
+            'username.required' => 'Username petugas wajib diisi.',
+            'password.required' => 'Kata sandi wajib diisi.',
+        ]);
+
+        $remember = $request->boolean('remember');
+
+        // Otentikasi berbasis kolom username
+        if (Auth::attempt(['username' => $credentials['username'], 'password' => $credentials['password']], $remember)) {
             $request->session()->regenerate();
-            return redirect('/'); 
+            $userName = Auth::user()->name;
+            return redirect()->intended(route('jurnal.create'))->with('success', "Selamat datang kembali, {$userName}!");
         }
 
         return back()->withErrors([
-            'email' => 'Email atau password salah!',
-        ])->onlyInput('email');
+            'username' => 'Username atau kata sandi yang Anda masukkan tidak sesuai.',
+        ])->onlyInput('username');
     }
 
-    // Proses Logout
-    public function logout(Request $request) 
+    /**
+     * Memproses logout pengguna
+     */
+    public function logout(Request $request)
     {
         Auth::logout();
 
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect('/login');
+        return redirect()->route('login')->with('success', 'Anda telah berhasil keluar dari sistem.');
     }
 }
