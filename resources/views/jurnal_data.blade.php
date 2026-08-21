@@ -242,6 +242,235 @@
     }
 
     /* Action Buttons */
+    .btn-export-excel {
+        background-color: #059669;
+        color: #ffffff !important;
+        border: 1px solid #047857;
+        padding: 7px 14px;
+        font-size: 13px;
+        font-weight: 600;
+        border-radius: var(--radius-md);
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        text-decoration: none;
+        transition: all 0.2s ease;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    }
+
+    .btn-export-excel:hover {
+        background-color: #047857;
+        border-color: #065f46;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 6px -1px rgba(5, 150, 105, 0.2);
+    }
+
+    .btn-export-excel:active {
+        transform: translateY(0);
+    }
+
+    .btn-import-excel {
+        background-color: #0284c7;
+        color: #ffffff !important;
+        border: 1px solid #0369a1;
+        padding: 7px 14px;
+        font-size: 13px;
+        font-weight: 600;
+        border-radius: var(--radius-md);
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        cursor: pointer;
+        text-decoration: none;
+        transition: all 0.2s ease;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    }
+
+    .btn-import-excel:hover {
+        background-color: #0369a1;
+        border-color: #075985;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 6px -1px rgba(2, 132, 199, 0.2);
+    }
+
+    .btn-import-excel:active {
+        transform: translateY(0);
+    }
+
+    .btn-reset-all {
+        background-color: #fff1f2;
+        color: #e11d48 !important;
+        border: 1px solid #fecdd3;
+        padding: 7px 14px;
+        font-size: 13px;
+        font-weight: 600;
+        border-radius: var(--radius-md);
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        cursor: pointer;
+        text-decoration: none;
+        transition: all 0.2s ease;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    }
+
+    .btn-reset-all:hover {
+        background-color: #ffe4e6;
+        color: #be123c !important;
+        border-color: #fda4af;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 6px -1px rgba(225, 29, 72, 0.15);
+    }
+
+    .btn-reset-all:active {
+        transform: translateY(0);
+    }
+
+    /* Drag and drop upload zone */
+    .upload-dropzone {
+        border: 2px dashed #93c5fd;
+        background-color: #f0f9ff;
+        border-radius: var(--radius-md);
+        padding: 28px 20px;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    .upload-dropzone:hover, .upload-dropzone.dragover {
+        border-color: #0284c7;
+        background-color: #e0f2fe;
+    }
+
+    .upload-dropzone svg {
+        width: 44px;
+        height: 44px;
+        color: #0284c7;
+        margin-bottom: 10px;
+    }
+
+    /* Real-Time Import Step Tracker */
+    .import-steps-container {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        margin-top: 16px;
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: var(--radius-md);
+        padding: 14px 16px;
+    }
+
+    .import-step-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-size: 13px;
+        color: var(--bs-gray-500);
+        transition: all 0.25s ease;
+    }
+
+    .import-step-item.active {
+        color: #0284c7;
+        font-weight: 700;
+    }
+
+    .import-step-item.completed {
+        color: #059669;
+        font-weight: 600;
+    }
+
+    .import-step-badge {
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 11px;
+        font-weight: 700;
+        background-color: #e2e8f0;
+        color: #64748b;
+        flex-shrink: 0;
+        transition: all 0.25s ease;
+    }
+
+    .import-step-item.active .import-step-badge {
+        background-color: #0284c7;
+        color: #ffffff;
+        box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.2);
+    }
+
+    .import-step-item.completed .import-step-badge {
+        background-color: #059669;
+        color: #ffffff;
+    }
+
+    /* Success & Error Modal Custom Elements */
+    .modal-icon-wrapper {
+        width: 64px;
+        height: 64px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 16px;
+    }
+
+    .modal-icon-success {
+        background-color: #d1fae5;
+        color: #059669;
+    }
+
+    .modal-icon-error {
+        background-color: #fee2e2;
+        color: #dc2626;
+    }
+
+    .stat-result-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 12px;
+        margin: 18px 0;
+    }
+
+    .stat-result-card {
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: var(--radius-md);
+        padding: 14px 10px;
+        text-align: center;
+    }
+
+    .stat-result-card.card-total {
+        border-top: 3px solid #0284c7;
+    }
+
+    .stat-result-card.card-new {
+        border-top: 3px solid #059669;
+        background-color: #f0fdf4;
+    }
+
+    .stat-result-card.card-sync {
+        border-top: 3px solid #d97706;
+    }
+
+    .stat-result-val {
+        font-size: 20px;
+        font-weight: 800;
+        color: var(--bs-gray-900);
+        line-height: 1.2;
+    }
+
+    .stat-result-lbl {
+        font-size: 11px;
+        font-weight: 600;
+        color: var(--bs-gray-500);
+        margin-top: 4px;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+    }
+
     .btn-danger-sm {
         display: inline-flex;
         align-items: center;
@@ -434,19 +663,103 @@
         background: var(--bs-gray-50);
     }
 
-    /* Pagination Styling */
-    .pagination-wrapper {
-        margin-top: 20px;
+    /* Toolbar & Pagination Styling */
+    .table-toolbar {
+        padding: 10px 20px;
+        background: #f8fafc;
+        border-bottom: 1px solid var(--bs-gray-200);
         display: flex;
         justify-content: space-between;
         align-items: center;
         flex-wrap: wrap;
-        gap: 12px;
+        gap: 10px;
     }
 
-    .pagination-info {
+    .per-page-select {
+        padding: 5px 10px;
         font-size: 13px;
-        color: var(--bs-gray-500);
+        font-weight: 700;
+        height: 34px;
+        border-radius: var(--radius-sm);
+        border: 1px solid var(--bs-gray-300);
+        background-color: #ffffff;
+        color: var(--bs-navy);
+        cursor: pointer;
+        outline: none;
+        transition: border-color 0.2s ease;
+    }
+
+    .per-page-select:focus {
+        border-color: var(--bs-blue);
+        box-shadow: 0 0 0 3px rgba(0, 51, 102, 0.1);
+    }
+
+    .custom-pagination-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 14px;
+        width: 100%;
+    }
+
+    .custom-pagination-nav {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        flex-wrap: wrap;
+    }
+
+    .page-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 6px 12px;
+        min-width: 34px;
+        height: 34px;
+        font-size: 12.5px;
+        font-weight: 600;
+        border-radius: var(--radius-sm);
+        border: 1px solid var(--bs-gray-300);
+        background-color: #ffffff;
+        color: var(--bs-navy);
+        text-decoration: none;
+        transition: all 0.18s ease;
+        user-select: none;
+        cursor: pointer;
+    }
+
+    .page-btn:hover:not(.disabled):not(.active) {
+        background-color: #f1f5f9;
+        border-color: #cbd5e1;
+        color: var(--bs-blue);
+        transform: translateY(-1px);
+    }
+
+    .page-btn.active {
+        background-color: var(--bs-navy);
+        border-color: var(--bs-navy);
+        color: #ffffff;
+        font-weight: 700;
+        box-shadow: 0 2px 4px rgba(0, 51, 102, 0.2);
+    }
+
+    .page-btn.disabled {
+        background-color: #f8fafc;
+        border-color: #e2e8f0;
+        color: #94a3b8;
+        cursor: not-allowed;
+    }
+
+    .page-btn-dots {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 24px;
+        height: 34px;
+        color: #94a3b8;
+        font-weight: 700;
+        letter-spacing: 1px;
     }
 
     @media (max-width: 992px) {
@@ -627,7 +940,7 @@
 
 <!-- Card Tabel Data Jurnal -->
 <div class="card" id="tableCard">
-    <div class="card-header">
+    <div class="card-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
         <div class="card-title">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
@@ -636,13 +949,54 @@
             </svg>
             <span>Daftar Jurnal Keluhan Tersimpan</span>
         </div>
-        <div id="totalCountBadge" style="font-size: 13px; color: var(--bs-gray-500);">
-            Menampilkan <strong id="totalCountNum">{{ $jurnals->total() }}</strong> total data keluhan
+        <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+            <div id="totalCountBadge" style="font-size: 13px; color: var(--bs-gray-500); margin-right: 4px;">
+                Menampilkan <strong id="totalCountNum">{{ $jurnals->total() }}</strong> total data keluhan
+            </div>
+            <button type="button" class="btn btn-import-excel" onclick="openImportModal()" title="Unggah / Import File Excel Master (.xlsx / .xls)">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="17 8 12 3 7 8"></polyline>
+                    <line x1="12" y1="3" x2="12" y2="15"></line>
+                </svg>
+                <span>Import Excel Master</span>
+            </button>
+            <button type="button" onclick="startExportProcess()" id="btnExportExcel" class="btn-export-excel" title="Ekspor Data ke Master Excel Multi-Sheet (.xlsx)">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="7 10 12 15 17 10"></polyline>
+                    <line x1="12" y1="15" x2="12" y2="3"></line>
+                </svg>
+                <span>Export Excel (.xlsx)</span>
+            </button>
+            <button type="button" class="btn btn-reset-all" onclick="openResetAllModal()" title="Kosongkan / Reset Seluruh Data Jurnal & Master Template">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="3 6 5 6 21 6"></polyline>
+                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                </svg>
+                <span>Reset Semua Data</span>
+            </button>
         </div>
     </div>
 
     <div class="card-body" id="tableBodyWrapper" style="padding: 0;">
         @if($jurnals->count() > 0)
+            <!-- Toolbar Pilihan Baris Data (10, 50, 100) & Info Range -->
+            <div class="table-toolbar">
+                <div style="display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--bs-gray-700);">
+                    <span>Tampilkan</span>
+                    <select id="perPageSelect" class="per-page-select" onchange="handlePerPageChange(this.value)" title="Pilih jumlah baris data yang ditampilkan per halaman">
+                        <option value="10" {{ $jurnals->perPage() == 10 ? 'selected' : '' }}>10</option>
+                        <option value="50" {{ $jurnals->perPage() == 50 ? 'selected' : '' }}>50</option>
+                        <option value="100" {{ $jurnals->perPage() == 100 ? 'selected' : '' }}>100</option>
+                    </select>
+                    <span>data per halaman</span>
+                </div>
+                <div style="font-size: 12.5px; color: var(--bs-gray-500); font-weight: 500;">
+                    Menampilkan <strong>{{ $jurnals->firstItem() ?? 0 }} - {{ $jurnals->lastItem() ?? 0 }}</strong> dari total <strong style="color: var(--bs-navy);">{{ number_format($jurnals->total(), 0, ',', '.') }}</strong> data
+                </div>
+            </div>
+
             <div class="table-container" id="tableContainer">
                 <table class="custom-table" id="jurnalTable">
                     <thead>
@@ -740,15 +1094,70 @@
                 </table>
             </div>
 
-            <!-- Pagination -->
-            <div id="paginationWrapper" style="padding: 16px 24px; border-top: 1px solid var(--bs-gray-200);">
-                <div class="pagination-wrapper">
+            <!-- Custom Pagination Navigation Footer -->
+            <div id="paginationWrapper" style="padding: 16px 24px; border-top: 1px solid var(--bs-gray-200); background: #ffffff;">
+                <div class="custom-pagination-container">
                     <div class="pagination-info">
-                        Menampilkan halaman <strong>{{ $jurnals->currentPage() }}</strong> dari <strong>{{ $jurnals->lastPage() }}</strong>
+                        Halaman <strong>{{ $jurnals->currentPage() }}</strong> dari <strong>{{ $jurnals->lastPage() }}</strong>
+                        <span style="color: var(--bs-gray-400); margin: 0 4px;">•</span>
+                        (Total <strong style="color: var(--bs-navy);">{{ number_format($jurnals->total(), 0, ',', '.') }}</strong> transaksi)
                     </div>
-                    <div class="pagination-links">
-                        {{ $jurnals->links() }}
-                    </div>
+
+                    @if($jurnals->hasPages())
+                        <nav class="custom-pagination-nav" aria-label="Navigasi Halaman Data">
+                            {{-- Tombol Pertama & Sebelumnya --}}
+                            @if ($jurnals->onFirstPage())
+                                <span class="page-btn disabled" title="Halaman Pertama">«</span>
+                                <span class="page-btn disabled" title="Halaman Sebelumnya">‹ Sebelumnya</span>
+                            @else
+                                <a href="{{ $jurnals->url(1) }}" class="page-btn" title="Halaman Pertama">«</a>
+                                <a href="{{ $jurnals->previousPageUrl() }}" class="page-btn" title="Halaman Sebelumnya">‹ Sebelumnya</a>
+                            @endif
+
+                            {{-- Nomor Halaman Pintar --}}
+                            @php
+                                $current = $jurnals->currentPage();
+                                $last = $jurnals->lastPage();
+                                $start = max(1, $current - 2);
+                                $end = min($last, $current + 2);
+                                if ($end - $start < 4) {
+                                    if ($start == 1) $end = min($last, $start + 4);
+                                    else if ($end == $last) $start = max(1, $end - 4);
+                                }
+                            @endphp
+
+                            @if($start > 1)
+                                <a href="{{ $jurnals->url(1) }}" class="page-btn">1</a>
+                                @if($start > 2)
+                                    <span class="page-btn-dots">...</span>
+                                @endif
+                            @endif
+
+                            @for ($i = $start; $i <= $end; $i++)
+                                @if ($i == $current)
+                                    <span class="page-btn active">{{ $i }}</span>
+                                @else
+                                    <a href="{{ $jurnals->url($i) }}" class="page-btn">{{ $i }}</a>
+                                @endif
+                            @endfor
+
+                            @if($end < $last)
+                                @if($end < $last - 1)
+                                    <span class="page-btn-dots">...</span>
+                                @endif
+                                <a href="{{ $jurnals->url($last) }}" class="page-btn">{{ $last }}</a>
+                            @endif
+
+                            {{-- Tombol Selanjutnya & Terakhir --}}
+                            @if ($jurnals->hasMorePages())
+                                <a href="{{ $jurnals->nextPageUrl() }}" class="page-btn" title="Halaman Selanjutnya">Selanjutnya ›</a>
+                                <a href="{{ $jurnals->url($last) }}" class="page-btn" title="Halaman Terakhir">»</a>
+                            @else
+                                <span class="page-btn disabled" title="Halaman Selanjutnya">Selanjutnya ›</span>
+                                <span class="page-btn disabled" title="Halaman Terakhir">»</span>
+                            @endif
+                        </nav>
+                    @endif
                 </div>
             </div>
         @else
@@ -990,6 +1399,333 @@
     </div>
 </div>
 
+<!-- Modal Import Excel Master -->
+<div class="modal-backdrop" id="importModal">
+    <div class="modal-content" style="max-width: 580px; border-top: 4px solid #0284c7;">
+        <div class="modal-header" style="background-color: #f0f9ff; border-bottom: 1px solid #bae6fd;">
+            <h3 style="color: #0369a1; display: flex; align-items: center; gap: 8px;">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0284c7" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="17 8 12 3 7 8"></polyline>
+                    <line x1="12" y1="3" x2="12" y2="15"></line>
+                </svg>
+                <span>Import Data Excel Master ke Sistem</span>
+            </h3>
+            <button class="btn-close-modal" onclick="closeImportModal()">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+        </div>
+
+        <form id="importForm" action="{{ route('jurnal.import_excel') }}" method="POST" enctype="multipart/form-data" onsubmit="handleImportSubmit(event)">
+            @csrf
+            <div class="modal-body" style="padding: 24px;">
+                <p style="font-size: 13.5px; color: var(--bs-gray-700); margin-bottom: 16px; line-height: 1.5;">
+                    Unggah file <strong>Excel Master (.xlsx / .xls)</strong> Anda yang sudah terisi ribuan data transaksi. Sistem akan memetakan dan memasukkan seluruh baris data ke database secara otomatis.
+                </p>
+
+                <!-- Drag & Drop Upload Zone -->
+                <div class="upload-dropzone" id="dropzone" onclick="document.getElementById('fileExcelInput').click()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                        <polyline points="14 2 14 8 20 8"></polyline>
+                        <line x1="12" y1="18" x2="12" y2="12"></line>
+                        <line x1="9" y1="15" x2="15" y2="15"></line>
+                    </svg>
+                    <div id="dropzoneText" style="font-weight: 700; color: #0369a1; font-size: 14px;">Klik untuk memilih file Excel atau seret file ke sini</div>
+                    <div style="font-size: 12px; color: var(--bs-gray-500); margin-top: 4px;">Mendukung format: .xlsx, .xls, .csv (Maks. 50MB)</div>
+                    <div id="selectedFileName" style="display: none; margin-top: 10px; font-weight: 700; color: #047857; background: #ecfdf5; padding: 6px 12px; border-radius: var(--radius-sm); border: 1px solid #a7f3d0; font-size: 13px;"></div>
+                </div>
+                <input type="file" id="fileExcelInput" name="file_excel" accept=".xlsx,.xls,.csv" style="display: none;" onchange="handleFileSelected(this)" required>
+
+                <!-- Option Checkbox -->
+                <div id="templateOptionBox" style="margin-top: 18px; display: flex; align-items: flex-start; gap: 10px; background: #f8fafc; padding: 12px 14px; border-radius: var(--radius-md); border: 1px solid var(--bs-gray-200);">
+                    <input type="checkbox" id="chkSetAsTemplate" name="set_as_template" value="1" checked style="margin-top: 3px; cursor: pointer; width: 16px; height: 16px;">
+                    <label for="chkSetAsTemplate" style="font-size: 12.5px; color: var(--bs-gray-700); cursor: pointer; margin: 0; line-height: 1.4;">
+                        <strong>Jadikan sebagai Master Template aktif</strong><br>
+                        <span style="color: var(--bs-gray-500);">Format cetak slip, rekapitulasi cabang, dan seluruh rumus bawaan dari file ini akan disimpan dan digunakan saat ekspor berikutnya.</span>
+                    </label>
+                </div>
+
+                <!-- Info Box -->
+                <div id="tipsInfoBox" style="margin-top: 14px; font-size: 12px; color: #0369a1; background-color: #f0f9ff; border-left: 3px solid #0284c7; padding: 10px 12px; border-radius: 0 var(--radius-sm) var(--radius-sm) 0;">
+                    💡 <strong>Tips Cerdas:</strong> Awalan angka nol pada Nomor Rekening, Nomor Kartu, dan Kode Cabang akan tetap dipertahankan. Data yang sudah pernah dimasukkan akan diperbarui secara otomatis tanpa menimbulkan duplikat.
+                </div>
+
+                <!-- Live Real-Time Progress Wrapper (Hidden by default) -->
+                <div id="importProgressBarWrapper" style="display: none; margin-top: 18px;">
+                    <!-- Status & Percentage -->
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                        <span id="importProgressText" style="font-size: 13px; font-weight: 700; color: #0369a1;">Mengunggah berkas Excel ke server...</span>
+                        <span id="importProgressPercent" style="font-size: 14px; font-weight: 800; color: #0284c7;">0%</span>
+                    </div>
+
+                    <!-- Progress Bar Track -->
+                    <div style="width: 100%; height: 10px; background-color: #e2e8f0; border-radius: 5px; overflow: hidden;">
+                        <div id="importProgressBar" style="width: 0%; height: 100%; background: linear-gradient(90deg, #0284c7, #059669); transition: width 0.3s ease; border-radius: 5px;"></div>
+                    </div>
+
+                    <!-- Live Step-by-Step Tracker -->
+                    <div class="import-steps-container">
+                        <div class="import-step-item" id="step1">
+                            <div class="import-step-badge" id="stepBadge1">1</div>
+                            <span>Mengunggah berkas Excel ke server</span>
+                        </div>
+                        <div class="import-step-item" id="step2">
+                            <div class="import-step-badge" id="stepBadge2">2</div>
+                            <span>Membaca sheet data & memvalidasi struktur kolom</span>
+                        </div>
+                        <div class="import-step-item" id="step3">
+                            <div class="import-step-badge" id="stepBadge3">3</div>
+                            <span>Menyimpan & memetakan ribuan data transaksi ke database</span>
+                        </div>
+                        <div class="import-step-item" id="step4">
+                            <div class="import-step-badge" id="stepBadge4">4</div>
+                            <span>Sinkronisasi master template & formula otomatis</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer" style="background-color: #fafafa; border-top: 1px solid var(--bs-gray-200); padding: 16px 24px; display: flex; justify-content: flex-end; gap: 10px;">
+                <button type="button" class="btn btn-secondary" onclick="closeImportModal()" id="btnCancelImport">
+                    <span>Batal</span>
+                </button>
+                <button type="submit" class="btn" id="btnSubmitImport" style="background-color: #0284c7; color: #ffffff; border: 1px solid #0369a1; font-weight: 700; display: inline-flex; align-items: center; gap: 6px;">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="17 8 12 3 7 8"></polyline>
+                        <line x1="12" y1="3" x2="12" y2="15"></line>
+                    </svg>
+                    <span>Mulai Proses Import</span>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Modal Sukses Import (Custom UI Feedback) -->
+<div class="modal-backdrop" id="importSuccessModal">
+    <div class="modal-content" style="max-width: 520px; text-align: center; border-top: 4px solid #059669; animation: modalFadeIn 0.25s ease-out;">
+        <div class="modal-body" style="padding: 30px 24px 20px;">
+            <div class="modal-icon-wrapper modal-icon-success">
+                <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+            </div>
+            
+            <h3 style="font-size: 20px; font-weight: 800; color: var(--bs-navy); margin-bottom: 6px;">Import Data Berhasil!</h3>
+            <p style="font-size: 13.5px; color: var(--bs-gray-600); margin-bottom: 0; line-height: 1.5;">
+                Seluruh data dari berkas Excel Master telah berhasil diproses dan tersimpan ke dalam sistem.
+            </p>
+
+            <!-- Stat Summary Cards -->
+            <div class="stat-result-grid">
+                <div class="stat-result-card card-total">
+                    <div class="stat-result-val" id="resTotalCount" style="color: #0284c7;">0</div>
+                    <div class="stat-result-lbl">Total Dibaca</div>
+                </div>
+                <div class="stat-result-card card-new">
+                    <div class="stat-result-val" id="resInsertedCount" style="color: #059669;">0</div>
+                    <div class="stat-result-lbl">Data Baru</div>
+                </div>
+                <div class="stat-result-card card-sync">
+                    <div class="stat-result-val" id="resUpdatedCount" style="color: #d97706;">0</div>
+                    <div class="stat-result-lbl">Diperbarui</div>
+                </div>
+            </div>
+
+            <!-- Details Note -->
+            <div style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: var(--radius-md); padding: 12px 14px; text-align: left; font-size: 12.5px; color: var(--bs-gray-700);">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+                    <span style="color: var(--bs-gray-500);">Berkas:</span>
+                    <strong id="resFileName" style="color: var(--bs-navy);">-</strong>
+                </div>
+                <div style="display: flex; justify-content: space-between;">
+                    <span style="color: var(--bs-gray-500);">Status Template:</span>
+                    <strong style="color: #059669;">✓ Aktif Sebagai Master Template</strong>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-footer" style="background-color: #fafafa; border-top: 1px solid var(--bs-gray-200); padding: 16px 24px; display: flex; justify-content: center;">
+            <button type="button" class="btn" onclick="closeImportSuccessModal()" style="background-color: #059669; color: #ffffff; min-width: 180px; padding: 10px 20px; font-weight: 700; border: none; border-radius: var(--radius-md); box-shadow: 0 2px 4px rgba(5, 150, 105, 0.25); cursor: pointer;">
+                Lihat Data di Tabel
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Error Import (Custom UI Feedback) -->
+<div class="modal-backdrop" id="importErrorModal">
+    <div class="modal-content" style="max-width: 480px; text-align: center; border-top: 4px solid #dc2626; animation: modalFadeIn 0.25s ease-out;">
+        <div class="modal-body" style="padding: 30px 24px 20px;">
+            <div class="modal-icon-wrapper modal-icon-error">
+                <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="8" x2="12" y2="12"></line>
+                    <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                </svg>
+            </div>
+            
+            <h3 id="resErrorTitle" style="font-size: 19px; font-weight: 800; color: #991b1b; margin-bottom: 6px;">Proses Gagal</h3>
+            <p id="resErrorMessage" style="font-size: 13.5px; color: var(--bs-gray-700); margin-bottom: 0; line-height: 1.5;">
+                Terjadi kesalahan saat memproses berkas Excel.
+            </p>
+        </div>
+
+        <div class="modal-footer" style="background-color: #fafafa; border-top: 1px solid var(--bs-gray-200); padding: 16px 24px; display: flex; justify-content: center; gap: 10px;">
+            <button type="button" class="btn btn-secondary" onclick="closeImportErrorModal()">
+                Tutup
+            </button>
+            <button type="button" class="btn" onclick="retryImport()" style="background-color: #0284c7; color: #ffffff; font-weight: 600; border: none; cursor: pointer;">
+                Coba Lagi
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Konfirmasi Reset Semua Data -->
+<div class="modal-backdrop" id="resetAllModal">
+    <div class="modal-content" style="max-width: 500px; border-top: 4px solid #dc2626; animation: modalFadeIn 0.25s ease-out;">
+        <div class="modal-header" style="background-color: #fff1f2; border-bottom: 1px solid #fecdd3;">
+            <h3 style="color: #991b1b; display: flex; align-items: center; gap: 8px;">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                    <line x1="12" y1="9" x2="12" y2="13"></line>
+                    <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                </svg>
+                <span>Konfirmasi Reset Semua Data Jurnal</span>
+            </h3>
+            <button class="btn-close-modal" onclick="closeResetAllModal()">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+        </div>
+
+        <form id="resetAllForm" action="{{ route('jurnal.reset_all') }}" method="POST" onsubmit="handleResetAllSubmit(event)">
+            @csrf
+            @method('DELETE')
+            <div class="modal-body" style="padding: 24px;">
+                <p style="font-size: 14px; color: var(--bs-gray-800); line-height: 1.5; margin-bottom: 16px;">
+                    Apakah Anda <strong>benar-benar yakin</strong> ingin mengosongkan seluruh data jurnal keluhan dari sistem?
+                </p>
+
+                <div style="background-color: #fef2f2; border: 1px dashed #fca5a5; border-radius: var(--radius-md); padding: 12px 14px; font-size: 13px; color: #991b1b; display: flex; align-items: flex-start; gap: 10px; margin-bottom: 16px;">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0; margin-top: 2px;">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="12" y1="8" x2="12" y2="12"></line>
+                        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                    </svg>
+                    <span><strong>Peringatan Kritis:</strong> Seluruh baris transaksi yang telah terdaftar saat ini akan dihapus secara permanen. Anda dapat mengimpor kembali berkas Master Excel yang baru setelah proses ini selesai.</span>
+                </div>
+
+                <!-- Opsi Hapus Master Template -->
+                <div style="display: flex; align-items: flex-start; gap: 10px; background: #f8fafc; padding: 12px 14px; border-radius: var(--radius-md); border: 1px solid var(--bs-gray-200);">
+                    <input type="checkbox" id="chkDeleteTemplate" name="delete_template" value="1" checked style="margin-top: 3px; cursor: pointer; width: 16px; height: 16px;">
+                    <label for="chkDeleteTemplate" style="font-size: 12.5px; color: var(--bs-gray-700); cursor: pointer; margin: 0; line-height: 1.4;">
+                        <strong>Hapus juga berkas Master Template tersimpan</strong><br>
+                        <span style="color: var(--bs-gray-500);">Mengembalikan template ekspor ke format bawaan default sistem Bank Sulteng.</span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="modal-footer" style="background-color: #fafafa; border-top: 1px solid var(--bs-gray-200); padding: 16px 24px; display: flex; justify-content: flex-end; gap: 10px;">
+                <button type="button" class="btn btn-secondary" onclick="closeResetAllModal()" id="btnCancelResetAll">
+                    <span>Batal</span>
+                </button>
+                <button type="submit" class="btn" id="btnSubmitResetAll" style="background-color: #dc2626; color: #ffffff; border: 1px solid #b91c1c; font-weight: 700; display: inline-flex; align-items: center; gap: 6px; cursor: pointer;">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="3 6 5 6 21 6"></polyline>
+                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                    </svg>
+                    <span>Ya, Bersihkan Seluruh Data</span>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Modal Proses Export Excel (Live Real-Time UI Progress) -->
+<div class="modal-backdrop" id="exportProgressModal">
+    <div class="modal-content" style="max-width: 520px; border-top: 4px solid #059669; animation: modalFadeIn 0.25s ease-out;">
+        <div class="modal-header" style="background-color: #f0fdf4; border-bottom: 1px solid #bbf7d0;">
+            <h3 style="color: #065f46; display: flex; align-items: center; gap: 8px; font-size: 17px; font-weight: 700;">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="7 10 12 15 17 10"></polyline>
+                    <line x1="12" y1="15" x2="12" y2="3"></line>
+                </svg>
+                <span id="exportModalTitle">Mengekspor Berkas Master Excel...</span>
+            </h3>
+        </div>
+        
+        <div class="modal-body" style="padding: 24px;">
+            <!-- Animated Icon / Spinner -->
+            <div style="text-align: center; margin-bottom: 18px;">
+                <div id="exportIconWrapper" style="display: inline-flex; align-items: center; justify-content: center; width: 68px; height: 68px; border-radius: 50%; background: #ecfdf5; border: 2px solid #a7f3d0; margin-bottom: 12px;">
+                    <svg id="exportSpinnerSvg" width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="animation: spin 1s linear infinite;">
+                        <line x1="12" y1="2" x2="12" y2="6"></line>
+                        <line x1="12" y1="18" x2="12" y2="22"></line>
+                        <line x1="4.93" y1="4.93" x2="7.76" y2="7.76"></line>
+                        <line x1="16.24" y1="16.24" x2="19.07" y2="19.07"></line>
+                        <line x1="2" y1="12" x2="6" y2="12"></line>
+                        <line x1="18" y1="12" x2="22" y2="12"></line>
+                        <line x1="4.93" y1="19.07" x2="7.76" y2="16.24"></line>
+                        <line x1="16.24" y1="7.76" x2="19.07" y2="4.93"></line>
+                    </svg>
+                    <svg id="exportSuccessCheckSvg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="display: none;">
+                        <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                </div>
+                <h4 id="exportStatusTitle" style="font-size: 16px; font-weight: 700; color: var(--bs-navy); margin-bottom: 4px;">Menyiapkan Data Transaksi</h4>
+                <p id="exportStatusSub" style="font-size: 13px; color: var(--bs-gray-600); margin: 0;">Mengagregasikan ribuan baris data jurnal dengan relasi master...</p>
+            </div>
+
+            <!-- Status & Percentage -->
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                <span id="exportProgressText" style="font-size: 13px; font-weight: 700; color: #065f46;">Proses ekspor sedang berjalan...</span>
+                <span id="exportProgressPercent" style="font-size: 14px; font-weight: 800; color: #059669;">25%</span>
+            </div>
+
+            <!-- Progress Bar Track -->
+            <div style="width: 100%; height: 10px; background-color: #e2e8f0; border-radius: 5px; overflow: hidden; margin-bottom: 20px;">
+                <div id="exportProgressBar" style="width: 25%; height: 100%; background: linear-gradient(90deg, #059669, #10b981); transition: width 0.25s ease; border-radius: 5px;"></div>
+            </div>
+
+            <!-- Step Tracker -->
+            <div class="import-steps-container">
+                <div class="import-step-item active" id="expStep1">
+                    <div class="import-step-badge" id="expStepBadge1">1</div>
+                    <span>Menarik seluruh data transaksi dari database server</span>
+                </div>
+                <div class="import-step-item" id="expStep2">
+                    <div class="import-step-badge" id="expStepBadge2">2</div>
+                    <span>Menyusun lembar data master (Sheet DATA_KELUHAN)</span>
+                </div>
+                <div class="import-step-item" id="expStep3">
+                    <div class="import-step-badge" id="expStepBadge3">3</div>
+                    <span>Menghubungkan formula dinamis Slip Jurnal & Rekapitulasi Cabang</span>
+                </div>
+                <div class="import-step-item" id="expStep4">
+                    <div class="import-step-badge" id="expStepBadge4">4</div>
+                    <span>Mengunduh berkas Excel .xlsx ke komputer Anda</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="modal-footer" style="background-color: #fafafa; border-top: 1px solid var(--bs-gray-200); padding: 14px 24px; display: flex; justify-content: flex-end;">
+            <button type="button" class="btn btn-secondary" onclick="closeExportModal()" id="btnCancelExport" style="display: none;">
+                <span>Tutup</span>
+            </button>
+        </div>
+    </div>
+</div>
+
 @endsection
 
 @push('scripts')
@@ -1093,6 +1829,8 @@
         const cabangVal = document.getElementById('filterCabang').value;
         const tglDariVal = document.getElementById('filterTglDari').value;
         const tglSampaiVal = document.getElementById('filterTglSampai').value;
+        const perPageEl = document.getElementById('perPageSelect');
+        const perPageVal = perPageEl ? perPageEl.value : '10';
 
         // Tampilkan / Sembunyikan Tombol Reset
         const hasFilters = qVal || statusVal || cabangVal || tglDariVal || tglSampaiVal;
@@ -1107,11 +1845,24 @@
             if (cabangVal) params.set('master_cabang_id', cabangVal);
             if (tglDariVal) params.set('tgl_dari', tglDariVal);
             if (tglSampaiVal) params.set('tgl_sampai', tglSampaiVal);
+            if (perPageVal && perPageVal !== '10') params.set('per_page', perPageVal);
             url = "{{ route('jurnal.index') }}?" + params.toString();
         }
 
         // Update URL Address Bar tanpa reload
         window.history.replaceState({}, '', url);
+
+        // Update Link Tombol Export Excel dengan parameter filter aktif
+        const btnExport = document.getElementById('btnExportExcel');
+        if (btnExport) {
+            const exportParams = new URLSearchParams();
+            if (qVal) exportParams.set('q', qVal);
+            if (statusVal) exportParams.set('status', statusVal);
+            if (cabangVal) exportParams.set('master_cabang_id', cabangVal);
+            if (tglDariVal) exportParams.set('tgl_dari', tglDariVal);
+            if (tglSampaiVal) exportParams.set('tgl_sampai', tglSampaiVal);
+            btnExport.href = "{{ route('jurnal.export_excel') }}?" + exportParams.toString();
+        }
 
         // Fetch HTML Parsed Response
         fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
@@ -1145,12 +1896,36 @@
             .catch(err => console.error('Gagal mengambil data pencarian:', err));
     }
 
+    // Handler Ganti Jumlah Baris Per Halaman (10, 50, 100)
+    function handlePerPageChange(val) {
+        const qVal = document.getElementById('searchInput').value;
+        const statusVal = document.getElementById('filterStatus').value;
+        const cabangVal = document.getElementById('filterCabang').value;
+        const tglDariVal = document.getElementById('filterTglDari').value;
+        const tglSampaiVal = document.getElementById('filterTglSampai').value;
+
+        const params = new URLSearchParams();
+        if (qVal) params.set('q', qVal);
+        if (statusVal) params.set('status', statusVal);
+        if (cabangVal) params.set('master_cabang_id', cabangVal);
+        if (tglDariVal) params.set('tgl_dari', tglDariVal);
+        if (tglSampaiVal) params.set('tgl_sampai', tglSampaiVal);
+        if (val && val !== '10') params.set('per_page', val);
+        params.set('page', '1'); // Reset ke halaman 1 saat mengubah jumlah baris
+
+        const newUrl = "{{ route('jurnal.index') }}?" + params.toString();
+        fetchServerFilteredData(newUrl);
+    }
+
     // Intercept Pagination Klik untuk AJAX Navigation
     function bindPaginationEvents() {
-        document.querySelectorAll('#paginationWrapper a').forEach(link => {
+        document.querySelectorAll('#paginationWrapper a.page-btn').forEach(link => {
             link.addEventListener('click', function(e) {
                 e.preventDefault();
-                fetchServerFilteredData(this.getAttribute('href'));
+                const targetUrl = this.getAttribute('href');
+                if (targetUrl && targetUrl !== '#' && !this.classList.contains('disabled')) {
+                    fetchServerFilteredData(targetUrl);
+                }
             });
         });
     }
@@ -1277,8 +2052,16 @@
     document.addEventListener('click', function(e) {
         const detailModal = document.getElementById('detailModal');
         const deleteModal = document.getElementById('deleteConfirmModal');
+        const importModal = document.getElementById('importModal');
+        const successModal = document.getElementById('importSuccessModal');
+        const errorModal = document.getElementById('importErrorModal');
+        const resetModal = document.getElementById('resetAllModal');
         if (e.target === detailModal) closeDetailModal();
         if (e.target === deleteModal) closeDeleteConfirmModal();
+        if (e.target === importModal) closeImportModal();
+        if (e.target === successModal) closeImportSuccessModal();
+        if (e.target === errorModal) closeImportErrorModal();
+        if (e.target === resetModal) closeResetAllModal();
     });
 
     // Close on escape key
@@ -1286,7 +2069,524 @@
         if(e.key === 'Escape') {
             closeDetailModal();
             closeDeleteConfirmModal();
+            closeImportModal();
+            closeImportSuccessModal();
+            closeImportErrorModal();
+            closeResetAllModal();
         }
     });
+
+    // Modal Reset Semua Data
+    function openResetAllModal() {
+        const modal = document.getElementById('resetAllModal');
+        if (modal) modal.classList.add('show');
+    }
+
+    function closeResetAllModal() {
+        const modal = document.getElementById('resetAllModal');
+        if (modal) modal.classList.remove('show');
+    }
+
+    function handleResetAllSubmit(e) {
+        e.preventDefault();
+        const form = document.getElementById('resetAllForm');
+        const submitBtn = document.getElementById('btnSubmitResetAll');
+        const cancelBtn = document.getElementById('btnCancelResetAll');
+
+        submitBtn.disabled = true;
+        if (cancelBtn) cancelBtn.disabled = true;
+        submitBtn.innerHTML = `
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="animation: spin 1s infinite linear;">
+                <circle cx="12" cy="12" r="10"></circle>
+                <path d="M12 2a10 10 0 0 1 10 10"></path>
+            </svg>
+            <span>Membersihkan Data...</span>`;
+
+        const formData = new FormData(form);
+
+        fetch(form.action, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(res => res.json())
+        .then(data => {
+            closeResetAllModal();
+            if (data.success) {
+                // Refresh data table and stats immediately
+                fetchServerFilteredData();
+                showImportSuccessModal({ total: data.deleted_count || 0, inserted: 0, updated: 0 }, 'Seluruh Data Dibersihkan');
+                const fileEl = document.getElementById('resFileName');
+                if (fileEl) fileEl.textContent = 'Database Dikosongkan (Siap Import Baru)';
+            } else {
+                showImportErrorModal(data.message || 'Gagal mereset data.');
+            }
+            submitBtn.disabled = false;
+            if (cancelBtn) cancelBtn.disabled = false;
+            submitBtn.innerHTML = `
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="3 6 5 6 21 6"></polyline>
+                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                </svg>
+                <span>Ya, Bersihkan Seluruh Data</span>`;
+        })
+        .catch(err => {
+            console.error('Error resetting data:', err);
+            closeResetAllModal();
+            showImportErrorModal('Terjadi kesalahan jaringan atau server saat mereset data.');
+            submitBtn.disabled = false;
+            if (cancelBtn) cancelBtn.disabled = false;
+        });
+    }
+
+    // Modal Import Excel Functions
+    function openImportModal() {
+        const modal = document.getElementById('importModal');
+        if (modal) {
+            modal.classList.add('show');
+            resetImportForm();
+        }
+    }
+
+    function closeImportModal() {
+        const modal = document.getElementById('importModal');
+        if (modal) {
+            modal.classList.remove('show');
+        }
+    }
+
+    function resetImportForm() {
+        const form = document.getElementById('importForm');
+        if (form) form.reset();
+        const selectedFileName = document.getElementById('selectedFileName');
+        if (selectedFileName) {
+            selectedFileName.style.display = 'none';
+            selectedFileName.textContent = '';
+        }
+        const progressWrapper = document.getElementById('importProgressBarWrapper');
+        if (progressWrapper) progressWrapper.style.display = 'none';
+        const progressBar = document.getElementById('importProgressBar');
+        if (progressBar) progressBar.style.width = '0%';
+        const progressPercent = document.getElementById('importProgressPercent');
+        if (progressPercent) progressPercent.textContent = '0%';
+        const progressText = document.getElementById('importProgressText');
+        if (progressText) progressText.textContent = 'Mengunggah berkas Excel ke server...';
+
+        const dropzone = document.getElementById('dropzone');
+        if (dropzone) dropzone.style.pointerEvents = 'auto';
+        const templateBox = document.getElementById('templateOptionBox');
+        if (templateBox) templateBox.style.opacity = '1';
+        const tipsBox = document.getElementById('tipsInfoBox');
+        if (tipsBox) tipsBox.style.display = 'block';
+
+        const submitBtn = document.getElementById('btnSubmitImport');
+        if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = `
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="17 8 12 3 7 8"></polyline>
+                    <line x1="12" y1="3" x2="12" y2="15"></line>
+                </svg>
+                <span>Mulai Proses Import</span>`;
+        }
+        const cancelBtn = document.getElementById('btnCancelImport');
+        if (cancelBtn) cancelBtn.disabled = false;
+
+        setStepState(1, 'idle');
+        setStepState(2, 'idle');
+        setStepState(3, 'idle');
+        setStepState(4, 'idle');
+    }
+
+    function handleFileSelected(input) {
+        if (input.files && input.files[0]) {
+            const file = input.files[0];
+            const nameEl = document.getElementById('selectedFileName');
+            if (nameEl) {
+                const sizeMb = (file.size / (1024 * 1024)).toFixed(2);
+                nameEl.innerHTML = `📄 <strong>${file.name}</strong> (${sizeMb} MB) dipilih`;
+                nameEl.style.display = 'block';
+            }
+        }
+    }
+
+    // Modal Success & Error UI Handlers (In-App Modal, No Browser Alert)
+    function showImportSuccessModal(data, filename) {
+        document.getElementById('resTotalCount').textContent = Number(data.total || 0).toLocaleString('id-ID');
+        document.getElementById('resInsertedCount').textContent = Number(data.inserted || 0).toLocaleString('id-ID');
+        document.getElementById('resUpdatedCount').textContent = Number(data.updated || 0).toLocaleString('id-ID');
+        document.getElementById('resFileName').textContent = filename || 'Master_Excel_BankSulteng.xlsx';
+        
+        document.getElementById('importSuccessModal').classList.add('show');
+    }
+
+    function closeImportSuccessModal() {
+        document.getElementById('importSuccessModal').classList.remove('show');
+        // Refresh tabel data secara instan
+        fetchServerFilteredData();
+    }
+
+    function showImportErrorModal(message, title = 'Terjadi Kesalahan') {
+        const titleEl = document.getElementById('resErrorTitle');
+        if (titleEl) titleEl.textContent = title;
+        document.getElementById('resErrorMessage').textContent = message || 'Terjadi kesalahan saat memproses data.';
+        document.getElementById('importErrorModal').classList.add('show');
+    }
+
+    function closeImportErrorModal() {
+        document.getElementById('importErrorModal').classList.remove('show');
+        resetImportForm();
+    }
+
+    function retryImport() {
+        closeImportErrorModal();
+        openImportModal();
+    }
+
+    // Step state helper
+    function setStepState(stepNum, state) {
+        const item = document.getElementById('step' + stepNum);
+        const badge = document.getElementById('stepBadge' + stepNum);
+        if (!item || !badge) return;
+
+        item.classList.remove('active', 'completed');
+        if (state === 'active') {
+            item.classList.add('active');
+            badge.innerHTML = `<span style="animation: spin 1s infinite linear; display: inline-block;">⟳</span>`;
+        } else if (state === 'completed') {
+            item.classList.add('completed');
+            badge.innerHTML = `✓`;
+        } else {
+            badge.textContent = stepNum;
+        }
+    }
+
+    // Drag & Drop event bindings
+    document.addEventListener('DOMContentLoaded', function() {
+        const dropzone = document.getElementById('dropzone');
+        const fileInput = document.getElementById('fileExcelInput');
+
+        if (dropzone && fileInput) {
+            ['dragenter', 'dragover'].forEach(eventName => {
+                dropzone.addEventListener(eventName, function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    dropzone.classList.add('dragover');
+                }, false);
+            });
+
+            ['dragleave', 'drop'].forEach(eventName => {
+                dropzone.addEventListener(eventName, function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    dropzone.classList.remove('dragover');
+                }, false);
+            });
+
+            dropzone.addEventListener('drop', function(e) {
+                const dt = e.dataTransfer;
+                const files = dt.files;
+                if (files && files.length > 0) {
+                    fileInput.files = files;
+                    handleFileSelected(fileInput);
+                }
+            }, false);
+        }
+    });
+
+    // Real-Time Upload & Processing Handler
+    let progressTimer = null;
+
+    function handleImportSubmit(e) {
+        e.preventDefault();
+        const form = document.getElementById('importForm');
+        const fileInput = document.getElementById('fileExcelInput');
+
+        if (!fileInput || !fileInput.files || fileInput.files.length === 0) {
+            showImportErrorModal('Silakan pilih berkas Excel (.xlsx / .xls) terlebih dahulu.');
+            return;
+        }
+
+        const selectedFile = fileInput.files[0];
+        const fileName = selectedFile.name;
+
+        const submitBtn = document.getElementById('btnSubmitImport');
+        const cancelBtn = document.getElementById('btnCancelImport');
+        const progressWrapper = document.getElementById('importProgressBarWrapper');
+        const progressBar = document.getElementById('importProgressBar');
+        const progressText = document.getElementById('importProgressText');
+        const progressPercent = document.getElementById('importProgressPercent');
+        const dropzone = document.getElementById('dropzone');
+        const templateBox = document.getElementById('templateOptionBox');
+        const tipsBox = document.getElementById('tipsInfoBox');
+
+        // UI state saat proses aktif
+        submitBtn.disabled = true;
+        if (cancelBtn) cancelBtn.disabled = true;
+        if (dropzone) dropzone.style.pointerEvents = 'none';
+        if (templateBox) templateBox.style.opacity = '0.5';
+        if (tipsBox) tipsBox.style.display = 'none';
+
+        submitBtn.innerHTML = `
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="animation: spin 1s infinite linear;">
+                <circle cx="12" cy="12" r="10"></circle>
+                <path d="M12 2a10 10 0 0 1 10 10"></path>
+            </svg>
+            <span>Memproses Data...</span>`;
+        
+        progressWrapper.style.display = 'block';
+
+        // Step 1: Uploading
+        setStepState(1, 'active');
+        setStepState(2, 'idle');
+        setStepState(3, 'idle');
+        setStepState(4, 'idle');
+
+        progressBar.style.width = '10%';
+        progressPercent.textContent = '10%';
+        progressText.textContent = 'Mengunggah berkas ' + fileName + ' (' + (selectedFile.size / (1024*1024)).toFixed(2) + ' MB)...';
+
+        const xhr = new XMLHttpRequest();
+        xhr.open('POST', form.action, true);
+        xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+
+        // Pantau real-time upload progress (0% - 35%)
+        xhr.upload.onprogress = function(event) {
+            if (event.lengthComputable) {
+                const percent = Math.round((event.loaded / event.total) * 35);
+                progressBar.style.width = percent + '%';
+                progressPercent.textContent = percent + '%';
+            }
+        };
+
+        xhr.upload.onload = function() {
+            // Upload selesai, backend mulai parsing
+            setStepState(1, 'completed');
+            setStepState(2, 'active');
+            progressBar.style.width = '45%';
+            progressPercent.textContent = '45%';
+            progressText.textContent = 'Membaca lembar data & memvalidasi header...';
+
+            let curPct = 45;
+            progressTimer = setInterval(() => {
+                curPct += 5;
+                if (curPct >= 65 && curPct < 85) {
+                    setStepState(2, 'completed');
+                    setStepState(3, 'active');
+                    progressText.textContent = 'Menyimpan & memetakan ribuan data transaksi ke database...';
+                } else if (curPct >= 85 && curPct < 96) {
+                    setStepState(3, 'completed');
+                    setStepState(4, 'active');
+                    progressText.textContent = 'Sinkronisasi master template & kalkulasi formula...';
+                }
+                if (curPct > 96) curPct = 96;
+                progressBar.style.width = curPct + '%';
+                progressPercent.textContent = curPct + '%';
+            }, 300);
+        };
+
+        xhr.onload = function() {
+            clearInterval(progressTimer);
+            if (xhr.status >= 200 && xhr.status < 300) {
+                try {
+                    const data = JSON.parse(xhr.responseText);
+                    if (data.success) {
+                        setStepState(1, 'completed');
+                        setStepState(2, 'completed');
+                        setStepState(3, 'completed');
+                        setStepState(4, 'completed');
+                        progressBar.style.width = '100%';
+                        progressPercent.textContent = '100%';
+                        progressText.textContent = 'Proses import dan sinkronisasi selesai!';
+
+                        setTimeout(() => {
+                            closeImportModal();
+                            showImportSuccessModal(data.data || {}, fileName);
+                        }, 400);
+                    } else {
+                        closeImportModal();
+                        showImportErrorModal(data.message || 'Gagal memproses berkas Excel.');
+                    }
+                } catch (e) {
+                    closeImportModal();
+                    showImportErrorModal('Format respon server tidak valid.');
+                }
+            } else {
+                closeImportModal();
+                try {
+                    const errObj = JSON.parse(xhr.responseText);
+                    const msg = errObj.message || (errObj.errors && Object.values(errObj.errors).flat().join(', ')) || 'Terjadi kesalahan pada server.';
+                    showImportErrorModal(msg);
+                } catch (e) {
+                    showImportErrorModal('Gagal mengunggah berkas (Status: ' + xhr.status + ').');
+                }
+            }
+        };
+
+        xhr.onerror = function() {
+            clearInterval(progressTimer);
+            closeImportModal();
+            showImportErrorModal('Terjadi kegagalan jaringan atau koneksi ke server terputus.');
+        };
+
+        const formData = new FormData(form);
+        xhr.send(formData);
+    }
+
+    // Real-Time High-Speed Excel Export UI Handler
+    let exportTimer = null;
+
+    function setExportStepState(stepNum, state) {
+        const item = document.getElementById('expStep' + stepNum);
+        const badge = document.getElementById('expStepBadge' + stepNum);
+        if (!item || !badge) return;
+
+        item.classList.remove('active', 'completed');
+        if (state === 'active') {
+            item.classList.add('active');
+            badge.innerHTML = `<span style="animation: spin 1s infinite linear; display: inline-block;">⟳</span>`;
+        } else if (state === 'completed') {
+            item.classList.add('completed');
+            badge.innerHTML = `✓`;
+        } else {
+            badge.textContent = stepNum;
+        }
+    }
+
+    function openExportModal() {
+        const modal = document.getElementById('exportProgressModal');
+        if (!modal) return;
+
+        // Reset export UI elements
+        document.getElementById('exportSpinnerSvg').style.display = 'block';
+        document.getElementById('exportSuccessCheckSvg').style.display = 'none';
+        document.getElementById('exportIconWrapper').style.background = '#ecfdf5';
+        document.getElementById('exportIconWrapper').style.borderColor = '#a7f3d0';
+        document.getElementById('exportModalTitle').textContent = 'Mengekspor Berkas Master Excel...';
+        document.getElementById('exportStatusTitle').textContent = 'Menyiapkan Data Transaksi';
+        document.getElementById('exportStatusSub').textContent = 'Mengagregasikan ribuan baris data jurnal dengan relasi master...';
+        document.getElementById('exportProgressBar').style.width = '15%';
+        document.getElementById('exportProgressPercent').textContent = '15%';
+        document.getElementById('exportProgressText').textContent = 'Mengambil data dari server...';
+        document.getElementById('btnCancelExport').style.display = 'none';
+
+        setExportStepState(1, 'active');
+        setExportStepState(2, 'idle');
+        setExportStepState(3, 'idle');
+        setExportStepState(4, 'idle');
+
+        modal.classList.add('show');
+    }
+
+    function closeExportModal() {
+        const modal = document.getElementById('exportProgressModal');
+        if (modal) modal.classList.remove('show');
+        if (exportTimer) clearInterval(exportTimer);
+    }
+
+    function startExportProcess() {
+        openExportModal();
+
+        const searchParams = new URLSearchParams(window.location.search);
+        const exportBaseUrl = "{{ route('jurnal.export_excel') }}";
+        const finalExportUrl = exportBaseUrl + (searchParams.toString() ? '?' + searchParams.toString() : '');
+
+        let curPct = 15;
+        exportTimer = setInterval(() => {
+            curPct += 15;
+            if (curPct >= 35 && curPct < 65) {
+                setExportStepState(1, 'completed');
+                setExportStepState(2, 'active');
+                document.getElementById('exportStatusTitle').textContent = 'Menyusun Lembar Data';
+                document.getElementById('exportStatusSub').textContent = 'Menyusun Sheet DATA_KELUHAN dengan format perbankan...';
+                document.getElementById('exportProgressText').textContent = 'Menyusun lembar data master...';
+            } else if (curPct >= 65 && curPct < 88) {
+                setExportStepState(2, 'completed');
+                setExportStepState(3, 'active');
+                document.getElementById('exportStatusTitle').textContent = 'Menghubungkan Formula Multi-Sheet';
+                document.getElementById('exportStatusSub').textContent = 'Menautkan formula interaktif Slip Jurnal & Rekapitulasi Cabang...';
+                document.getElementById('exportProgressText').textContent = 'Kalkulasi relasi formula...';
+            } else if (curPct >= 88 && curPct < 96) {
+                setExportStepState(3, 'completed');
+                setExportStepState(4, 'active');
+                document.getElementById('exportStatusTitle').textContent = 'Mengompresi Berkas Excel';
+                document.getElementById('exportStatusSub').textContent = 'Menyiapkan berkas .xlsx untuk diunduh ke browser...';
+                document.getElementById('exportProgressText').textContent = 'Mempersiapkan unduhan...';
+            }
+            if (curPct > 95) curPct = 95;
+            document.getElementById('exportProgressBar').style.width = curPct + '%';
+            document.getElementById('exportProgressPercent').textContent = curPct + '%';
+        }, 200);
+
+        fetch(finalExportUrl, {
+            method: 'GET',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(async response => {
+            clearInterval(exportTimer);
+
+            if (!response.ok) {
+                throw new Error('Gagal mengekspor data (Status: ' + response.status + ')');
+            }
+
+            // Dapatkan nama file dari header Content-Disposition
+            let filename = 'Jurnal_Keluhan_BankSulteng_' + new Date().toISOString().slice(0, 10) + '.xlsx';
+            const disposition = response.headers.get('Content-Disposition');
+            if (disposition && disposition.indexOf('filename=') !== -1) {
+                const matches = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/.exec(disposition);
+                if (matches != null && matches[1]) {
+                    filename = matches[1].replace(/['"]/g, '');
+                }
+            }
+
+            const totalRows = response.headers.get('X-Total-Count') || '';
+
+            const blob = await response.blob();
+            const downloadUrl = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.style.display = 'none';
+            a.href = downloadUrl;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            setTimeout(() => {
+                document.body.removeChild(a);
+                window.URL.revokeObjectURL(downloadUrl);
+            }, 200);
+
+            // Tampilkan UI Sukses
+            setExportStepState(1, 'completed');
+            setExportStepState(2, 'completed');
+            setExportStepState(3, 'completed');
+            setExportStepState(4, 'completed');
+
+            document.getElementById('exportProgressBar').style.width = '100%';
+            document.getElementById('exportProgressPercent').textContent = '100%';
+            document.getElementById('exportProgressText').textContent = 'Berkas Excel berhasil diunduh!';
+
+            document.getElementById('exportSpinnerSvg').style.display = 'none';
+            document.getElementById('exportSuccessCheckSvg').style.display = 'block';
+            document.getElementById('exportIconWrapper').style.background = '#dcfce7';
+            document.getElementById('exportIconWrapper').style.borderColor = '#86efac';
+
+            document.getElementById('exportStatusTitle').textContent = 'Ekspor Selesai!';
+            document.getElementById('exportStatusSub').textContent = (totalRows ? totalRows + ' baris transaksi' : 'Seluruh data transaksi') + ' berhasil diekspor ke format multi-sheet.';
+
+            setTimeout(() => {
+                closeExportModal();
+            }, 1800);
+        })
+        .catch(err => {
+            clearInterval(exportTimer);
+            console.error('Export error:', err);
+            closeExportModal();
+            showImportErrorModal('Gagal mengekspor berkas Excel: ' + (err.message || 'Terjadi kesalahan server.'), 'Ekspor Gagal');
+        });
+    }
 </script>
 @endpush

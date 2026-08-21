@@ -666,16 +666,13 @@
             </div>
         </div>
 
-        <form action="{{ route('logout') }}" method="POST" style="margin: 0;">
-            @csrf
-            <button type="submit" class="btn-sidebar-logout" title="Keluar / Logout">
-                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
-                    <polyline points="16 17 21 12 16 7"></polyline>
-                    <line x1="21" y1="12" x2="9" y2="12"></line>
-                </svg>
-            </button>
-        </form>
+        <button type="button" class="btn-sidebar-logout" onclick="openLogoutModal()" title="Keluar / Logout">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                <polyline points="16 17 21 12 16 7"></polyline>
+                <line x1="21" y1="12" x2="9" y2="12"></line>
+            </svg>
+        </button>
     </div>
 </aside>
 
@@ -707,19 +704,6 @@
             </div>
 
             @yield('topbar_action')
-
-            <!-- Topbar Logout Button -->
-            <form action="{{ route('logout') }}" method="POST" style="display: inline; margin: 0;">
-                @csrf
-                <button type="submit" class="btn-topbar-logout" title="Keluar dari Sistem">
-                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
-                        <polyline points="16 17 21 12 16 7"></polyline>
-                        <line x1="21" y1="12" x2="9" y2="12"></line>
-                    </svg>
-                    <span>Logout</span>
-                </button>
-            </form>
         </div>
     </header>
 
@@ -767,6 +751,36 @@
     </footer>
 </div>
 
+<!-- MODAL KONFIRMASI LOGOUT -->
+<div class="modal-backdrop" id="logoutModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(15, 23, 42, 0.65); z-index: 1200; backdrop-filter: blur(3px); align-items: center; justify-content: center; padding: 20px;">
+    <div style="background: #ffffff; border-radius: var(--radius-lg); width: 100%; max-width: 420px; box-shadow: var(--shadow-xl); overflow: hidden; animation: modalFadeIn 0.2s ease-out;">
+        <div style="padding: 26px 24px 18px; text-align: center;">
+            <div style="width: 56px; height: 56px; background-color: #fee2e2; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; color: var(--bs-danger);">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                    <polyline points="16 17 21 12 16 7"></polyline>
+                    <line x1="21" y1="12" x2="9" y2="12"></line>
+                </svg>
+            </div>
+            <h3 style="font-size: 18px; font-weight: 700; color: var(--bs-navy); margin-bottom: 8px;">Konfirmasi Logout</h3>
+            <p style="font-size: 13.5px; color: var(--bs-gray-600); line-height: 1.5; margin: 0;">
+                Apakah Anda benar-benar ingin keluar dari <strong>Sistem E-Jurnal Bank Sulteng</strong>?
+            </p>
+        </div>
+        <div style="padding: 16px 24px 20px; background-color: var(--bs-gray-50); border-top: 1px solid var(--bs-gray-200); display: flex; justify-content: center; gap: 12px;">
+            <button type="button" class="btn btn-secondary" onclick="closeLogoutModal()" style="min-width: 110px;">
+                Batal
+            </button>
+            <form action="{{ route('logout') }}" method="POST" style="margin: 0;">
+                @csrf
+                <button type="submit" class="btn" style="background-color: var(--bs-danger); color: #ffffff; min-width: 120px; border: none; font-weight: 600;">
+                    Ya, Logout
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
 <script>
     // Live Clock (WITA)
     function updateClock() {
@@ -803,6 +817,37 @@
     }
     if(overlay) {
         overlay.addEventListener('click', toggleSidebar);
+    }
+
+    // Modal Logout Functions
+    function openLogoutModal() {
+        const modal = document.getElementById('logoutModal');
+        if(modal) {
+            modal.style.display = 'flex';
+        }
+    }
+
+    function closeLogoutModal() {
+        const modal = document.getElementById('logoutModal');
+        if(modal) {
+            modal.style.display = 'none';
+        }
+    }
+
+    // Close Modal on Escape or Click Outside
+    window.addEventListener('keydown', function(e) {
+        if(e.key === 'Escape') {
+            closeLogoutModal();
+        }
+    });
+
+    const logoutModal = document.getElementById('logoutModal');
+    if(logoutModal) {
+        logoutModal.addEventListener('click', function(e) {
+            if(e.target === this) {
+                closeLogoutModal();
+            }
+        });
     }
 </script>
 
