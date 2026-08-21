@@ -504,6 +504,13 @@
             border: 1px solid #fca5a5;
         }
 
+        .badge-strip, .badge-neutral {
+            background-color: #f1f5f9;
+            color: #64748b;
+            border: 1px solid #cbd5e1;
+            font-weight: 700;
+        }
+
         .badge-channel {
             background-color: #f1f5f9;
             color: #334155;
@@ -650,7 +657,7 @@
                 <line x1="9" y1="21" x2="9" y2="9"></line>
             </svg>
             <span>Data Keluhan</span>
-            <span class="nav-badge">{{ \App\Models\Jurnal::count() }}</span>
+            <span class="nav-badge" id="sidebarBadgeCount">{{ number_format(\App\Models\Jurnal::count(), 0, ',', '.') }}</span>
         </a>
     </div>
 

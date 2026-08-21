@@ -12,7 +12,7 @@ Projek **Jurnal_Banksulteng** adalah aplikasi web berbasis **Laravel 12/13** yan
   - Mengklik tombol Hapus Data pada modal rincian akan membuka dialog konfirmasi hapus data permanen dengan double-confirmation.
 - **Modal Konfirmasi Hapus Data Ekstra Aman**: Dialog konfirmasi interaktif dengan rincian data nasabah dan peringatan permanen sebelum eksekusi penghapusan data.
 - **Standar Seluruh Input Wajib Diisi**: Menjamin kelengkapan data perbankan dengan mewajibkan seluruh 16 field pengaduan jurnal keluhan nasabah.
-- **Pencarian Bebas Huruf Besar/Kecil (*Case-Insensitive*)**: Pencarian instan (*live detect*) otomatis mendeteksi kata kunci baik ditulis huruf besar, kecil, maupun campuran (`budi`, `BUDI`, `Budi`) tanpa peduli kapitalisasi huruf.
+- **Pencarian Bebas Huruf Besar/Kecil (*Case-Insensitive*)**: Pencarian otomatis mendeteksi kata kunci baik ditulis huruf besar, kecil, maupun campuran (`budi`, `BUDI`, `Budi`) tanpa peduli kapitalisasi huruf.
 - **Penanda Teks Latar Kuning (*Yellow Highlight*)**: Kata yang cocok otomatis disorot dengan latar belakang kuning stabilo dengan tetap mempertahankan huruf besar/kecil asli data nasabah.
 - **Master Data 41 Kantor Cabang**: Mendukung seluruh jaringan kantor cabang, KCP, dan Bank Lain di seluruh wilayah Sulawesi Tengah & Jakarta.
 - **Pencatatan Terpusat**: Menggantikan pencatatan manual keluhan nasabah ke dalam sistem web yang terstruktur.
@@ -51,7 +51,7 @@ Projek **Jurnal_Banksulteng** adalah aplikasi web berbasis **Laravel 12/13** yan
 | 9 | **Fitur Auto-Fill AJAX** | Auto-fill biaya admin dan channel saat memilih jenis transaksi | **Selesai** | **100%** |
 | 10 | **Validasi Hard Anti-Duplikat** | Logika penolakan klaim ganda (Nama + No. Resi + Tanggal) | **Selesai** | **100%** |
 | 11 | **Case-Insensitive Live Search & Highlight** | Pencarian instan otomatis tanpa peduli huruf besar/kecil dengan highlight kuning | **Selesai** | **100%** |
-| 12 | **Tabel Data Keluhan Ultra Rapi** | Tabel daftar jurnal 8 kolom dengan single button "Detail" di kolom aksi | **Selesai** | **100%** |
+| 12 | **Tabel Data Keluhan Ultra Rapi** | Tabel daftar jurnal 9 kolom (termasuk kolom Channel terpisah) dengan single button "Detail" di kolom aksi | **Selesai** | **100%** |
 | 13 | **Pusat Aksi di Modal Detail** | Pop-up modal rincian 16 field lengkap dengan tombol Edit Data dan Hapus Data berdampingan | **Selesai** | **100%** |
 
 ---
@@ -107,14 +107,14 @@ Projek **Jurnal_Banksulteng** adalah aplikasi web berbasis **Laravel 12/13** yan
 | 6 | **Cabang Transaksi / Pelapor** | `master_cabang_id` | Select | **Wajib (`*`)** | Dropdown 41 daftar kantor cabang Bank Sulteng. |
 | 7 | **Jenis Transaksi** | `master_transaksi_id` | Select | **Wajib (`*`)** | Dropdown 33 jenis transaksi (memicu auto-fill). |
 | 8 | **Channel Transaksi (Otomatis)** | `channel` | Text (Readonly) | Otomatis | Terisi otomatis sesuai channel jenis transaksi. |
-| 9 | **Biaya Admin (Otomatis)** | `biaya_admin` | Text (Readonly) | Otomatis | Terisi otomatis dari database via AJAX saat jenis transaksi dipilih. |
+| 9 | **Biaya Admin (Pilihan)** | `biaya_admin` | Select | **Wajib (`*`)** | Dropdown pilihan biaya admin: `- (Rp 0)`, `Rp 1.000`, `Rp 1.500`, `Rp 1.750`, `Rp 2.000`, `Rp 2.500`, `Rp 2.750`, `Rp 3.000`, `Rp 6.500`, `Rp 7.500` / sesuai Excel saat import. |
 | 10 | **Biaya / Nominal Transaksi** | `nominal_transaksi` | Number | **Wajib (`*`)** | Jumlah nominal uang yang dikeluhkan nasabah (Rp). |
 | 11 | **Terminal Transaksi / Mesin** | `terminal_transaksi` | Text | **Wajib (`*`)** | ID Mesin ATM / Terminal EDC. |
 | 12 | **Tanggal Transaksi Bermasalah** | `tgl_transaksi` | Date | **Wajib (`*`)** | Tanggal saat nasabah melakukan transaksi yang bermasalah. |
 | 13 | **Tanggal Terima Keluhan** | `tgl_terima` | Date | **Wajib (`*`)** | Tanggal saat cabang/petugas menerima pengaduan nasabah. |
-| 14 | **Tanggal Selesai Penanganan** | `tgl_selesai` | Date | **Wajib (`*`)** | Tanggal saat keluhan selesai diproses/diselesaikan. |
-| 15 | **Status Keluhan** | `status` | Select | **Wajib (`*`)** | Pilihan: **Menunggu**, **Success**, **Done**, **Rejected**. |
-| 16 | **Keterangan Log / Kronologi** | `keterangan_log` | Textarea | **Wajib (`*`)** | Catatan kronologi keluhan atau detail tindak lanjut. |
+| 14 | **Tanggal Selesai Penanganan** | `tgl_selesai` | Date | Opsional | Tanggal saat keluhan selesai diproses (boleh kosong / `-` jika belum selesai). |
+| 15 | **Status Keluhan** | `status` | Select | **Wajib (`*`)** | Pilihan: **`-` (Belum Ditentukan)**, **Menunggu**, **Success**, **Done**, **Rejected** (otomatis `-` jika kosong di Excel). |
+| 16 | **Keterangan Log / Kronologi** | `keterangan_log` | Textarea | Opsional | Catatan kronologi keluhan atau detail tindak lanjut (default `-`). |
 
 ---
 

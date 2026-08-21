@@ -76,8 +76,16 @@ class JurnalController extends Controller
             $perPage = 10;
         }
 
-        // Urutkan data terbaru terlebih dahulu
-        $jurnals = $query->latest('id')->paginate($perPage)->withQueryString();
+        // Logika Pengurutan:
+        // Jika filter tanggal (tgl_dari / tgl_sampai) digunakan, urutkan kronologis dari tanggal terlama ke tanggal terbaru (ASC)
+        // Jika tidak ada filter tanggal, tampilkan data terbaru terlebih dahulu (DESC)
+        if ($request->filled('tgl_dari') || $request->filled('tgl_sampai')) {
+            $query->orderBy('tgl_transaksi', 'asc')->orderBy('id', 'asc');
+        } else {
+            $query->latest('id');
+        }
+
+        $jurnals = $query->paginate($perPage)->withQueryString();
 
         // Ambil data Master untuk pilihan filter
         $cabangs = MasterCabang::orderBy('kode_cabang')->get();
@@ -115,22 +123,31 @@ class JurnalController extends Controller
             'nama_nasabah'       => 'required|string|max:255',
             'no_resi'            => 'required|string|max:255|unique:jurnals,no_resi,NULL,id,nama_nasabah,' . $request->nama_nasabah . ',tgl_transaksi,' . $request->tgl_transaksi,
             'no_rekening'        => 'required|string|max:255',
-            'no_kartu'           => 'required|string|max:255',
-            'no_tiket'           => 'required|string|max:255',
+            'no_kartu'           => 'nullable|string|max:255',
+            'no_tiket'           => 'nullable|string|max:255',
             'master_cabang_id'   => 'required|exists:master_cabangs,id',
             'master_transaksi_id'=> 'required|exists:master_transaksis,id',
-            'terminal_transaksi' => 'required|string|max:255',
+            'terminal_transaksi' => 'nullable|string|max:255',
             'nominal_transaksi'  => 'required|numeric|min:0',
+            'biaya_admin'        => 'nullable|numeric|min:0',
             'tgl_transaksi'      => 'required|date',
             'tgl_terima'         => 'required|date',
-            'tgl_selesai'        => 'required|date',
-            'status'             => 'required|string|in:Menunggu,Done,Rejected,Success',
-            'keterangan_log'     => 'required|string'
+            'tgl_selesai'        => 'nullable|date',
+            'status'             => 'required|string|max:50',
+            'keterangan_log'     => 'nullable|string'
         ], [
             'no_resi.unique' => 'Gagal! Keluhan atas nama nasabah ini dengan No. Resi dan Tanggal tersebut sudah pernah dijurnal.'
         ]);
 
-        Jurnal::create($request->all());
+        $data = $request->all();
+        $data['biaya_admin'] = $request->filled('biaya_admin') ? (float)$request->biaya_admin : 0;
+        $data['status'] = $request->filled('status') ? $request->status : '-';
+        $data['no_kartu'] = $request->filled('no_kartu') ? $request->no_kartu : '-';
+        $data['no_tiket'] = $request->filled('no_tiket') ? $request->no_tiket : '-';
+        $data['terminal_transaksi'] = $request->filled('terminal_transaksi') ? $request->terminal_transaksi : '-';
+        $data['keterangan_log'] = $request->filled('keterangan_log') ? $request->keterangan_log : '-';
+
+        Jurnal::create($data);
 
         return redirect()->route('jurnal.index')->with('success', 'Jurnal keluhan nasabah berhasil disimpan!');
     }
@@ -176,22 +193,31 @@ class JurnalController extends Controller
             'nama_nasabah'       => 'required|string|max:255',
             'no_resi'            => 'required|string|max:255|unique:jurnals,no_resi,' . $id . ',id,nama_nasabah,' . $request->nama_nasabah . ',tgl_transaksi,' . $request->tgl_transaksi,
             'no_rekening'        => 'required|string|max:255',
-            'no_kartu'           => 'required|string|max:255',
-            'no_tiket'           => 'required|string|max:255',
+            'no_kartu'           => 'nullable|string|max:255',
+            'no_tiket'           => 'nullable|string|max:255',
             'master_cabang_id'   => 'required|exists:master_cabangs,id',
             'master_transaksi_id'=> 'required|exists:master_transaksis,id',
-            'terminal_transaksi' => 'required|string|max:255',
+            'terminal_transaksi' => 'nullable|string|max:255',
             'nominal_transaksi'  => 'required|numeric|min:0',
+            'biaya_admin'        => 'nullable|numeric|min:0',
             'tgl_transaksi'      => 'required|date',
             'tgl_terima'         => 'required|date',
-            'tgl_selesai'        => 'required|date',
-            'status'             => 'required|string|in:Menunggu,Done,Rejected,Success',
-            'keterangan_log'     => 'required|string'
+            'tgl_selesai'        => 'nullable|date',
+            'status'             => 'required|string|max:50',
+            'keterangan_log'     => 'nullable|string'
         ], [
             'no_resi.unique' => 'Gagal! Keluhan atas nama nasabah ini dengan No. Resi dan Tanggal tersebut sudah pernah dijurnal.'
         ]);
 
-        $jurnal->update($request->all());
+        $data = $request->all();
+        $data['biaya_admin'] = $request->filled('biaya_admin') ? (float)$request->biaya_admin : 0;
+        $data['status'] = $request->filled('status') ? $request->status : '-';
+        $data['no_kartu'] = $request->filled('no_kartu') ? $request->no_kartu : '-';
+        $data['no_tiket'] = $request->filled('no_tiket') ? $request->no_tiket : '-';
+        $data['terminal_transaksi'] = $request->filled('terminal_transaksi') ? $request->terminal_transaksi : '-';
+        $data['keterangan_log'] = $request->filled('keterangan_log') ? $request->keterangan_log : '-';
+
+        $jurnal->update($data);
 
         return redirect()->route('jurnal.index')->with('success', "Perubahan data jurnal keluhan {$jurnal->nama_nasabah} berhasil disimpan!");
     }
@@ -267,7 +293,13 @@ class JurnalController extends Controller
             $query->whereDate('tgl_transaksi', '<=', $request->tgl_sampai);
         }
 
-        $jurnals = $query->with(['masterCabang', 'masterTransaksi'])->orderBy('id', 'asc')->get();
+        if ($request->filled('tgl_dari') || $request->filled('tgl_sampai')) {
+            $query->orderBy('tgl_transaksi', 'asc')->orderBy('id', 'asc');
+        } else {
+            $query->orderBy('id', 'asc');
+        }
+
+        $jurnals = $query->with(['masterCabang', 'masterTransaksi'])->get();
 
         $spreadsheet = $this->buildCleanExportSpreadsheet($jurnals);
 
@@ -394,7 +426,7 @@ class JurnalController extends Controller
             $sheet1->setCellValueExplicit("I{$currentRow}", (string)($item->no_resi ?? ''), DataType::TYPE_STRING);
 
             $sheet1->setCellValue("J{$currentRow}", $item->masterTransaksi->jenis_transaksi ?? '');
-            $sheet1->setCellValue("K{$currentRow}", (float)($item->masterTransaksi->biaya_admin ?? 0));
+            $sheet1->setCellValue("K{$currentRow}", (float)($item->biaya_admin ?? $item->masterTransaksi->biaya_admin ?? 0));
             $sheet1->setCellValue("L{$currentRow}", $item->masterTransaksi->channel ?? '');
             
             // Format Cabang: "001 - CABANG UTAMA"
@@ -1138,6 +1170,8 @@ class JurnalController extends Controller
                         $columnMap['terminal_transaksi'] = $colIdx;
                     } elseif (empty($columnMap['nominal_transaksi']) && (str_contains($normVal, 'nominaltransaksi') || str_contains($normVal, 'nominal') || str_contains($normVal, 'jumlah') || str_contains($normVal, 'amount') || str_contains($normVal, 'nilai') || str_contains($normVal, 'totalnominal') || str_contains($normVal, 'total'))) {
                         $columnMap['nominal_transaksi'] = $colIdx;
+                    } elseif (empty($columnMap['biaya_admin']) && (str_contains($normVal, 'biayaadmin') || $normVal === 'admin' || str_contains($normVal, 'biayaadm') || str_contains($normVal, 'biayadmin') || str_contains($normVal, 'fee') || (str_contains($normVal, 'biaya') && !str_contains($normVal, 'nominal')) || str_contains($normVal, 'adm'))) {
+                        $columnMap['biaya_admin'] = $colIdx;
                     } elseif (empty($columnMap['channel']) && (str_contains($normVal, 'channel') || str_contains($normVal, 'chanel') || str_contains($normVal, 'kanal') || str_contains($normVal, 'media') || str_contains($normVal, 'via') || str_contains($normVal, 'jalur') || str_contains($normVal, 'tipechannel'))) {
                         $columnMap['channel'] = $colIdx;
                     } elseif (empty($columnMap['tgl_terima']) && (str_contains($normVal, 'tglterima') || str_contains($normVal, 'tanggalterima') || str_contains($normVal, 'tglmasuk') || str_contains($normVal, 'tanggalmasuk') || str_contains($normVal, 'tglpengaduan') || str_contains($normVal, 'penerimaan') || str_contains($normVal, 'tglterimalaporan'))) {
@@ -1181,6 +1215,7 @@ class JurnalController extends Controller
                 'nama_cabang'        => 11,
                 'jenis_transaksi'    => 12,
                 'channel'            => 13,
+                'biaya_admin'        => 14,
                 'nominal_transaksi'  => 15,
                 'terminal_transaksi' => 16,
                 'status'             => 17,
@@ -1257,13 +1292,17 @@ class JurnalController extends Controller
                 $parsedTerima  = $this->parseExcelDate($sheet, $columnMap, 'tgl_terima', $row);
                 $parsedSelesai = $this->parseExcelDate($sheet, $columnMap, 'tgl_selesai', $row);
 
-                $tglTransaksi = $parsedTrx ?? $parsedTerima ?? $parsedSelesai ?? now()->format('Y-m-d');
+                $tglTransaksi = $parsedTrx ?? $parsedTerima ?? now()->format('Y-m-d');
                 $tglTerima    = $parsedTerima ?? $tglTransaksi;
-                $tglSelesai   = $parsedSelesai ?? $tglTerima;
+                $tglSelesai   = $parsedSelesai; // Tetap null jika belum ada tanggal selesai di Excel
 
                 // Parse Nominal
                 $rawNominal = $this->getCellValue($sheet, $columnMap, 'nominal_transaksi', $row);
                 $nominal = $this->parseNominal($rawNominal);
+
+                // Parse Biaya Admin dari Excel
+                $rawBiayaAdmin = $this->getCellValue($sheet, $columnMap, 'biaya_admin', $row);
+                $biayaAdmin = $rawBiayaAdmin !== null ? $this->parseNominal($rawBiayaAdmin) : 0;
 
                 // Parse Cabang Pintar
                 $kodeCabang = trim((string)$this->getCellValue($sheet, $columnMap, 'kode_cabang', $row));
@@ -1275,14 +1314,14 @@ class JurnalController extends Controller
                 $channel        = trim((string)$this->getCellValue($sheet, $columnMap, 'channel', $row));
                 $transaksiId    = $this->resolveTransaksiId($jenisTransaksi, $channel, $transaksiByKey, $defaultTransaksiId);
 
-                // Parse Status Fleksibel
+                // Parse Status Fleksibel (Kosong -> '-')
                 $rawStatus = trim((string)$this->getCellValue($sheet, $columnMap, 'status', $row));
                 $status    = $this->parseStatus($rawStatus);
 
-                $noKartu   = $this->getCellValue($sheet, $columnMap, 'no_kartu', $row) ?? '-';
-                $noTiket   = $this->getCellValue($sheet, $columnMap, 'no_tiket', $row) ?? '';
-                $terminal  = $this->getCellValue($sheet, $columnMap, 'terminal_transaksi', $row) ?? '-';
-                $keterangan = $this->getCellValue($sheet, $columnMap, 'keterangan_log', $row) ?? 'Diimpor otomatis dari Master Excel.';
+                $noKartu   = $this->getCellValue($sheet, $columnMap, 'no_kartu', $row) ?: '-';
+                $noTiket   = $this->getCellValue($sheet, $columnMap, 'no_tiket', $row) ?: '-';
+                $terminal  = $this->getCellValue($sheet, $columnMap, 'terminal_transaksi', $row) ?: '-';
+                $keterangan = $this->getCellValue($sheet, $columnMap, 'keterangan_log', $row) ?: '-';
 
                 // Simpan / Perbarui data ke Database dengan Anti-Duplikat
                 $existing = Jurnal::where('nama_nasabah', $namaNasabah)
@@ -1303,6 +1342,7 @@ class JurnalController extends Controller
                     'master_transaksi_id' => $transaksiId,
                     'terminal_transaksi'  => $terminal,
                     'nominal_transaksi'   => $nominal,
+                    'biaya_admin'         => $biayaAdmin,
                     'status'              => $status,
                     'keterangan_log'      => $keterangan,
                 ];
@@ -1440,12 +1480,14 @@ class JurnalController extends Controller
     }
 
     /**
-     * Helper konversi status teks Excel ke status standar sistem (Success, Done, Rejected, Menunggu)
+     * Helper konversi status teks Excel ke status standar sistem (Success, Done, Rejected, Menunggu, atau '-')
      */
     private function parseStatus($rawStatus)
     {
         $s = strtolower(trim((string)$rawStatus));
-        if (empty($s)) return 'Menunggu';
+        if (empty($s) || $s === '-' || $s === 'null' || $s === 'none' || $s === 'undefined') {
+            return '-';
+        }
 
         // 1. Status Selesai / Done / Closed
         if (str_contains($s, 'done') || str_contains($s, 'selesai') || str_contains($s, 'close') || str_contains($s, 'closed') || str_contains($s, 'lunas') || str_contains($s, 'finish')) {
@@ -1462,8 +1504,13 @@ class JurnalController extends Controller
             return 'Rejected';
         }
 
-        // 4. Default: Menunggu / Pending / On Progress
-        return 'Menunggu';
+        // 4. Status Menunggu / Pending / On Progress
+        if (str_contains($s, 'menunggu') || str_contains($s, 'pending') || str_contains($s, 'progress') || str_contains($s, 'proses')) {
+            return 'Menunggu';
+        }
+
+        // 5. Default jika ada teks lain di excel, simpan nilai aslinya atau '-'
+        return trim((string)$rawStatus) ?: '-';
     }
 
     /**
@@ -1628,15 +1675,17 @@ class JurnalController extends Controller
                 }
             }
 
-            // Buat cabang baru jika belum ada sama sekali
-            $newKode = !empty($rawKode) ? str_pad($rawKode, 3, '0', STR_PAD_LEFT) : 'CBG-' . rand(100, 999);
-            $newCabang = MasterCabang::firstOrCreate(
-                ['nama_cabang' => strtoupper($rawNama)],
-                ['kode_cabang' => $newKode]
-            );
-            $byKode[strtoupper($newCabang->kode_cabang)] = $newCabang->id;
-            $byNama[strtolower($newCabang->nama_cabang)] = $newCabang->id;
-            return $newCabang->id;
+            // Buat cabang baru HANYA jika benar-benar nama kantor valid (bukan murni angka / strip / tanggal)
+            if (!empty($rawNama) && strlen($rawNama) >= 4 && !is_numeric($rawNama) && $rawNama !== '-' && preg_match('/[a-zA-Z]/', $rawNama)) {
+                $newKode = !empty($rawKode) && strlen($rawKode) === 3 ? strtoupper($rawKode) : 'CBG-' . rand(100, 999);
+                $newCabang = MasterCabang::firstOrCreate(
+                    ['nama_cabang' => strtoupper($rawNama)],
+                    ['kode_cabang' => $newKode]
+                );
+                $byKode[strtoupper($newCabang->kode_cabang)] = $newCabang->id;
+                $byNama[strtolower($newCabang->nama_cabang)] = $newCabang->id;
+                return $newCabang->id;
+            }
         }
 
         return $defaultId;
@@ -1681,7 +1730,7 @@ class JurnalController extends Controller
     }
 
     /**
-     * Helper resolve ID Master Transaksi yang valid (mencegah tanggal, log panjang, norek masuk ke master transaksi)
+     * Helper resolve ID Master Transaksi yang valid (mencocokkan jenis transaksi & channel resmi Bank Sulteng)
      */
     private function resolveTransaksiId($jenis, $channel, &$byKey, $defaultId)
     {
@@ -1690,36 +1739,93 @@ class JurnalController extends Controller
 
         // 1. Cek apakah $rawJenis adalah Tanggal, Log Keterangan, Nomor Rekening, atau Karakter Tak Valid
         if ($this->isInvalidJenisTransaksi($rawJenis)) {
-            $rawJenis = 'Keluhan Transaksi';
+            $rawJenis = 'ATM_TARIK TUNAI ATM BANK SULTENG';
         }
 
-        $jenisClean = $rawJenis ?: 'Keluhan Transaksi';
-        $channelClean = $rawChannel ?: 'UMUM';
+        $jenisClean = $rawJenis ?: 'ATM_TARIK TUNAI ATM BANK SULTENG';
+        $normJenis = strtolower(preg_replace('/[^a-zA-Z0-9]/', '', $jenisClean));
 
-        // 2. Cek apakah kombinasi sudah ada di Master Data
-        $key = strtolower($jenisClean) . '___' . strtolower($channelClean);
-        if (isset($byKey[$key])) {
-            return $byKey[$key];
+        // 2. Jika channel diisi di Excel, coba cocokkan kombinasi jenis___channel
+        if (!empty($rawChannel) && $rawChannel !== '-' && strtolower($rawChannel) !== 'umum') {
+            $key = strtolower($jenisClean) . '___' . strtolower($rawChannel);
+            if (isset($byKey[$key])) {
+                return $byKey[$key];
+            }
         }
 
-        // 3. Cek apakah jenis_transaksi sudah cocok dengan salah satu di database
+        // 3. Cek pencocokan eksak jenis_transaksi dengan master data resmi
         foreach ($byKey as $k => $id) {
             $parts = explode('___', $k);
-            if (isset($parts[0]) && strtolower($jenisClean) === $parts[0]) {
+            $dbJenis = $parts[0] ?? '';
+            $normDb = strtolower(preg_replace('/[^a-zA-Z0-9]/', '', $dbJenis));
+            if ($normJenis === $normDb) {
                 return $id;
             }
         }
 
-        // 4. Hanya buat record baru jika benar-benar nama transaksi yang valid (bukan tanggal, bukan log)
-        if (strlen($jenisClean) <= 45 && !$this->isInvalidJenisTransaksi($jenisClean)) {
+        // 4. Cek pencocokan substring / fuzzy dengan master data resmi
+        foreach ($byKey as $k => $id) {
+            $parts = explode('___', $k);
+            $dbJenis = $parts[0] ?? '';
+            $normDb = strtolower(preg_replace('/[^a-zA-Z0-9]/', '', $dbJenis));
+            if (strlen($normJenis) >= 5 && (str_contains($normDb, $normJenis) || str_contains($normJenis, $normDb))) {
+                return $id;
+            }
+        }
+
+        // 5. Cerdas tentukan channel dari nama transaksi jika belum ada channel spesifik
+        $autoChannel = $this->detectChannelFromJenis($jenisClean);
+        if (!empty($rawChannel) && $rawChannel !== '-' && strtolower($rawChannel) !== 'umum') {
+            $autoChannel = strtoupper($rawChannel);
+        }
+
+        // 6. Buat master transaksi baru hanya jika nama valid
+        if (strlen($jenisClean) <= 50 && !$this->isInvalidJenisTransaksi($jenisClean)) {
             $transaksi = MasterTransaksi::firstOrCreate(
-                ['jenis_transaksi' => strtoupper($jenisClean), 'channel' => strtoupper($channelClean)],
-                ['biaya_admin' => 0]
+                ['jenis_transaksi' => strtoupper($jenisClean)],
+                ['channel' => $autoChannel, 'biaya_admin' => 0]
             );
+            $key = strtolower($transaksi->jenis_transaksi) . '___' . strtolower($transaksi->channel);
             $byKey[$key] = $transaksi->id;
             return $transaksi->id;
         }
 
         return $defaultId;
+    }
+
+    /**
+     * Helper deteksi channel perbankan otomatis berdasarkan pola nama jenis transaksi
+     */
+    private function detectChannelFromJenis($jenis)
+    {
+        $j = strtolower($jenis);
+        if (str_contains($j, 'mbanking') || str_contains($j, 'm-banking') || str_contains($j, 'mobile') || str_contains($j, 'qris')) {
+            return 'MOBILE BANKING';
+        }
+        if (str_contains($j, 'sms')) {
+            return 'SMS BANKING';
+        }
+        if (str_contains($j, 'edc')) {
+            return str_contains($j, 'lain') ? 'EDC BANK LAIN' : 'DEBIT';
+        }
+        if (str_contains($j, 'laku pandai')) {
+            return 'LAKU PANDAI';
+        }
+        if (str_contains($j, 'cctv')) {
+            return 'CCTV';
+        }
+        if (str_contains($j, 'telkom') || str_contains($j, 'pulsa') || str_contains($j, 'pln') || str_contains($j, 'dana') || str_contains($j, 'gopay') || str_contains($j, 'bpjs') || str_contains($j, 'halo') || str_contains($j, 'pembayaran') || str_contains($j, 'pembelian') || str_contains($j, 'finnet')) {
+            return 'FINNET';
+        }
+        if (str_contains($j, 'bank lain') || str_contains($j, 'bersama')) {
+            return 'ATM BERSAMA';
+        }
+        if (str_contains($j, 'link')) {
+            return 'ATM LINK';
+        }
+        if (str_contains($j, 'atm') || str_contains($j, 'crm')) {
+            return 'ATM LOKAL';
+        }
+        return '-';
     }
 }

@@ -230,10 +230,20 @@
                         <input type="text" id="channel" readonly placeholder="Akan terisi otomatis...">
                     </div>
 
-                    <!-- Biaya Admin (Auto-fill) -->
+                    <!-- Biaya Admin (Dropdown) -->
                     <div class="form-group">
-                        <label>Biaya Admin (Otomatis)</label>
-                        <input type="text" id="biaya_admin" readonly placeholder="Akan terisi otomatis...">
+                        <label>Biaya Admin (Rp) <span class="required">*</span></label>
+                        @php
+                            $adminFeeOptions = [0, 1000, 1500, 1750, 2000, 2500, 2750, 3000, 6500, 7500];
+                            $selectedAdmin = (float) old('biaya_admin', 0);
+                        @endphp
+                        <select name="biaya_admin" id="biaya_admin" required>
+                            @foreach($adminFeeOptions as $fee)
+                                <option value="{{ $fee }}" {{ $selectedAdmin == $fee ? 'selected' : '' }}>
+                                    {{ $fee == 0 ? '- (Rp 0)' : 'Rp ' . number_format($fee, 0, ',', '.') }}
+                                </option>
+                            @endforeach
+                        </select>
                     </div>
 
                     <!-- Nominal Transaksi -->
@@ -271,14 +281,15 @@
 
                     <!-- Tanggal Selesai -->
                     <div class="form-group">
-                        <label>Tanggal Selesai Penanganan <span class="required">*</span></label>
-                        <input type="date" name="tgl_selesai" value="{{ old('tgl_selesai') }}" required>
+                        <label>Tanggal Selesai Penanganan <span style="font-size: 11.5px; color: var(--bs-gray-500); font-weight: normal;">(Opsional jika belum selesai)</span></label>
+                        <input type="date" name="tgl_selesai" value="{{ old('tgl_selesai') }}">
                     </div>
 
                     <!-- Status -->
                     <div class="form-group">
                         <label>Status Keluhan <span class="required">*</span></label>
                         <select name="status" required>
+                            <option value="-" {{ old('status') == '-' ? 'selected' : '' }}>- (Belum Ditentukan)</option>
                             <option value="Menunggu" {{ old('status', 'Menunggu') == 'Menunggu' ? 'selected' : '' }}>Menunggu</option>
                             <option value="Success" {{ old('status') == 'Success' ? 'selected' : '' }}>Success</option>
                             <option value="Done" {{ old('status') == 'Done' ? 'selected' : '' }}>Done</option>
@@ -288,8 +299,8 @@
 
                     <!-- Keterangan Log -->
                     <div class="form-group full-width">
-                        <label>Keterangan Log / Catatan Kronologi Keluhan <span class="required">*</span></label>
-                        <textarea name="keterangan_log" required placeholder="Tuliskan catatan, kronologi masalah, atau tindak lanjut petugas di sini...">{{ old('keterangan_log') }}</textarea>
+                        <label>Keterangan Log / Catatan Kronologi Keluhan</label>
+                        <textarea name="keterangan_log" placeholder="Tuliskan catatan, kronologi masalah, atau tindak lanjut petugas di sini...">{{ old('keterangan_log') }}</textarea>
                     </div>
                 </div>
 
@@ -318,20 +329,18 @@
 
 @push('scripts')
 <script>
-    // Logic Auto-fill AJAX saat Jenis Transaksi dipilih
+    // Logic Auto-fill AJAX saat Jenis Transaksi dipilih (Channel)
     function loadDetailTransaksi(id) {
         if(id) {
             fetch('/api/transaksi/' + id)
                 .then(response => response.json())
                 .then(data => {
-                    document.getElementById('biaya_admin').value = data.biaya_admin ? 'Rp ' + Number(data.biaya_admin).toLocaleString('id-ID') : 'Rp 0';
                     document.getElementById('channel').value = data.channel || '-';
                 })
                 .catch(err => {
                     console.error('Gagal memuat detail transaksi:', err);
                 });
         } else {
-            document.getElementById('biaya_admin').value = '';
             document.getElementById('channel').value = '';
         }
     }

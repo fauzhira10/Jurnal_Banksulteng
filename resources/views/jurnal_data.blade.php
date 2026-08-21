@@ -872,14 +872,9 @@
     <div class="card-body">
         <form id="filterForm" method="GET" action="{{ route('jurnal.index') }}" onsubmit="return false;">
             <div class="filter-grid">
-                <!-- Search Keyword with Live Indicator -->
+                <!-- Search Keyword -->
                 <div class="filter-group">
-                    <div style="display: flex; justify-content: space-between; align-items: center;">
-                        <label for="searchInput">Pencarian Otomatis</label>
-                        <span class="live-search-badge" id="searchBadge">
-                            <span class="pulse-dot"></span> Live Detect
-                        </span>
-                    </div>
+                    <label for="searchInput">Pencarian Otomatis</label>
                     <div class="search-input-wrapper">
                         <span class="search-icon">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -902,6 +897,7 @@
                     <label for="filterStatus">Status</label>
                     <select id="filterStatus" name="status" class="form-control">
                         <option value="">-- Semua Status --</option>
+                        <option value="-" {{ request('status') === '-' ? 'selected' : '' }}>- (Belum Ditentukan)</option>
                         <option value="Menunggu" {{ request('status') == 'Menunggu' ? 'selected' : '' }}>Menunggu</option>
                         <option value="Success" {{ request('status') == 'Success' ? 'selected' : '' }}>Success</option>
                         <option value="Done" {{ request('status') == 'Done' ? 'selected' : '' }}>Done</option>
@@ -922,16 +918,16 @@
                     </select>
                 </div>
 
-                <!-- Tanggal Dari -->
+                <!-- Tanggal Transaksi Dari -->
                 <div class="filter-group">
-                    <label for="filterTglDari">Tanggal Dari</label>
-                    <input type="date" id="filterTglDari" name="tgl_dari" value="{{ request('tgl_dari') }}" class="form-control">
+                    <label for="filterTglDari">Tgl Transaksi (Dari)</label>
+                    <input type="date" id="filterTglDari" name="tgl_dari" value="{{ request('tgl_dari') }}" class="form-control" title="Filter awal tanggal transaksi">
                 </div>
 
-                <!-- Tanggal Sampai -->
+                <!-- Tanggal Transaksi Sampai -->
                 <div class="filter-group">
-                    <label for="filterTglSampai">Tanggal Sampai</label>
-                    <input type="date" id="filterTglSampai" name="tgl_sampai" value="{{ request('tgl_sampai') }}" class="form-control">
+                    <label for="filterTglSampai">Tgl Transaksi (Sampai)</label>
+                    <input type="date" id="filterTglSampai" name="tgl_sampai" value="{{ request('tgl_sampai') }}" class="form-control" title="Filter batas akhir tanggal transaksi">
                 </div>
             </div>
         </form>
@@ -974,7 +970,7 @@
                     <polyline points="3 6 5 6 21 6"></polyline>
                     <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
                 </svg>
-                <span>Reset Semua Data</span>
+                <span>Hapus Semua Data</span>
             </button>
         </div>
     </div>
@@ -1006,6 +1002,7 @@
                             <th>Data Nasabah</th>
                             <th>Kantor Cabang</th>
                             <th>Jenis Transaksi</th>
+                            <th style="text-align: center; width: 110px;">Channel</th>
                             <th>Nominal Transaksi</th>
                             <th>Status</th>
                             <th style="text-align: center; width: 75px;">Aksi</th>
@@ -1019,9 +1016,9 @@
                                 </td>
                                 <td>
                                     <div style="font-weight: 600; color: var(--bs-navy);">
-                                        {{ \Carbon\Carbon::parse($jurnal->tgl_transaksi)->translatedFormat('d M Y') }}
+                                        Transaksi: {{ \Carbon\Carbon::parse($jurnal->tgl_transaksi)->translatedFormat('d M Y') }}
                                     </div>
-                                    <div style="font-size: 11.5px; color: var(--bs-gray-500); margin-top: 2px;">
+                                    <div style="font-size: 11.5px; color: var(--bs-gray-500); margin-top: 5px;">
                                         Terima: {{ \Carbon\Carbon::parse($jurnal->tgl_terima)->translatedFormat('d/m/Y') }}
                                     </div>
                                 </td>
@@ -1050,32 +1047,33 @@
                                     <div class="highlightable" style="font-weight: 600; color: var(--bs-navy);">
                                         {{ $jurnal->masterTransaksi->jenis_transaksi ?? '-' }}
                                     </div>
-                                    <div style="margin-top: 4px;">
-                                        <span class="badge badge-channel highlightable">
-                                            {{ $jurnal->masterTransaksi->channel ?? 'UMUM' }}
-                                        </span>
-                                    </div>
+                                </td>
+                                <td style="text-align: center; vertical-align: middle; white-space: nowrap;">
+                                    <span class="badge badge-channel highlightable">
+                                        {{ $jurnal->masterTransaksi->channel ?? '-' }}
+                                    </span>
                                 </td>
                                 <td style="white-space: nowrap;">
                                     <div class="nominal-badge highlightable" style="font-size: 14.5px;">
                                         Rp {{ number_format($jurnal->nominal_transaksi, 0, ',', '.') }}
                                     </div>
                                     <div style="font-size: 11.5px; color: var(--bs-gray-500); margin-top: 2px;">
-                                        Admin: Rp {{ number_format($jurnal->masterTransaksi->biaya_admin ?? 0, 0, ',', '.') }}
+                                        Admin: Rp {{ number_format($jurnal->biaya_admin ?? $jurnal->masterTransaksi->biaya_admin ?? 0, 0, ',', '.') }}
                                     </div>
                                 </td>
                                 <td>
                                     @php
-                                        $statusClass = match(strtolower($jurnal->status)) {
+                                        $st = strtolower(trim($jurnal->status ?? '-'));
+                                        $statusClass = match($st) {
                                             'menunggu' => 'badge-menunggu',
                                             'success' => 'badge-success',
                                             'done' => 'badge-done',
                                             'rejected' => 'badge-rejected',
-                                            default => 'badge-menunggu'
+                                            default => 'badge-strip'
                                         };
                                     @endphp
                                     <span class="badge {{ $statusClass }}">
-                                        {{ $jurnal->status }}
+                                        {{ $jurnal->status ?: '-' }}
                                     </span>
                                 </td>
                                 <td style="text-align: center; vertical-align: middle; white-space: nowrap;">
@@ -1795,7 +1793,7 @@
             if (!emptyRow) {
                 emptyRow = document.createElement('tr');
                 emptyRow.id = 'localEmptyRow';
-                emptyRow.innerHTML = `<td colspan="8" style="text-align: center; padding: 35px 20px; color: var(--bs-gray-500);">
+                emptyRow.innerHTML = `<td colspan="9" style="text-align: center; padding: 35px 20px; color: var(--bs-gray-500);">
                     <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom: 8px; color: var(--bs-gray-400);">
                         <circle cx="11" cy="11" r="8"></circle>
                         <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
@@ -1889,6 +1887,12 @@
                     currentStats.innerHTML = newStats.innerHTML;
                 }
 
+                const newSidebarBadge = doc.getElementById('sidebarBadgeCount');
+                const currentSidebarBadge = document.getElementById('sidebarBadgeCount');
+                if (newSidebarBadge && currentSidebarBadge) {
+                    currentSidebarBadge.textContent = newSidebarBadge.textContent;
+                }
+
                 // Terapkan kembali penyorotan kuning pada data baru
                 applyYellowHighlights(document.getElementById('searchInput').value);
                 bindPaginationEvents();
@@ -1980,7 +1984,7 @@
 
     // Formatting & Modal Detail Functions
     function formatDateIndo(dateStr) {
-        if(!dateStr) return '-';
+        if(!dateStr || dateStr === '-' || dateStr === 'null') return '-';
         const d = new Date(dateStr);
         if(isNaN(d.getTime())) return dateStr;
         return d.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
@@ -2000,11 +2004,18 @@
         const nominal = Number(jurnal.nominal_transaksi) || 0;
         document.getElementById('modal_nominal_transaksi').textContent = 'Rp ' + nominal.toLocaleString('id-ID');
         
-        const admin = (jurnal.master_transaksi && Number(jurnal.master_transaksi.biaya_admin)) ? Number(jurnal.master_transaksi.biaya_admin) : 0;
+        const admin = Number(jurnal.biaya_admin !== null && jurnal.biaya_admin !== undefined ? jurnal.biaya_admin : (jurnal.master_transaksi ? jurnal.master_transaksi.biaya_admin : 0)) || 0;
         document.getElementById('modal_biaya_admin').textContent = 'Rp ' + admin.toLocaleString('id-ID');
         
         document.getElementById('modal_terminal_transaksi').textContent = jurnal.terminal_transaksi || '-';
-        document.getElementById('modal_status').innerHTML = '<span class="badge badge-' + (jurnal.status || '').toLowerCase() + '">' + (jurnal.status || '-') + '</span>';
+        
+        const rawSt = (jurnal.status || '-').toLowerCase().trim();
+        let statusBadgeClass = 'badge-strip';
+        if (rawSt === 'menunggu') statusBadgeClass = 'badge-menunggu';
+        else if (rawSt === 'success') statusBadgeClass = 'badge-success';
+        else if (rawSt === 'done') statusBadgeClass = 'badge-done';
+        else if (rawSt === 'rejected') statusBadgeClass = 'badge-rejected';
+        document.getElementById('modal_status').innerHTML = '<span class="badge ' + statusBadgeClass + '">' + (jurnal.status || '-') + '</span>';
         
         document.getElementById('modal_tgl_transaksi').textContent = formatDateIndo(jurnal.tgl_transaksi);
         document.getElementById('modal_tgl_terima').textContent = formatDateIndo(jurnal.tgl_terima);
@@ -2120,6 +2131,10 @@
                 showImportSuccessModal({ total: data.deleted_count || 0, inserted: 0, updated: 0 }, 'Seluruh Data Dibersihkan');
                 const fileEl = document.getElementById('resFileName');
                 if (fileEl) fileEl.textContent = 'Database Dikosongkan (Siap Import Baru)';
+
+                // Reset angka counter di sidebar ke 0
+                const sidebarBadge = document.getElementById('sidebarBadgeCount');
+                if (sidebarBadge) sidebarBadge.textContent = '0';
             } else {
                 showImportErrorModal(data.message || 'Gagal mereset data.');
             }
