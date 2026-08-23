@@ -53,6 +53,8 @@ Projek **Jurnal_Banksulteng** adalah aplikasi web berbasis **Laravel 12/13** yan
 | 11 | **Case-Insensitive Live Search & Highlight** | Pencarian instan otomatis tanpa peduli huruf besar/kecil dengan highlight kuning | **Selesai** | **100%** |
 | 12 | **Tabel Data Keluhan Ultra Rapi** | Tabel daftar jurnal 9 kolom (termasuk kolom Channel terpisah) dengan single button "Detail" di kolom aksi | **Selesai** | **100%** |
 | 13 | **Pusat Aksi di Modal Detail** | Pop-up modal rincian 16 field lengkap dengan tombol Edit Data dan Hapus Data berdampingan | **Selesai** | **100%** |
+| 14 | **Laporan Rekapitulasi Keluhan Bulanan** | Matriks 12 bulan (Jan-Des), tab drilldown bulanan, 8 kelompok klaim standar, dan export Excel identik | **Selesai** | **100%** |
+| 15 | **Monitoring Mesin ATM Bermasalah** | Peringkat terminal ATM berdasarkan jumlah keluhan terbanyak, KPI cards, filter cabang/periode, modal drill-down nasabah, dan export Excel | **Selesai** | **100%** |
 
 ---
 

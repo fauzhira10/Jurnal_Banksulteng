@@ -1,7 +1,9 @@
 <?php
 
+use App\Http\Controllers\AtmMonitoringController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\JurnalController;
+use App\Http\Controllers\LaporanController;
 use Illuminate\Support\Facades\Route;
 
 // Rute Autentikasi (Hanya untuk Tamu / Guest)
@@ -39,6 +41,14 @@ Route::middleware('auth')->group(function () {
 
     // Route Hapus Data Jurnal Keluhan
     Route::delete('/jurnal/{id}', [JurnalController::class, 'destroy'])->name('jurnal.destroy')->whereNumber('id');
+
+    // Route Menu Laporan Rekapitulasi Penyelesaian Keluhan Nasabah (Bulanan & Tahunan)
+    Route::get('/laporan/rekapitulasi', [LaporanController::class, 'index'])->name('laporan.index');
+    Route::get('/laporan/export-excel', [LaporanController::class, 'exportExcel'])->name('laporan.export_excel');
+
+    // Route Menu Monitoring & Rekapitulasi Keluhan Mesin ATM
+    Route::get('/atm-monitoring', [AtmMonitoringController::class, 'index'])->name('atm.index');
+    Route::get('/atm-monitoring/export-excel', [AtmMonitoringController::class, 'exportExcel'])->name('atm.export_excel');
 
     // Route API AJAX Auto-Fill Biaya Admin & Channel
     Route::get('/api/transaksi/{id}', [JurnalController::class, 'getDetailTransaksi'])->name('api.transaksi.detail');

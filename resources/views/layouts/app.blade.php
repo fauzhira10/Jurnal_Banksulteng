@@ -659,6 +659,27 @@
             <span>Data Keluhan</span>
             <span class="nav-badge" id="sidebarBadgeCount">{{ number_format(\App\Models\Jurnal::count(), 0, ',', '.') }}</span>
         </a>
+
+        <!-- Menu 3: Rekap Laporan Keluhan -->
+        <a href="{{ route('laporan.index') }}" class="nav-link {{ request()->routeIs('laporan.*') ? 'active' : '' }}">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="18" y1="20" x2="18" y2="10"></line>
+                <line x1="12" y1="20" x2="12" y2="4"></line>
+                <line x1="6" y1="20" x2="6" y2="14"></line>
+            </svg>
+            <span>Rekap Laporan Keluhan</span>
+        </a>
+
+        <!-- Menu 4: Monitoring Mesin ATM -->
+        <a href="{{ route('atm.index') }}" class="nav-link {{ request()->routeIs('atm.*') ? 'active' : '' }}">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect>
+                <rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect>
+                <line x1="6" y1="6" x2="6.01" y2="6"></line>
+                <line x1="6" y1="18" x2="6.01" y2="18"></line>
+            </svg>
+            <span>Monitoring Mesin ATM</span>
+        </a>
     </div>
 
     <!-- Sidebar Footer -->
