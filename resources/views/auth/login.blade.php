@@ -3,246 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login Petugas - E-Jurnal Keluhan Bank Sulteng</title>
+    <title>Login Petugas - E-JURNAL KELUHAN Bank Sulteng</title>
     
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     
-    <style>
-        :root {
-            --bs-navy: #0b2f54;
-            --bs-navy-dark: #071f38;
-            --bs-blue: #0066cc;
-            --bs-blue-light: #e6f0fa;
-            --bs-gold: #f59e0b;
-            --bs-gray-100: #f1f5f9;
-            --bs-gray-200: #e2e8f0;
-            --bs-gray-300: #cbd5e1;
-            --bs-gray-400: #94a3b8;
-            --bs-gray-500: #64748b;
-            --bs-gray-600: #475569;
-            --bs-gray-700: #334155;
-            --bs-gray-800: #1e293b;
-            --radius-md: 10px;
-            --radius-lg: 16px;
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
-        body {
-            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: radial-gradient(circle at top right, #13467b 0%, var(--bs-navy) 45%, var(--bs-navy-dark) 100%);
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-            position: relative;
-            overflow-x: hidden;
-        }
-
-        /* Subtle Background Decorative Elements */
-        .bg-pattern {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-image: 
-                radial-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px);
-            background-size: 28px 28px;
-            pointer-events: none;
-        }
-
-        .login-card {
-            background: #ffffff;
-            width: 100%;
-            max-width: 440px;
-            border-radius: var(--radius-lg);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.35);
-            overflow: hidden;
-            position: relative;
-            z-index: 10;
-            animation: fadeIn 0.35s ease-out;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(15px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .login-header {
-            background: linear-gradient(135deg, var(--bs-navy) 0%, var(--bs-navy-dark) 100%);
-            color: #ffffff;
-            padding: 32px 28px 24px;
-            text-align: center;
-            border-bottom: 3px solid var(--bs-gold);
-            position: relative;
-        }
-
-        .brand-icon {
-            width: 52px;
-            height: 52px;
-            background: #ffffff;
-            border-radius: 12px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--bs-navy);
-            margin-bottom: 12px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-        }
-
-        .login-header h1 {
-            font-size: 19px;
-            font-weight: 800;
-            letter-spacing: 0.5px;
-            margin-bottom: 4px;
-        }
-
-        .login-header p {
-            font-size: 12px;
-            color: #93c5fd;
-            font-weight: 500;
-        }
-
-        .login-body {
-            padding: 32px 28px 30px;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-        }
-
-        .form-group label {
-            font-size: 13px;
-            font-weight: 600;
-            color: var(--bs-gray-700);
-        }
-
-        .input-wrapper {
-            position: relative;
-            display: flex;
-            align-items: center;
-        }
-
-        .input-icon {
-            position: absolute;
-            left: 14px;
-            color: var(--bs-gray-400);
-            pointer-events: none;
-            display: flex;
-            align-items: center;
-        }
-
-        .form-control {
-            width: 100%;
-            padding: 11px 14px 11px 42px;
-            border: 1px solid var(--bs-gray-300);
-            border-radius: var(--radius-md);
-            font-size: 14px;
-            color: var(--bs-gray-800);
-            transition: all 0.2s ease;
-            font-family: inherit;
-        }
-
-        .form-control:focus {
-            border-color: var(--bs-blue);
-            outline: none;
-            box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.15);
-        }
-
-        .btn-toggle-pwd {
-            position: absolute;
-            right: 12px;
-            background: transparent;
-            border: none;
-            color: var(--bs-gray-400);
-            cursor: pointer;
-            padding: 4px;
-            display: flex;
-            align-items: center;
-        }
-
-        .btn-toggle-pwd:hover {
-            color: var(--bs-gray-600);
-        }
-
-        .btn-login {
-            width: 100%;
-            padding: 12px 20px;
-            background: linear-gradient(135deg, var(--bs-blue) 0%, var(--bs-navy) 100%);
-            color: #ffffff;
-            border: none;
-            border-radius: var(--radius-md);
-            font-size: 15px;
-            font-weight: 700;
-            cursor: pointer;
-            box-shadow: 0 4px 12px rgba(0, 102, 204, 0.35);
-            transition: all 0.2s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            margin-top: 26px;
-        }
-
-        .btn-login:hover {
-            opacity: 0.95;
-            transform: translateY(-1px);
-            box-shadow: 0 6px 16px rgba(0, 102, 204, 0.45);
-        }
-
-        /* Alert */
-        .alert {
-            padding: 12px 14px;
-            border-radius: var(--radius-md);
-            font-size: 13px;
-            margin-bottom: 18px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .alert-danger {
-            background-color: #fee2e2;
-            color: #991b1b;
-            border: 1px solid #fecaca;
-        }
-
-        .alert-success {
-            background-color: #d1fae5;
-            color: #065f46;
-            border: 1px solid #a7f3d0;
-        }
-
-        .login-footer {
-            padding: 16px 28px 20px;
-            text-align: center;
-            font-size: 11.5px;
-            color: var(--bs-gray-400);
-            border-top: 1px solid var(--bs-gray-200);
-            background: #fafafa;
-        }
-    </style>
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body>
+<body class="font-sans bg-[radial-gradient(ellipse_at_top_right,_#13467b_0%,_#0b2f54_45%,_#071f38_100%)] min-h-screen flex items-center justify-center p-5 relative overflow-x-hidden antialiased text-slate-800">
 
-<div class="bg-pattern"></div>
+<!-- Subtle Background Decorative Elements -->
+<div class="absolute inset-0 bg-pattern-dots pointer-events-none"></div>
 
-<div class="login-card">
+<div class="bg-white w-full max-w-[440px] rounded-2xl shadow-2xl overflow-hidden relative z-10 animate-modal-in">
     <!-- Header -->
-    <div class="login-header">
-        <div class="brand-icon">
+    <div class="bg-gradient-to-br from-navy to-navy-dark text-white pt-8 px-7 pb-6 text-center border-b-[3px] border-brand-gold relative">
+        <div class="w-13 h-13 bg-white rounded-xl inline-flex items-center justify-center text-navy mb-3 shadow-lg">
             <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                 <rect x="3" y="3" width="18" height="18" rx="2"/>
                 <path d="M7 8h10"/>
@@ -250,16 +28,16 @@
                 <path d="M7 16h6"/>
             </svg>
         </div>
-        <h1>PORTAL E-JURNAL</h1>
-        <p>PT Bank Pembangunan Daerah Sulawesi Tengah</p>
+        <h1 class="text-[19px] font-extrabold tracking-wide mb-1 text-white">PORTAL E-JURNAL</h1>
+        <p class="text-xs text-blue-200 font-medium">PT Bank Pembangunan Daerah Sulawesi Tengah</p>
     </div>
 
     <!-- Body -->
-    <div class="login-body">
+    <div class="p-7 sm:p-8">
         <!-- Notifikasi Sukses Logout -->
         @if(session('success'))
-            <div class="alert alert-success">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <div class="bg-emerald-50 border border-emerald-200 text-emerald-900 rounded-xl p-3.5 text-[13px] mb-4.5 flex items-center gap-2.5 shadow-xs">
+                <svg class="w-4.5 h-4.5 text-emerald-600 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
                     <polyline points="22 4 12 14.01 9 11.01"></polyline>
                 </svg>
@@ -269,8 +47,8 @@
 
         <!-- Notifikasi Error Login -->
         @if (isset($errors) && $errors->any())
-            <div class="alert alert-danger">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <div class="bg-rose-50 border border-rose-200 text-rose-900 rounded-xl p-3.5 text-[13px] mb-4.5 flex items-center gap-2.5 shadow-xs">
+                <svg class="w-4.5 h-4.5 text-rose-600 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <circle cx="12" cy="12" r="10"></circle>
                     <line x1="12" y1="8" x2="12" y2="12"></line>
                     <line x1="12" y1="16" x2="12.01" y2="16"></line>
@@ -283,31 +61,31 @@
             @csrf
 
             <!-- Username Input -->
-            <div class="form-group">
-                <label for="username">Username Petugas</label>
-                <div class="input-wrapper">
-                    <span class="input-icon">
+            <div class="mb-5 flex flex-col gap-1.5">
+                <label for="username" class="text-[13px] font-semibold text-slate-700">Username Petugas</label>
+                <div class="relative flex items-center">
+                    <span class="absolute left-3.5 text-slate-400 pointer-events-none flex items-center">
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
                             <circle cx="12" cy="7" r="4"></circle>
                         </svg>
                     </span>
-                    <input type="text" name="username" id="username" class="form-control" value="{{ old('username') }}" required autofocus placeholder="Masukkan username">
+                    <input type="text" name="username" id="username" class="w-full py-2.5 pl-11 pr-3.5 border border-slate-300 rounded-xl text-sm text-slate-800 placeholder-slate-400 transition-all duration-200 focus:border-brand-blue focus:ring-3 focus:ring-brand-blue/15 focus:outline-none" value="{{ old('username') }}" required autofocus placeholder="Masukkan username">
                 </div>
             </div>
 
             <!-- Password Input -->
-            <div class="form-group">
-                <label for="password">Kata Sandi</label>
-                <div class="input-wrapper">
-                    <span class="input-icon">
+            <div class="mb-5 flex flex-col gap-1.5">
+                <label for="password" class="text-[13px] font-semibold text-slate-700">Kata Sandi</label>
+                <div class="relative flex items-center">
+                    <span class="absolute left-3.5 text-slate-400 pointer-events-none flex items-center">
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
                             <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
                         </svg>
                     </span>
-                    <input type="password" name="password" id="password" class="form-control" required placeholder="Masukkan kata sandi">
-                    <button type="button" class="btn-toggle-pwd" id="togglePwd" title="Tampilkan/Sembunyikan Sandi">
+                    <input type="password" name="password" id="password" class="w-full py-2.5 pl-11 pr-11 border border-slate-300 rounded-xl text-sm text-slate-800 placeholder-slate-400 transition-all duration-200 focus:border-brand-blue focus:ring-3 focus:ring-brand-blue/15 focus:outline-none" required placeholder="Masukkan kata sandi">
+                    <button type="button" class="absolute right-3 bg-transparent border-0 text-slate-400 hover:text-slate-600 cursor-pointer p-1 flex items-center" id="togglePwd" title="Tampilkan/Sembunyikan Sandi">
                         <svg id="eyeIcon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
                             <circle cx="12" cy="12" r="3"></circle>
@@ -317,7 +95,7 @@
             </div>
 
             <!-- Submit Button -->
-            <button type="submit" class="btn-login">
+            <button type="submit" class="w-full py-3 px-5 bg-gradient-to-r from-brand-blue to-navy text-white rounded-xl text-[15px] font-bold cursor-pointer shadow-lg shadow-brand-blue/30 hover:opacity-95 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-brand-blue/40 transition-all duration-200 flex items-center justify-center gap-2 mt-6.5">
                 <span>Masuk ke Sistem</span>
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path>
@@ -329,7 +107,7 @@
     </div>
 
     <!-- Footer -->
-    <div class="login-footer">
+    <div class="px-7 py-4 text-center text-[11.5px] text-slate-400 border-t border-slate-200 bg-slate-50/80">
         &copy; {{ date('Y') }} PT Bank Sulteng &bull; Layanan Pengaduan & Jurnal Keluhan
     </div>
 </div>
@@ -339,24 +117,27 @@
     const togglePwd = document.getElementById('togglePwd');
     const pwdInput = document.getElementById('password');
 
-    togglePwd.addEventListener('click', function() {
-        if (pwdInput.type === 'password') {
-            pwdInput.type = 'text';
-            togglePwd.innerHTML = `
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
-                    <line x1="1" y1="1" x2="23" y2="23"></line>
-                </svg>`;
-        } else {
-            pwdInput.type = 'password';
-            togglePwd.innerHTML = `
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                    <circle cx="12" cy="12" r="3"></circle>
-                </svg>`;
-        }
-    });
+    if(togglePwd && pwdInput) {
+        togglePwd.addEventListener('click', function() {
+            if (pwdInput.type === 'password') {
+                pwdInput.type = 'text';
+                togglePwd.innerHTML = `
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+                        <line x1="1" y1="1" x2="23" y2="23"></line>
+                    </svg>`;
+            } else {
+                pwdInput.type = 'password';
+                togglePwd.innerHTML = `
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                        <circle cx="12" cy="12" r="3"></circle>
+                    </svg>`;
+            }
+        });
+    }
 </script>
 
 </body>
 </html>
+

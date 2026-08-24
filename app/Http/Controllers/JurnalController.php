@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Jurnal;
+use App\Models\MasterAtm;
 use App\Models\MasterCabang;
 use App\Models\MasterTransaksi;
 use Illuminate\Http\Request;
@@ -28,7 +29,11 @@ class JurnalController extends Controller
         // 1. Filter Pencarian Keyword Multi-Field (Case-Insensitive & Multi-Word)
         if ($request->filled('q')) {
             $keyword = trim($request->q);
-            $terms = array_filter(explode(' ', $keyword));
+            $rawTerms = explode(' ', $keyword);
+            $terms = array_values(array_filter($rawTerms, fn($t) => trim($t) !== '' && trim($t) !== '-'));
+            if (empty($terms)) {
+                $terms = [$keyword];
+            }
 
             $query->where(function ($q) use ($terms) {
                 foreach ($terms as $term) {
@@ -47,6 +52,11 @@ class JurnalController extends Controller
                                  $tQ->where('jenis_transaksi', 'LIKE', "%{$term}%")
                                     ->orWhere('channel', 'LIKE', "%{$term}%");
                              });
+
+                        $atmMatch = \App\Models\MasterAtm::findAtmInfo($term);
+                        if ($atmMatch && !empty($atmMatch['profil'])) {
+                            $subQ->orWhere('terminal_transaksi', 'LIKE', "%{$atmMatch['profil']}%");
+                        }
                     });
                 }
             });
@@ -62,7 +72,50 @@ class JurnalController extends Controller
             $query->where('master_cabang_id', $request->master_cabang_id);
         }
 
-        // 4. Filter Rentang Tanggal Transaksi
+        // 4. Filter Terminal Transaksi / Mesin ATM
+        if ($request->filled('terminal_transaksi')) {
+            $termVal = trim($request->terminal_transaksi);
+            $query->where(function($tq) use ($termVal) {
+                $clean = strtoupper($termVal);
+
+                // 1. Channel non-mesin (Bank Lain, Mobile Banking)
+                if (str_contains($clean, 'BANK LAIN') || str_contains($clean, 'MOBILE') || str_contains($clean, 'SMS')) {
+                    $tq->where('terminal_transaksi', 'LIKE', "%{$termVal}%");
+                    return;
+                }
+
+                // 2. Format gabungan "ID - PROFIL" (misal: "452 - GRG.KCU1")
+                if (str_contains($clean, '-')) {
+                    $parts = explode('-', $clean, 2);
+                    $idPart = trim($parts[0] ?? '');
+                    $profilPart = trim($parts[1] ?? '');
+
+                    $tq->where('terminal_transaksi', '=', $clean)
+                       ->orWhere('terminal_transaksi', '=', $profilPart)
+                       ->orWhere('terminal_transaksi', '=', "{$idPart} - {$profilPart}")
+                       ->orWhere('terminal_transaksi', 'LIKE', "% - {$profilPart}")
+                       ->orWhere('terminal_transaksi', 'LIKE', "{$profilPart} %");
+                    return;
+                }
+
+                // 3. Single term profil atau ID
+                $atmMatch = \App\Models\MasterAtm::findAtmInfo($clean);
+                $profil = $atmMatch['profil'] ?? $clean;
+                $idLuno = $atmMatch['id_luno'] ?? null;
+
+                $tq->where('terminal_transaksi', '=', $clean)
+                   ->orWhere('terminal_transaksi', '=', $profil)
+                   ->orWhere('terminal_transaksi', 'LIKE', "% - {$profil}")
+                   ->orWhere('terminal_transaksi', 'LIKE', "{$profil} %");
+
+                if ($idLuno) {
+                    $tq->orWhere('terminal_transaksi', '=', (string)$idLuno)
+                       ->orWhere('terminal_transaksi', '=', "{$idLuno} - {$profil}");
+                }
+            });
+        }
+
+        // 5. Filter Rentang Tanggal Transaksi
         if ($request->filled('tgl_dari')) {
             $query->whereDate('tgl_transaksi', '>=', $request->tgl_dari);
         }
@@ -90,6 +143,7 @@ class JurnalController extends Controller
         // Ambil data Master untuk pilihan filter
         $cabangs = MasterCabang::orderBy('kode_cabang')->get();
         $transaksis = MasterTransaksi::orderBy('jenis_transaksi')->get();
+        $atmsGrouped = MasterAtm::getAtmsGroupedByCabang();
 
         // Hitung Ringkasan Statistik
         $stats = [
@@ -100,7 +154,7 @@ class JurnalController extends Controller
             'rejected' => Jurnal::where('status', 'Rejected')->count(),
         ];
 
-        return view('jurnal_data', compact('jurnals', 'cabangs', 'transaksis', 'stats'));
+        return view('jurnal_data', compact('jurnals', 'cabangs', 'transaksis', 'stats', 'atmsGrouped'));
     }
 
     /**
@@ -110,8 +164,9 @@ class JurnalController extends Controller
     {
         $cabangs = MasterCabang::orderBy('kode_cabang')->get();
         $transaksis = MasterTransaksi::orderBy('jenis_transaksi')->get();
+        $atmsGrouped = MasterAtm::getAtmsGroupedByCabang();
 
-        return view('jurnal_form', compact('cabangs', 'transaksis'));
+        return view('jurnal_form', compact('cabangs', 'transaksis', 'atmsGrouped'));
     }
 
     /**
@@ -162,6 +217,23 @@ class JurnalController extends Controller
     }
 
     /**
+     * API AJAX untuk mengambil daftar mesin ATM berdasarkan Kantor Cabang
+     */
+    public function getAtmsByCabang($id)
+    {
+        $cabang = MasterCabang::find($id);
+        $grouped = MasterAtm::getAtmsGroupedByCabang();
+        $kode = $cabang ? $cabang->kode_cabang : null;
+        $atms = ($kode && isset($grouped[$kode])) ? $grouped[$kode] : [];
+
+        return response()->json([
+            'kode_cabang' => $kode,
+            'nama_cabang' => $cabang->nama_cabang ?? '',
+            'atms'        => $atms
+        ]);
+    }
+
+    /**
      * API AJAX untuk mengambil rincian 1 data jurnal keluhan
      */
     public function getDetailJurnal($id)
@@ -178,8 +250,9 @@ class JurnalController extends Controller
         $jurnal = Jurnal::with(['masterCabang', 'masterTransaksi'])->findOrFail($id);
         $cabangs = MasterCabang::orderBy('kode_cabang')->get();
         $transaksis = MasterTransaksi::orderBy('jenis_transaksi')->get();
+        $atmsGrouped = MasterAtm::getAtmsGroupedByCabang();
 
-        return view('jurnal_edit', compact('jurnal', 'cabangs', 'transaksis'));
+        return view('jurnal_edit', compact('jurnal', 'cabangs', 'transaksis', 'atmsGrouped'));
     }
 
     /**

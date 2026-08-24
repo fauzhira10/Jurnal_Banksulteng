@@ -13,7 +13,7 @@ class AuthController extends Controller
     public function showLoginForm()
     {
         if (Auth::check()) {
-            return redirect()->route('jurnal.create');
+            return redirect()->route('dashboard');
         }
 
         return view('auth.login');
@@ -38,7 +38,7 @@ class AuthController extends Controller
         if (Auth::attempt(['username' => $credentials['username'], 'password' => $credentials['password']], $remember)) {
             $request->session()->regenerate();
             $userName = Auth::user()->name;
-            return redirect()->intended(route('jurnal.create'))->with('success', "Selamat datang kembali, {$userName}!");
+            return redirect()->intended(route('dashboard'))->with('success', "Selamat datang kembali, {$userName}!");
         }
 
         return back()->withErrors([

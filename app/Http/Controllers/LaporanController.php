@@ -22,7 +22,8 @@ class LaporanController extends Controller
     {
         return [
             // 1. MESIN ATM BANK SULTENG (Group 1)
-            '1_A_ATM_SULTENG_TARIK_TUNAI' => ['no' => '1', 'sub' => 'A', 'group' => 'MESIN ATM BANK SULTENG', 'label' => 'TARIK TUNAI', 'group_header' => true],
+            '1_HEADER_ATM_SULTENG'        => ['no' => '1', 'sub' => '',  'group' => 'MESIN ATM BANK SULTENG', 'label' => 'MESIN ATM BANK SULTENG', 'is_header' => true],
+            '1_A_ATM_SULTENG_TARIK_TUNAI' => ['no' => '',  'sub' => 'A', 'group' => 'MESIN ATM BANK SULTENG', 'label' => 'TARIK TUNAI'],
             '1_B_ATM_SULTENG_SETOR_TUNAI' => ['no' => '',  'sub' => 'B', 'group' => 'MESIN ATM BANK SULTENG', 'label' => 'SETOR TUNAI'],
             '1_C_ATM_SULTENG_TRANSFER'    => ['no' => '',  'sub' => 'C', 'group' => 'MESIN ATM BANK SULTENG', 'label' => 'TRANSFER'],
             '1_D_ATM_SULTENG_PULSA'       => ['no' => '',  'sub' => 'D', 'group' => 'MESIN ATM BANK SULTENG', 'label' => 'PULSA'],
@@ -37,7 +38,8 @@ class LaporanController extends Controller
             '5_MOBILE_BANKING'            => ['no' => '5', 'sub' => '',  'group' => 'MOBILE BANKING', 'label' => 'MOBILE BANKING', 'single' => true],
             
             // 6. MESIN ATM BANK LAIN (Group 6)
-            '6_A_ATM_LAIN_TARIK_TUNAI'    => ['no' => '6', 'sub' => 'A', 'group' => 'MESIN ATM BANK LAIN', 'label' => 'TARIK TUNAI', 'group_header' => true, 'theme' => 'blue'],
+            '6_HEADER_ATM_LAIN'           => ['no' => '6', 'sub' => '',  'group' => 'MESIN ATM BANK LAIN', 'label' => 'MESIN ATM BANK LAIN', 'is_header' => true, 'theme' => 'blue'],
+            '6_A_ATM_LAIN_TARIK_TUNAI'    => ['no' => '',  'sub' => 'A', 'group' => 'MESIN ATM BANK LAIN', 'label' => 'TARIK TUNAI', 'theme' => 'blue'],
             '6_B_ATM_LAIN_TRANSFER'       => ['no' => '',  'sub' => 'B', 'group' => 'MESIN ATM BANK LAIN', 'label' => 'TRANSFER', 'theme' => 'blue'],
             
             // 7 & 8. Other Channels
@@ -203,9 +205,10 @@ class LaporanController extends Controller
         // Rincian Kategori Terbanyak di Bulan Terpilih
         $monthCategoryRank = [];
         foreach ($structure as $key => $meta) {
+            if ($meta['is_header'] ?? false) continue;
             $count = $matrix[$key][$selectedMonth] ?? 0;
             if ($count > 0) {
-                $lbl = ($meta['group_header'] ?? false) ? "{$meta['group']} ({$meta['label']})" : $meta['group'];
+                $lbl = (!empty($meta['sub'])) ? "{$meta['group']} ({$meta['label']})" : $meta['label'];
                 $monthCategoryRank[] = [
                     'label' => $lbl,
                     'count' => $count,
@@ -339,24 +342,25 @@ class LaporanController extends Controller
         // 3. BARIS DATA KATEGORI
         $row = 6;
         foreach ($structure as $key => $meta) {
+            $isHeader = $meta['is_header'] ?? false;
+            $isSingle = $meta['single'] ?? false;
+
             $sheet->setCellValue("A{$row}", $meta['no'] ?? '');
             $sheet->setCellValue("B{$row}", $meta['sub'] ?? '');
 
-            if ($meta['group_header'] ?? false) {
-                $sheet->setCellValue("C{$row}", $meta['group'] . ' - ' . $meta['label']);
-                $sheet->getStyle("A{$row}:C{$row}")->getFont()->setBold(true);
-            } elseif ($meta['single'] ?? false) {
+            if ($isHeader || $isSingle) {
                 $sheet->setCellValue("C{$row}", $meta['label']);
                 $sheet->getStyle("A{$row}:C{$row}")->getFont()->setBold(true);
             } else {
-                $sheet->setCellValue("C{$row}", $meta['label']);
+                $sheet->setCellValue("C{$row}", '   ' . $meta['label']);
             }
 
             // Fill background colors according to Bank Sulteng standard template
-            if ($meta['group_header'] ?? false) {
+            if ($isHeader) {
                 $color = ($meta['theme'] ?? '') === 'blue' ? $blueHeaderBg : $greenHeaderBg;
-                $sheet->getStyle("A{$row}:C{$row}")->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setRGB($color);
-            } elseif ($meta['single'] ?? false) {
+                $sheet->getStyle("A{$row}:P{$row}")->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setRGB($color);
+                $sheet->getStyle("A{$row}:P{$row}")->getFont()->setBold(true);
+            } elseif ($isSingle) {
                 $color = ($meta['theme'] ?? '') === 'blue' ? $blueSubBg : $greenSubBg;
                 $sheet->getStyle("A{$row}:C{$row}")->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setRGB($color);
             }
@@ -364,15 +368,23 @@ class LaporanController extends Controller
             // Month values
             $mIdx = 1;
             foreach ($monthHeaders as $col => $mName) {
-                $val = $matrix[$key][$mIdx] ?? 0;
-                $sheet->setCellValue("{$col}{$row}", $val > 0 ? $val : '-');
+                if ($isHeader) {
+                    $sheet->setCellValue("{$col}{$row}", '-');
+                } else {
+                    $val = $matrix[$key][$mIdx] ?? 0;
+                    $sheet->setCellValue("{$col}{$row}", $val > 0 ? $val : '-');
+                }
                 $sheet->getStyle("{$col}{$row}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
                 $mIdx++;
             }
 
             // Total per row
-            $rTot = $rowTotals[$key] ?? 0;
-            $sheet->setCellValue("P{$row}", $rTot > 0 ? $rTot : '-');
+            if ($isHeader) {
+                $sheet->setCellValue("P{$row}", '-');
+            } else {
+                $rTot = $rowTotals[$key] ?? 0;
+                $sheet->setCellValue("P{$row}", $rTot > 0 ? $rTot : '-');
+            }
             $sheet->getStyle("P{$row}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
             $sheet->getStyle("P{$row}")->getFont()->setBold(true);
 

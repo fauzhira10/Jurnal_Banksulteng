@@ -4,851 +4,7 @@
 @section('page_title', 'Data Jurnal Keluhan')
 @section('page_subtitle', 'Rekapitulasi dan pencarian data keluhan transaksi nasabah Bank Sulteng')
 
-@push('styles')
-<style>
-    /* Stats Grid */
-    .stats-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 16px;
-        margin-bottom: 24px;
-    }
-
-    .stat-card {
-        background: #ffffff;
-        border-radius: var(--radius-lg);
-        border: 1px solid var(--bs-gray-200);
-        padding: 18px 20px;
-        display: flex;
-        align-items: center;
-        gap: 16px;
-        box-shadow: var(--shadow-sm);
-        transition: transform 0.2s ease, box-shadow 0.2s ease;
-        text-decoration: none;
-        color: inherit;
-    }
-
-    .stat-card:hover {
-        transform: translateY(-2px);
-        box-shadow: var(--shadow-md);
-    }
-
-    .stat-icon {
-        width: 48px;
-        height: 48px;
-        border-radius: var(--radius-md);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        flex-shrink: 0;
-    }
-
-    .stat-info {
-        display: flex;
-        flex-direction: column;
-    }
-
-    .stat-count {
-        font-size: 22px;
-        font-weight: 800;
-        color: var(--bs-gray-900);
-        line-height: 1.2;
-    }
-
-    .stat-label {
-        font-size: 12px;
-        font-weight: 600;
-        color: var(--bs-gray-500);
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        margin-top: 2px;
-    }
-
-    /* Icon colors */
-    .stat-total .stat-icon { background-color: var(--bs-blue-light); color: var(--bs-blue); }
-    .stat-menunggu .stat-icon { background-color: var(--bs-warning-light); color: var(--bs-warning); }
-    .stat-success .stat-icon { background-color: #e0f2fe; color: #0284c7; }
-    .stat-done .stat-icon { background-color: var(--bs-success-light); color: var(--bs-success); }
-    .stat-rejected .stat-icon { background-color: var(--bs-danger-light); color: var(--bs-danger); }
-
-    /* Filter Form */
-    .filter-grid {
-        display: grid;
-        grid-template-columns: 2fr 1fr 1.3fr 1fr 1fr;
-        gap: 14px;
-        align-items: flex-end;
-    }
-
-    .filter-group {
-        display: flex;
-        flex-direction: column;
-        gap: 6px;
-    }
-
-    .filter-group label {
-        font-size: 12px;
-        font-weight: 600;
-        color: var(--bs-gray-600);
-    }
-
-    .form-control {
-        width: 100%;
-        padding: 9px 12px;
-        border: 1px solid var(--bs-gray-300);
-        border-radius: var(--radius-md);
-        font-size: 13.5px;
-        background-color: #ffffff;
-        transition: border-color 0.2s, box-shadow 0.2s;
-    }
-
-    .form-control:focus {
-        border-color: var(--bs-blue);
-        outline: none;
-        box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.15);
-    }
-
-    /* Live Search Input & Indicators */
-    .search-input-wrapper {
-        position: relative;
-        display: flex;
-        align-items: center;
-    }
-
-    .search-icon {
-        position: absolute;
-        left: 12px;
-        color: var(--bs-gray-400);
-        pointer-events: none;
-        display: flex;
-        align-items: center;
-    }
-
-    .search-input {
-        padding-left: 36px !important;
-        padding-right: 32px !important;
-    }
-
-    .btn-clear-search {
-        position: absolute;
-        right: 8px;
-        background: var(--bs-gray-200);
-        border: none;
-        color: var(--bs-gray-600);
-        border-radius: 50%;
-        width: 20px;
-        height: 20px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        transition: all 0.2s;
-    }
-
-    .btn-clear-search:hover {
-        background: var(--bs-gray-300);
-        color: var(--bs-gray-900);
-    }
-
-    .live-search-badge {
-        font-size: 11px;
-        font-weight: 700;
-        color: #0284c7;
-        background: #e0f2fe;
-        padding: 2px 8px;
-        border-radius: 12px;
-        display: inline-flex;
-        align-items: center;
-        gap: 5px;
-    }
-
-    .pulse-dot {
-        width: 6px;
-        height: 6px;
-        border-radius: 50%;
-        background-color: #0284c7;
-        animation: pulse 1.5s infinite ease-in-out;
-    }
-
-    @keyframes pulse {
-        0%, 100% { opacity: 1; transform: scale(1); }
-        50% { opacity: 0.3; transform: scale(0.7); }
-    }
-
-    /* Yellow Match Highlight */
-    mark.highlight-yellow, .highlight-yellow {
-        background-color: #fef08a !important; /* Soft golden yellow */
-        color: #854d0e !important;           /* High-contrast amber text */
-        font-weight: 700 !important;
-        padding: 1px 4px !important;
-        border-radius: 3px !important;
-        border: 1px solid #fde047 !important;
-        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
-        display: inline;
-    }
-
-    /* Data Table */
-    .table-container {
-        width: 100%;
-        overflow-x: auto;
-    }
-
-    .custom-table {
-        width: 100%;
-        border-collapse: separate;
-        border-spacing: 0;
-        font-size: 13.5px;
-    }
-
-    .custom-table th {
-        background-color: var(--bs-gray-50);
-        color: var(--bs-gray-700);
-        font-weight: 700;
-        text-align: left;
-        padding: 14px 16px;
-        border-bottom: 2px solid var(--bs-gray-200);
-        white-space: nowrap;
-    }
-
-    .custom-table td {
-        padding: 14px 16px;
-        border-bottom: 1px solid var(--bs-gray-200);
-        vertical-align: middle;
-        color: var(--bs-gray-700);
-    }
-
-    .custom-table tr:hover td {
-        background-color: #f8fafc;
-    }
-
-    .nasabah-title {
-        font-weight: 700;
-        color: var(--bs-navy);
-        font-size: 14px;
-    }
-
-    .nasabah-sub {
-        font-size: 12px;
-        color: var(--bs-gray-500);
-        margin-top: 2px;
-        display: flex;
-        align-items: center;
-        gap: 6px;
-    }
-
-    .nominal-badge {
-        font-weight: 700;
-        color: #047857;
-        font-size: 13.5px;
-    }
-
-    /* Action Buttons */
-    .btn-export-excel {
-        background-color: #059669;
-        color: #ffffff !important;
-        border: 1px solid #047857;
-        padding: 7px 14px;
-        font-size: 13px;
-        font-weight: 600;
-        border-radius: var(--radius-md);
-        display: inline-flex;
-        align-items: center;
-        gap: 7px;
-        text-decoration: none;
-        transition: all 0.2s ease;
-        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
-    }
-
-    .btn-export-excel:hover {
-        background-color: #047857;
-        border-color: #065f46;
-        transform: translateY(-1px);
-        box-shadow: 0 4px 6px -1px rgba(5, 150, 105, 0.2);
-    }
-
-    .btn-export-excel:active {
-        transform: translateY(0);
-    }
-
-    .btn-import-excel {
-        background-color: #0284c7;
-        color: #ffffff !important;
-        border: 1px solid #0369a1;
-        padding: 7px 14px;
-        font-size: 13px;
-        font-weight: 600;
-        border-radius: var(--radius-md);
-        display: inline-flex;
-        align-items: center;
-        gap: 7px;
-        cursor: pointer;
-        text-decoration: none;
-        transition: all 0.2s ease;
-        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
-    }
-
-    .btn-import-excel:hover {
-        background-color: #0369a1;
-        border-color: #075985;
-        transform: translateY(-1px);
-        box-shadow: 0 4px 6px -1px rgba(2, 132, 199, 0.2);
-    }
-
-    .btn-import-excel:active {
-        transform: translateY(0);
-    }
-
-    .btn-reset-all {
-        background-color: #fff1f2;
-        color: #e11d48 !important;
-        border: 1px solid #fecdd3;
-        padding: 7px 14px;
-        font-size: 13px;
-        font-weight: 600;
-        border-radius: var(--radius-md);
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        cursor: pointer;
-        text-decoration: none;
-        transition: all 0.2s ease;
-        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
-    }
-
-    .btn-reset-all:hover {
-        background-color: #ffe4e6;
-        color: #be123c !important;
-        border-color: #fda4af;
-        transform: translateY(-1px);
-        box-shadow: 0 4px 6px -1px rgba(225, 29, 72, 0.15);
-    }
-
-    .btn-reset-all:active {
-        transform: translateY(0);
-    }
-
-    /* Drag and drop upload zone */
-    .upload-dropzone {
-        border: 2px dashed #93c5fd;
-        background-color: #f0f9ff;
-        border-radius: var(--radius-md);
-        padding: 28px 20px;
-        text-align: center;
-        cursor: pointer;
-        transition: all 0.2s ease;
-    }
-
-    .upload-dropzone:hover, .upload-dropzone.dragover {
-        border-color: #0284c7;
-        background-color: #e0f2fe;
-    }
-
-    .upload-dropzone svg {
-        width: 44px;
-        height: 44px;
-        color: #0284c7;
-        margin-bottom: 10px;
-    }
-
-    /* Real-Time Import Step Tracker */
-    .import-steps-container {
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
-        margin-top: 16px;
-        background: #f8fafc;
-        border: 1px solid #e2e8f0;
-        border-radius: var(--radius-md);
-        padding: 14px 16px;
-    }
-
-    .import-step-item {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        font-size: 13px;
-        color: var(--bs-gray-500);
-        transition: all 0.25s ease;
-    }
-
-    .import-step-item.active {
-        color: #0284c7;
-        font-weight: 700;
-    }
-
-    .import-step-item.completed {
-        color: #059669;
-        font-weight: 600;
-    }
-
-    .import-step-badge {
-        width: 24px;
-        height: 24px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 11px;
-        font-weight: 700;
-        background-color: #e2e8f0;
-        color: #64748b;
-        flex-shrink: 0;
-        transition: all 0.25s ease;
-    }
-
-    .import-step-item.active .import-step-badge {
-        background-color: #0284c7;
-        color: #ffffff;
-        box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.2);
-    }
-
-    .import-step-item.completed .import-step-badge {
-        background-color: #059669;
-        color: #ffffff;
-    }
-
-    /* Success & Error Modal Custom Elements */
-    .modal-icon-wrapper {
-        width: 64px;
-        height: 64px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin: 0 auto 16px;
-    }
-
-    .modal-icon-success {
-        background-color: #d1fae5;
-        color: #059669;
-    }
-
-    .modal-icon-error {
-        background-color: #fee2e2;
-        color: #dc2626;
-    }
-
-    .stat-result-grid {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 12px;
-        margin: 18px 0;
-    }
-
-    .stat-result-card {
-        background: #f8fafc;
-        border: 1px solid #e2e8f0;
-        border-radius: var(--radius-md);
-        padding: 14px 10px;
-        text-align: center;
-    }
-
-    .stat-result-card.card-total {
-        border-top: 3px solid #0284c7;
-    }
-
-    .stat-result-card.card-new {
-        border-top: 3px solid #059669;
-        background-color: #f0fdf4;
-    }
-
-    .stat-result-card.card-sync {
-        border-top: 3px solid #d97706;
-    }
-
-    .stat-result-val {
-        font-size: 20px;
-        font-weight: 800;
-        color: var(--bs-gray-900);
-        line-height: 1.2;
-    }
-
-    .stat-result-lbl {
-        font-size: 11px;
-        font-weight: 600;
-        color: var(--bs-gray-500);
-        margin-top: 4px;
-        text-transform: uppercase;
-        letter-spacing: 0.3px;
-    }
-
-    .btn-danger-sm {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        gap: 5px;
-        padding: 6px 10px;
-        font-size: 12px;
-        border-radius: var(--radius-sm);
-        background-color: #fff1f2;
-        color: #e11d48;
-        border: 1px solid #fecdd3;
-        font-weight: 600;
-        cursor: pointer;
-        transition: all 0.2s ease;
-        text-decoration: none;
-    }
-
-    .btn-danger-sm:hover {
-        background-color: #ffe4e6;
-        color: #be123c;
-        border-color: #fda4af;
-    }
-
-    /* Empty State */
-    .empty-state {
-        text-align: center;
-        padding: 50px 20px;
-        color: var(--bs-gray-500);
-    }
-
-    .empty-state svg {
-        width: 64px;
-        height: 64px;
-        color: var(--bs-gray-400);
-        margin-bottom: 16px;
-    }
-
-    .empty-state h3 {
-        font-size: 17px;
-        font-weight: 700;
-        color: var(--bs-gray-800);
-        margin-bottom: 6px;
-    }
-
-    .empty-state p {
-        font-size: 13.5px;
-        max-width: 400px;
-        margin: 0 auto 16px;
-    }
-
-    /* Modal Backdrop & Content */
-    .modal-backdrop {
-        display: none;
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(15, 23, 42, 0.6);
-        z-index: 1100;
-        backdrop-filter: blur(3px);
-        align-items: center;
-        justify-content: center;
-        padding: 20px;
-    }
-
-    .modal-backdrop.show {
-        display: flex;
-    }
-
-    .modal-content {
-        background: #ffffff;
-        border-radius: var(--radius-lg);
-        width: 100%;
-        max-width: 750px;
-        max-height: 90vh;
-        overflow-y: auto;
-        box-shadow: var(--shadow-xl);
-        animation: modalFadeIn 0.25s ease-out;
-    }
-
-    @keyframes modalFadeIn {
-        from { opacity: 0; transform: scale(0.95) translateY(10px); }
-        to { opacity: 1; transform: scale(1) translateY(0); }
-    }
-
-    .modal-header {
-        padding: 24px 26px 18px;
-        border-bottom: 1px solid var(--bs-gray-200);
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        background: var(--bs-gray-50);
-    }
-
-    .modal-header h3 {
-        font-size: 17.5px;
-        font-weight: 700;
-        color: var(--bs-navy);
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        margin: 0;
-        line-height: 1.3;
-    }
-
-    .btn-close-modal {
-        background: var(--bs-gray-100);
-        border: 1px solid var(--bs-gray-300);
-        cursor: pointer;
-        color: var(--bs-gray-500);
-        padding: 6px;
-        border-radius: var(--radius-sm);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        transition: all 0.2s;
-        flex-shrink: 0;
-    }
-
-    .btn-close-modal:hover {
-        background: var(--bs-gray-200);
-        color: var(--bs-gray-800);
-        border-color: var(--bs-gray-400);
-    }
-
-    .modal-body {
-        padding: 24px;
-    }
-
-    .detail-section {
-        margin-bottom: 20px;
-    }
-
-    .detail-section-title {
-        font-size: 13px;
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        color: var(--bs-blue);
-        border-bottom: 1px solid var(--bs-gray-200);
-        padding-bottom: 6px;
-        margin-bottom: 12px;
-        display: flex;
-        align-items: center;
-        gap: 6px;
-    }
-
-    .detail-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 12px 20px;
-    }
-
-    .detail-item {
-        display: flex;
-        flex-direction: column;
-    }
-
-    .detail-label {
-        font-size: 11.5px;
-        font-weight: 600;
-        color: var(--bs-gray-500);
-        margin-bottom: 3px;
-    }
-
-    .detail-value {
-        font-size: 14px;
-        font-weight: 600;
-        color: var(--bs-gray-800);
-    }
-
-    .detail-keterangan-box {
-        background: var(--bs-gray-50);
-        border: 1px solid var(--bs-gray-200);
-        border-radius: var(--radius-md);
-        padding: 12px 14px;
-        font-size: 13px;
-        line-height: 1.6;
-        color: var(--bs-gray-700);
-        white-space: pre-wrap;
-    }
-
-    .modal-footer {
-        padding: 16px 24px;
-        border-top: 1px solid var(--bs-gray-200);
-        display: flex;
-        justify-content: flex-end;
-        gap: 10px;
-        background: var(--bs-gray-50);
-    }
-
-    /* Toolbar & Pagination Styling */
-    .table-toolbar {
-        padding: 10px 20px;
-        background: #f8fafc;
-        border-bottom: 1px solid var(--bs-gray-200);
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        flex-wrap: wrap;
-        gap: 10px;
-    }
-
-    .per-page-select {
-        padding: 5px 10px;
-        font-size: 13px;
-        font-weight: 700;
-        height: 34px;
-        border-radius: var(--radius-sm);
-        border: 1px solid var(--bs-gray-300);
-        background-color: #ffffff;
-        color: var(--bs-navy);
-        cursor: pointer;
-        outline: none;
-        transition: border-color 0.2s ease;
-    }
-
-    .per-page-select:focus {
-        border-color: var(--bs-blue);
-        box-shadow: 0 0 0 3px rgba(0, 51, 102, 0.1);
-    }
-
-    .custom-pagination-container {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        flex-wrap: wrap;
-        gap: 14px;
-        width: 100%;
-    }
-
-    .custom-pagination-nav {
-        display: flex;
-        align-items: center;
-        gap: 4px;
-        flex-wrap: wrap;
-    }
-
-    .page-btn {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        padding: 6px 12px;
-        min-width: 34px;
-        height: 34px;
-        font-size: 12.5px;
-        font-weight: 600;
-        border-radius: var(--radius-sm);
-        border: 1px solid var(--bs-gray-300);
-        background-color: #ffffff;
-        color: var(--bs-navy);
-        text-decoration: none;
-        transition: all 0.18s ease;
-        user-select: none;
-        cursor: pointer;
-    }
-
-    .page-btn:hover:not(.disabled):not(.active) {
-        background-color: #f1f5f9;
-        border-color: #cbd5e1;
-        color: var(--bs-blue);
-        transform: translateY(-1px);
-    }
-
-    .page-btn.active {
-        background-color: var(--bs-navy);
-        border-color: var(--bs-navy);
-        color: #ffffff;
-        font-weight: 700;
-        box-shadow: 0 2px 4px rgba(0, 51, 102, 0.2);
-    }
-
-    .page-btn.disabled {
-        background-color: #f8fafc;
-        border-color: #e2e8f0;
-        color: #94a3b8;
-        cursor: not-allowed;
-    }
-
-    .page-btn-dots {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        min-width: 24px;
-        height: 34px;
-        color: #94a3b8;
-        font-weight: 700;
-        letter-spacing: 1px;
-    }
-
-    @media (max-width: 992px) {
-        .filter-grid {
-            grid-template-columns: 1fr 1fr;
-        }
-        .detail-grid {
-            grid-template-columns: 1fr;
-        }
-    }
-
-    @media (max-width: 600px) {
-        .filter-grid {
-            grid-template-columns: 1fr;
-        }
-    }
-</style>
-@endpush
-
 @section('content')
-
-<!-- Ringkasan Statistik -->
-<div id="statsSection" class="stats-grid">
-    <a href="{{ route('jurnal.index') }}" class="stat-card stat-total">
-        <div class="stat-icon">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-                <line x1="3" y1="9" x2="21" y2="9"></line>
-                <line x1="9" y1="21" x2="9" y2="9"></line>
-            </svg>
-        </div>
-        <div class="stat-info">
-            <div class="stat-count">{{ $stats['total'] }}</div>
-            <div class="stat-label">Total Keluhan</div>
-        </div>
-    </a>
-
-    <a href="{{ route('jurnal.index', ['status' => 'Menunggu']) }}" class="stat-card stat-menunggu">
-        <div class="stat-icon">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="12" cy="12" r="10"></circle>
-                <polyline points="12 6 12 12 16 14"></polyline>
-            </svg>
-        </div>
-        <div class="stat-info">
-            <div class="stat-count">{{ $stats['menunggu'] }}</div>
-            <div class="stat-label">Menunggu</div>
-        </div>
-    </a>
-
-    <a href="{{ route('jurnal.index', ['status' => 'Success']) }}" class="stat-card stat-success">
-        <div class="stat-icon">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
-                <polyline points="22 4 12 14.01 9 11.01"></polyline>
-            </svg>
-        </div>
-        <div class="stat-info">
-            <div class="stat-count">{{ $stats['success'] }}</div>
-            <div class="stat-label">Success</div>
-        </div>
-    </a>
-
-    <a href="{{ route('jurnal.index', ['status' => 'Done']) }}" class="stat-card stat-done">
-        <div class="stat-icon">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path>
-            </svg>
-        </div>
-        <div class="stat-info">
-            <div class="stat-count">{{ $stats['done'] }}</div>
-            <div class="stat-label">Done</div>
-        </div>
-    </a>
-
-    <a href="{{ route('jurnal.index', ['status' => 'Rejected']) }}" class="stat-card stat-rejected">
-        <div class="stat-icon">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="12" cy="12" r="10"></circle>
-                <line x1="15" y1="9" x2="9" y2="15"></line>
-                <line x1="9" y1="9" x2="15" y2="15"></line>
-            </svg>
-        </div>
-        <div class="stat-info">
-            <div class="stat-count">{{ $stats['rejected'] }}</div>
-            <div class="stat-label">Rejected</div>
-        </div>
-    </a>
-</div>
 
 <!-- Card Filter & Pencarian Otomatis -->
 <div class="card">
@@ -909,12 +65,20 @@
                 <div class="filter-group">
                     <label for="filterCabang">Kantor Cabang</label>
                     <select id="filterCabang" name="master_cabang_id" class="form-control">
-                        <option value="">-- Semua Cabang --</option>
+                        <option value="" data-kode="">-- Semua Cabang --</option>
                         @foreach($cabangs as $c)
-                            <option value="{{ $c->id }}" {{ request('master_cabang_id') == $c->id ? 'selected' : '' }}>
+                            <option value="{{ $c->id }}" data-kode="{{ $c->kode_cabang }}" {{ request('master_cabang_id') == $c->id ? 'selected' : '' }}>
                                 {{ $c->kode_cabang }} - {{ $c->nama_cabang }}
                             </option>
                         @endforeach
+                    </select>
+                </div>
+
+                <!-- Filter Terminal / Mesin ATM -->
+                <div class="filter-group">
+                    <label for="filterTerminal">Terminal / Mesin ATM</label>
+                    <select id="filterTerminal" name="terminal_transaksi" class="form-control">
+                        <option value="">-- Semua Terminal / Mesin --</option>
                     </select>
                 </div>
 
@@ -993,19 +157,19 @@
                 </div>
             </div>
 
-            <div class="table-container" id="tableContainer">
-                <table class="custom-table" id="jurnalTable">
+            <div class="table-container" id="tableContainer" style="overflow-x: auto; width: 100%; -webkit-overflow-scrolling: touch;">
+                <table class="custom-table" id="jurnalTable" style="min-width: 1100px; width: 100%;">
                     <thead>
                         <tr>
                             <th style="width: 50px; text-align: center;">No</th>
-                            <th>Tanggal</th>
-                            <th>Data Nasabah</th>
-                            <th>Kantor Cabang</th>
-                            <th>Jenis Transaksi</th>
-                            <th style="text-align: center; width: 110px;">Channel</th>
-                            <th>Nominal Transaksi</th>
-                            <th>Status</th>
-                            <th style="text-align: center; width: 75px;">Aksi</th>
+                            <th style="min-width: 130px;">Tanggal</th>
+                            <th style="min-width: 200px;">Data Nasabah</th>
+                            <th style="min-width: 170px;">Kantor Cabang</th>
+                            <th style="min-width: 170px;">Jenis Transaksi</th>
+                            <th style="text-align: center; width: 110px; min-width: 105px;">Channel</th>
+                            <th style="min-width: 160px;">Nominal Transaksi</th>
+                            <th style="min-width: 105px;">Status</th>
+                            <th style="text-align: center; width: 100px; min-width: 95px;">Aksi</th>
                         </tr>
                     </thead>
                     <tbody id="jurnalTbody">
@@ -1047,6 +211,11 @@
                                     <div class="highlightable" style="font-weight: 600; color: var(--bs-navy);">
                                         {{ $jurnal->masterTransaksi->jenis_transaksi ?? '-' }}
                                     </div>
+                                    @if(!empty($jurnal->terminal_transaksi) && $jurnal->terminal_transaksi !== '-')
+                                        <div style="font-size: 11.5px; color: var(--bs-blue); margin-top: 3px; font-weight: 500;">
+                                            Mesin: <span class="highlightable font-semibold" style="color: var(--bs-navy);">{{ $jurnal->terminal_transaksi }}</span>
+                                        </div>
+                                    @endif
                                 </td>
                                 <td style="text-align: center; vertical-align: middle; white-space: nowrap;">
                                     <span class="badge badge-channel highlightable">
@@ -1755,8 +924,14 @@
         if (terms.length === 0) return;
 
         // Buat Regex Case-Insensitive (Flag 'gi') yang mengenali huruf besar atau kecil
-        const escapedPattern = terms.map(t => t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|');
-        const regex = new RegExp(`(${escapedPattern})`, 'gi');
+        const regexParts = terms.map(t => {
+            const esc = t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            if (/^[a-z0-9]+\.[a-z0-9]+$/i.test(t)) {
+                return `(?:^|\\b)${esc}(?:\\b|$)`;
+            }
+            return esc;
+        });
+        const regex = new RegExp(`(${regexParts.join('|')})`, 'gi');
 
         document.querySelectorAll('.highlightable').forEach(el => {
             const raw = el.getAttribute('data-raw-text') || el.innerHTML;
@@ -1769,13 +944,19 @@
     function performClientSideFilter(query) {
         const rows = document.querySelectorAll('.jurnal-row');
         const q = (query || '').toLowerCase().trim();
-        const terms = q.split(/\s+/).filter(t => t.length > 0);
+        const terms = q.split(/\s+/).filter(t => t.length > 0 && t !== '-');
         let visibleCount = 0;
 
         rows.forEach(row => {
             const searchData = (row.getAttribute('data-search') || '').toLowerCase();
-            // Cocokkan seluruh kata kunci tanpa peduli huruf besar atau kecil
-            const matches = terms.length === 0 || terms.every(term => searchData.includes(term));
+            const matches = terms.length === 0 || terms.every(term => {
+                if (/^[a-z0-9]+\.[a-z0-9]+$/i.test(term)) {
+                    const escaped = term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                    const regex = new RegExp('(?:^|[\\s\\-_/\\(\\[])' + escaped + '(?=$|[\\s\\-_/\\)\\]])', 'i');
+                    return regex.test(searchData);
+                }
+                return searchData.includes(term);
+            });
 
             if (matches) {
                 row.style.display = '';
@@ -1822,16 +1003,17 @@
     // Mengambil data dari server melalui AJAX tanpa reload halaman
     function fetchServerFilteredData(urlOverride = null) {
         const form = document.getElementById('filterForm');
-        const qVal = document.getElementById('searchInput').value;
-        const statusVal = document.getElementById('filterStatus').value;
-        const cabangVal = document.getElementById('filterCabang').value;
-        const tglDariVal = document.getElementById('filterTglDari').value;
-        const tglSampaiVal = document.getElementById('filterTglSampai').value;
+        const qVal = document.getElementById('searchInput') ? document.getElementById('searchInput').value : '';
+        const statusVal = document.getElementById('filterStatus') ? document.getElementById('filterStatus').value : '';
+        const cabangVal = document.getElementById('filterCabang') ? document.getElementById('filterCabang').value : '';
+        const terminalVal = document.getElementById('filterTerminal') ? document.getElementById('filterTerminal').value : '';
+        const tglDariVal = document.getElementById('filterTglDari') ? document.getElementById('filterTglDari').value : '';
+        const tglSampaiVal = document.getElementById('filterTglSampai') ? document.getElementById('filterTglSampai').value : '';
         const perPageEl = document.getElementById('perPageSelect');
         const perPageVal = perPageEl ? perPageEl.value : '10';
 
         // Tampilkan / Sembunyikan Tombol Reset
-        const hasFilters = qVal || statusVal || cabangVal || tglDariVal || tglSampaiVal;
+        const hasFilters = qVal || statusVal || cabangVal || terminalVal || tglDariVal || tglSampaiVal;
         const btnReset = document.getElementById('btnResetFilter');
         if (btnReset) btnReset.style.display = hasFilters ? 'inline-flex' : 'none';
 
@@ -1841,6 +1023,7 @@
             if (qVal) params.set('q', qVal);
             if (statusVal) params.set('status', statusVal);
             if (cabangVal) params.set('master_cabang_id', cabangVal);
+            if (terminalVal) params.set('terminal_transaksi', terminalVal);
             if (tglDariVal) params.set('tgl_dari', tglDariVal);
             if (tglSampaiVal) params.set('tgl_sampai', tglSampaiVal);
             if (perPageVal && perPageVal !== '10') params.set('per_page', perPageVal);
@@ -1857,6 +1040,7 @@
             if (qVal) exportParams.set('q', qVal);
             if (statusVal) exportParams.set('status', statusVal);
             if (cabangVal) exportParams.set('master_cabang_id', cabangVal);
+            if (terminalVal) exportParams.set('terminal_transaksi', terminalVal);
             if (tglDariVal) exportParams.set('tgl_dari', tglDariVal);
             if (tglSampaiVal) exportParams.set('tgl_sampai', tglSampaiVal);
             btnExport.href = "{{ route('jurnal.export_excel') }}?" + exportParams.toString();
@@ -1902,16 +1086,18 @@
 
     // Handler Ganti Jumlah Baris Per Halaman (10, 50, 100)
     function handlePerPageChange(val) {
-        const qVal = document.getElementById('searchInput').value;
-        const statusVal = document.getElementById('filterStatus').value;
-        const cabangVal = document.getElementById('filterCabang').value;
-        const tglDariVal = document.getElementById('filterTglDari').value;
-        const tglSampaiVal = document.getElementById('filterTglSampai').value;
+        const qVal = document.getElementById('searchInput') ? document.getElementById('searchInput').value : '';
+        const statusVal = document.getElementById('filterStatus') ? document.getElementById('filterStatus').value : '';
+        const cabangVal = document.getElementById('filterCabang') ? document.getElementById('filterCabang').value : '';
+        const terminalVal = document.getElementById('filterTerminal') ? document.getElementById('filterTerminal').value : '';
+        const tglDariVal = document.getElementById('filterTglDari') ? document.getElementById('filterTglDari').value : '';
+        const tglSampaiVal = document.getElementById('filterTglSampai') ? document.getElementById('filterTglSampai').value : '';
 
         const params = new URLSearchParams();
         if (qVal) params.set('q', qVal);
         if (statusVal) params.set('status', statusVal);
         if (cabangVal) params.set('master_cabang_id', cabangVal);
+        if (terminalVal) params.set('terminal_transaksi', terminalVal);
         if (tglDariVal) params.set('tgl_dari', tglDariVal);
         if (tglSampaiVal) params.set('tgl_sampai', tglSampaiVal);
         if (val && val !== '10') params.set('per_page', val);
@@ -1940,6 +1126,7 @@
         const btnClear = document.getElementById('btnClearSearch');
         const filterStatus = document.getElementById('filterStatus');
         const filterCabang = document.getElementById('filterCabang');
+        const filterTerminal = document.getElementById('filterTerminal');
         const filterTglDari = document.getElementById('filterTglDari');
         const filterTglSampai = document.getElementById('filterTglSampai');
 
@@ -1965,7 +1152,7 @@
         }
 
         // 3. Auto Filter on Dropdown & Date Changes
-        [filterStatus, filterCabang, filterTglDari, filterTglSampai].forEach(el => {
+        [filterStatus, filterCabang, filterTerminal, filterTglDari, filterTglSampai].forEach(el => {
             if (el) {
                 el.addEventListener('change', function() {
                     fetchServerFilteredData();
@@ -2603,5 +1790,100 @@
             showImportErrorModal('Gagal mengekspor berkas Excel: ' + (err.message || 'Terjadi kesalahan server.'), 'Ekspor Gagal');
         });
     }
+
+    // Cascading Dropdown Filter Terminal / Mesin ATM di Halaman Data Keluhan
+    const atmsGrouped = @json($atmsGrouped);
+    const initialFilterTerminal = @json(request('terminal_transaksi', ''));
+    const filterCabangEl = document.getElementById('filterCabang');
+    const filterTerminalEl = document.getElementById('filterTerminal');
+
+    function isAtmMatchData(atm, target) {
+        if (!target) return false;
+        const t = target.toLowerCase().trim();
+        const val = (atm.value || '').toLowerCase().trim();
+        const prof = (atm.profil || '').toLowerCase().trim();
+        const id = (String(atm.id_luno || '')).toLowerCase().trim();
+        return t === val || t === prof || t === id || val.includes(t) || t.includes(prof);
+    }
+
+    function populateFilterTerminalData(kodeCabang, targetValue = '') {
+        if (!filterTerminalEl) return;
+        filterTerminalEl.innerHTML = '';
+
+        const defaultOpt = document.createElement('option');
+        defaultOpt.value = '';
+        defaultOpt.textContent = '-- Semua Terminal / Mesin --';
+        filterTerminalEl.appendChild(defaultOpt);
+
+        if (kodeCabang) {
+            const atms = atmsGrouped[kodeCabang] || [];
+            atms.forEach(atm => {
+                const opt = document.createElement('option');
+                opt.value = atm.value;
+                opt.textContent = atm.label;
+                if (isAtmMatchData(atm, targetValue)) {
+                    opt.selected = true;
+                }
+                filterTerminalEl.appendChild(opt);
+            });
+        } else {
+            // Tampilkan semua mesin terkelompok per cabang
+            Object.keys(atmsGrouped).forEach(kode => {
+                const atms = atmsGrouped[kode];
+                if (atms && atms.length > 0) {
+                    const optGroup = document.createElement('optgroup');
+                    optGroup.label = atms[0].cabang || `Cabang ${kode}`;
+                    atms.forEach(atm => {
+                        const opt = document.createElement('option');
+                        opt.value = atm.value;
+                        opt.textContent = atm.label;
+                        if (isAtmMatchData(atm, targetValue)) {
+                            opt.selected = true;
+                        }
+                        optGroup.appendChild(opt);
+                    });
+                    filterTerminalEl.appendChild(optGroup);
+                }
+            });
+
+            // Channel non-ATM
+            const generalGroup = document.createElement('optgroup');
+            generalGroup.label = 'Channel Non-ATM';
+            ['BANK LAIN', 'MOBILE BANKING', 'SMS BANKING'].forEach(ch => {
+                const opt = document.createElement('option');
+                opt.value = ch;
+                opt.textContent = ch;
+                if (targetValue && targetValue.toUpperCase().trim() === ch) {
+                    opt.selected = true;
+                }
+                generalGroup.appendChild(opt);
+            });
+            filterTerminalEl.appendChild(generalGroup);
+        }
+
+        if (targetValue && filterTerminalEl.selectedIndex <= 0) {
+            const customOpt = document.createElement('option');
+            customOpt.value = targetValue;
+            customOpt.textContent = targetValue;
+            customOpt.selected = true;
+            filterTerminalEl.appendChild(customOpt);
+        }
+    }
+
+    if (filterCabangEl) {
+        filterCabangEl.addEventListener('change', function() {
+            const selectedOpt = this.options[this.selectedIndex];
+            const kode = selectedOpt ? selectedOpt.getAttribute('data-kode') : '';
+            populateFilterTerminalData(kode);
+        });
+    }
+
+    window.addEventListener('DOMContentLoaded', function() {
+        if (filterCabangEl) {
+            const selectedOpt = filterCabangEl.options[filterCabangEl.selectedIndex];
+            const kode = selectedOpt ? selectedOpt.getAttribute('data-kode') : '';
+            populateFilterTerminalData(kode, initialFilterTerminal);
+        }
+    });
 </script>
 @endpush

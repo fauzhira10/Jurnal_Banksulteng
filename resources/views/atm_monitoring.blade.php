@@ -2,589 +2,80 @@
 
 @section('title', 'Monitoring Mesin ATM Bermasalah - PT Bank Sulteng')
 
-@push('styles')
-<style>
-    /* Hero Header */
-    .atm-hero {
-        background: linear-gradient(135deg, #0a2540 0%, #1e3a8a 50%, #0369a1 100%);
-        border-radius: var(--bs-radius-lg);
-        padding: 24px 28px;
-        color: #ffffff;
-        margin-bottom: 24px;
-        box-shadow: var(--bs-shadow-md);
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        flex-wrap: wrap;
-        gap: 16px;
-    }
-
-    .atm-hero h1 {
-        font-size: 22px;
-        font-weight: 700;
-        margin: 0 0 6px 0;
-        color: #ffffff;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-    }
-
-    .atm-hero p {
-        margin: 0;
-        font-size: 13.5px;
-        color: rgba(255, 255, 255, 0.85);
-    }
-
-    .hero-badge-year {
-        background: rgba(255, 255, 255, 0.15);
-        border: 1px solid rgba(255, 255, 255, 0.3);
-        backdrop-filter: blur(8px);
-        padding: 6px 14px;
-        border-radius: 20px;
-        font-size: 13px;
-        font-weight: 600;
-        color: #fef08a;
-    }
-
-    /* KPI Cards Grid */
-    .kpi-grid {
-        display: grid;
-        grid-template-columns: repeat(4, 1fr);
-        gap: 18px;
-        margin-bottom: 24px;
-    }
-
-    .kpi-card {
-        background: #ffffff;
-        border: 1px solid #e2e8f0;
-        border-radius: 14px;
-        padding: 20px;
-        box-shadow: 0 4px 15px -3px rgba(10, 37, 64, 0.05);
-        display: flex;
-        align-items: center;
-        gap: 16px;
-        transition: transform 0.2s ease, box-shadow 0.2s ease;
-    }
-
-    .kpi-card:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 20px -4px rgba(10, 37, 64, 0.1);
-    }
-
-    .kpi-icon-box {
-        width: 52px;
-        height: 52px;
-        border-radius: 12px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        flex-shrink: 0;
-    }
-
-    .kpi-icon-blue { background: #e0f2fe; color: #0284c7; }
-    .kpi-icon-amber { background: #fef3c7; color: #d97706; }
-    .kpi-icon-emerald { background: #dcfce7; color: #16a34a; }
-    .kpi-icon-purple { background: #f3e8ff; color: #9333ea; }
-
-    .kpi-info h4 {
-        margin: 0 0 4px 0;
-        font-size: 12px;
-        color: #64748b;
-        font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: 0.4px;
-    }
-
-    .kpi-info .kpi-num {
-        font-size: 22px;
-        font-weight: 800;
-        color: var(--bs-navy);
-        line-height: 1.2;
-    }
-
-    .kpi-info .kpi-sub {
-        font-size: 11px;
-        color: #94a3b8;
-        margin-top: 3px;
-    }
-
-    /* Filter Card */
-    .filter-card {
-        background: #ffffff;
-        border: 1px solid #e2e8f0;
-        border-radius: 14px;
-        padding: 20px 24px;
-        margin-bottom: 24px;
-        box-shadow: 0 4px 15px -3px rgba(10, 37, 64, 0.05);
-    }
-
-    .filter-card-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 16px;
-        padding-bottom: 12px;
-        border-bottom: 1px solid #f1f5f9;
-        flex-wrap: wrap;
-        gap: 8px;
-    }
-
-    .filter-card-title {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        font-size: 13.5px;
-        font-weight: 700;
-        color: var(--bs-navy);
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-    }
-
-    .filter-card-title svg {
-        color: #0284c7;
-    }
-
-    .filter-grid-atm {
-        display: grid;
-        grid-template-columns: 1fr 1.2fr 1.5fr 1.5fr auto;
-        gap: 16px;
-        align-items: flex-end;
-    }
-
-    .filter-control-group {
-        display: flex;
-        flex-direction: column;
-        gap: 7px;
-    }
-
-    .filter-control-group label {
-        font-size: 12px;
-        font-weight: 700;
-        color: #1e293b;
-        display: flex;
-        align-items: center;
-        gap: 6px;
-    }
-
-    .filter-control-group label svg {
-        color: #0284c7;
-    }
-
-    .custom-select-wrapper {
-        position: relative;
-        display: flex;
-        align-items: center;
-    }
-
-    .custom-select-wrapper select, .filter-control-group input[type="text"] {
-        width: 100%;
-        height: 42px;
-        padding: 0 34px 0 14px;
-        font-size: 13px;
-        font-weight: 600;
-        color: #1e293b;
-        background-color: #f8fafc;
-        border: 1.5px solid #e2e8f0;
-        border-radius: 10px;
-        appearance: none;
-        -webkit-appearance: none;
-        transition: all 0.2s ease;
-    }
-
-    .filter-control-group input[type="text"] {
-        padding-right: 14px;
-    }
-
-    .custom-select-wrapper select:hover, .filter-control-group input[type="text"]:hover {
-        background-color: #ffffff;
-        border-color: #cbd5e1;
-    }
-
-    .custom-select-wrapper select:focus, .filter-control-group input[type="text"]:focus {
-        background-color: #ffffff;
-        border-color: #0284c7;
-        box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.15);
-        outline: none;
-    }
-
-    .custom-select-wrapper .select-chevron {
-        position: absolute;
-        right: 12px;
-        pointer-events: none;
-        color: #64748b;
-    }
-
-    .filter-btn-group {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        height: 42px;
-    }
-
-    .btn-filter-apply {
-        height: 42px;
-        padding: 0 20px;
-        border-radius: 10px;
-        background: linear-gradient(135deg, var(--bs-navy) 0%, #1e40af 100%);
-        color: #ffffff;
-        font-weight: 700;
-        font-size: 13px;
-        border: none;
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        cursor: pointer;
-        box-shadow: 0 4px 10px rgba(10, 37, 64, 0.2);
-        transition: all 0.2s ease;
-    }
-
-    .btn-filter-apply:hover {
-        transform: translateY(-1px);
-        box-shadow: 0 6px 14px rgba(10, 37, 64, 0.3);
-    }
-
-    .btn-filter-reset {
-        height: 42px;
-        padding: 0 16px;
-        border-radius: 10px;
-        background: #f1f5f9;
-        color: #475569;
-        font-weight: 600;
-        font-size: 13px;
-        border: 1.5px solid #e2e8f0;
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        text-decoration: none;
-        transition: all 0.2s ease;
-    }
-
-    .btn-filter-reset:hover {
-        background: #e2e8f0;
-        color: #1e293b;
-    }
-
-    /* Table Card */
-    .table-leaderboard-card {
-        background: #ffffff;
-        border: 1px solid #e2e8f0;
-        border-radius: 14px;
-        box-shadow: 0 4px 15px -3px rgba(10, 37, 64, 0.05);
-        overflow: hidden;
-        margin-bottom: 30px;
-    }
-
-    .table-leaderboard-header {
-        padding: 18px 24px;
-        background: #f8fafc;
-        border-bottom: 1px solid #e2e8f0;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        flex-wrap: wrap;
-        gap: 12px;
-    }
-
-    .table-leaderboard-header h2 {
-        font-size: 16px;
-        font-weight: 700;
-        color: var(--bs-navy);
-        margin: 0;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-    }
-
-    .leaderboard-table {
-        width: 100%;
-        border-collapse: collapse;
-        font-size: 13px;
-    }
-
-    .leaderboard-table th, .leaderboard-table td {
-        padding: 13px 18px;
-        border-bottom: 1px solid #f1f5f9;
-        vertical-align: middle;
-    }
-
-    .leaderboard-table thead th {
-        background: #f8fafc;
-        color: #475569;
-        font-weight: 700;
-        font-size: 12px;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        border-bottom: 2px solid #e2e8f0;
-    }
-
-    .leaderboard-table tbody tr:hover {
-        background-color: #f8fafc;
-    }
-
-    .terminal-name {
-        font-weight: 700;
-        color: var(--bs-navy);
-        font-size: 14px;
-    }
-
-    .complaint-count-badge {
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        padding: 5px 14px;
-        border-radius: 20px;
-        background: #e0f2fe;
-        color: #0369a1;
-        font-weight: 800;
-        font-size: 13.5px;
-    }
-
-    /* Per Page Selector */
-    .per-page-select-box {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        font-size: 13px;
-        color: #64748b;
-    }
-
-    .per-page-select-box select {
-        padding: 4px 10px;
-        border-radius: 8px;
-        border: 1px solid #cbd5e1;
-        font-size: 12.5px;
-        font-weight: 600;
-        background: #ffffff;
-        color: #1e293b;
-        cursor: pointer;
-    }
-
-    /* Pagination Bar */
-    .pagination-bar-wrapper {
-        padding: 16px 24px;
-        background: #f8fafc;
-        border-top: 1px solid #e2e8f0;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        flex-wrap: wrap;
-        gap: 12px;
-    }
-
-    .pagination-info {
-        font-size: 13px;
-        color: #64748b;
-    }
-
-    .pagination-pills {
-        display: flex;
-        align-items: center;
-        gap: 4px;
-    }
-
-    .pagination-pills a, .pagination-pills span {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        min-width: 34px;
-        height: 34px;
-        padding: 0 8px;
-        border-radius: 8px;
-        font-size: 12.5px;
-        font-weight: 600;
-        text-decoration: none;
-        border: 1px solid #e2e8f0;
-        background: #ffffff;
-        color: #334155;
-        transition: all 0.15s ease;
-    }
-
-    .pagination-pills a:hover {
-        background: #e0f2fe;
-        border-color: #38bdf8;
-        color: #0284c7;
-    }
-
-    .pagination-pills span.current {
-        background: var(--bs-navy);
-        border-color: var(--bs-navy);
-        color: #ffffff;
-    }
-
-    .pagination-pills span.disabled {
-        color: #cbd5e1;
-        background: #f8fafc;
-        cursor: not-allowed;
-    }
-
-    @media (max-width: 1024px) {
-        .kpi-grid {
-            grid-template-columns: repeat(2, 1fr);
-        }
-        .filter-grid-atm {
-            grid-template-columns: 1fr 1fr;
-        }
-    }
-
-    @media (max-width: 640px) {
-        .kpi-grid {
-            grid-template-columns: 1fr;
-        }
-        .filter-grid-atm {
-            grid-template-columns: 1fr;
-        }
-    }
-</style>
-@endpush
-
 @section('content')
 <!-- Hero Header -->
-<div class="atm-hero">
+<div class="bg-gradient-to-r from-navy-dark via-blue-900 to-sky-700 rounded-2xl p-6 text-white mb-6 shadow-md flex justify-between items-center flex-wrap gap-4">
     <div>
-        <h1>
+        <h1 class="text-xl sm:text-2xl font-bold text-white flex items-center gap-2.5 m-0 mb-1.5">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                 <rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect>
                 <rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect>
                 <line x1="6" y1="6" x2="6.01" y2="6"></line>
                 <line x1="6" y1="18" x2="6.01" y2="18"></line>
             </svg>
-            Monitoring Keluhan Mesin ATM
+            <span>Monitoring Keluhan Mesin ATM</span>
         </h1>
-        <p>Identifikasi dan evaluasi unit mesin ATM / terminal yang paling sering mengalami kendala transaksi perbankan.</p>
+        <p class="text-xs sm:text-sm text-white/85 m-0">Identifikasi dan evaluasi unit mesin ATM / terminal yang paling sering mengalami kendala transaksi perbankan.</p>
     </div>
-    <div style="display: flex; align-items: center; gap: 10px;">
-        <span class="hero-badge-year">Periode: {{ $selectedMonth ? $monthNames[$selectedMonth] . ' ' : '' }}{{ $selectedYear }}</span>
-        <a href="{{ route('atm.export_excel', ['tahun' => $selectedYear, 'bulan' => $selectedMonth, 'master_cabang_id' => $selectedCabang, 'q' => $searchKeyword]) }}" 
-           class="btn btn-sm" 
-           style="background: #ffffff; color: var(--bs-navy); font-weight: 700; border: none; box-shadow: var(--bs-shadow-sm);"
-           title="Unduh laporan performa mesin ATM ke Excel (.xlsx)">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                <polyline points="7 10 12 15 17 10"></polyline>
-                <line x1="12" y1="15" x2="12" y2="3"></line>
-            </svg>
-            Export Excel (.xlsx)
-        </a>
-    </div>
-</div>
-
-<!-- KPI Summary Cards -->
-<div class="kpi-grid">
-    <!-- Total Mesin -->
-    <div class="kpi-card">
-        <div class="kpi-icon-box kpi-icon-blue">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect>
-                <rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect>
-            </svg>
-        </div>
-        <div class="kpi-info">
-            <h4>Mesin ATM Terdampak</h4>
-            <div class="kpi-num">{{ number_format($totalMesin, 0, ',', '.') }} Unit</div>
-            <div class="kpi-sub">Memiliki riwayat keluhan</div>
-        </div>
-    </div>
-
-    <!-- Total Kasus Keluhan -->
-    <div class="kpi-card">
-        <div class="kpi-icon-box kpi-icon-amber">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="12" cy="12" r="10"></circle>
-                <line x1="12" y1="8" x2="12" y2="12"></line>
-                <line x1="12" y1="16" x2="12.01" y2="16"></line>
-            </svg>
-        </div>
-        <div class="kpi-info">
-            <h4>Total Kasus Keluhan</h4>
-            <div class="kpi-num">{{ number_format($totalKasus, 0, ',', '.') }} Kasus</div>
-            <div class="kpi-sub">Sepanjang periode terpilih</div>
-        </div>
-    </div>
-
-    <!-- Mesin ATM #1 Paling Bermasalah -->
-    <div class="kpi-card">
-        <div class="kpi-icon-box kpi-icon-purple">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
-            </svg>
-        </div>
-        <div class="kpi-info">
-            <h4>Keluhan Terbanyak</h4>
-            <div class="kpi-num" style="font-size: 17px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 170px;" title="{{ $topAtm['terminal'] ?? '-' }}">
-                {{ $topAtm['terminal'] ?? '-' }}
-            </div>
-            <div class="kpi-sub">{{ $topAtm ? $topAtm['total_keluhan'] . ' Keluhan' : 'Tidak ada data' }}</div>
-        </div>
-    </div>
-
-    <!-- Total Nominal Masalah -->
-    <div class="kpi-card">
-        <div class="kpi-icon-box kpi-icon-emerald">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <line x1="12" y1="1" x2="12" y2="23"></line>
-                <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
-            </svg>
-        </div>
-        <div class="kpi-info">
-            <h4>Total Nominal Masalah</h4>
-            <div class="kpi-num" style="font-size: 18px;">Rp {{ number_format($totalNominal, 0, ',', '.') }}</div>
-            <div class="kpi-sub">Uang transaksi terkait</div>
-        </div>
+    <div class="flex items-center gap-2.5 flex-wrap">
+        <span class="bg-white/15 border border-white/30 backdrop-blur-xs px-3.5 py-1.5 rounded-full text-xs sm:text-sm font-semibold text-amber-200">
+            Periode: {{ $selectedMonth ? $monthNames[$selectedMonth] . ' ' : '' }}{{ $selectedYear }}
+        </span>
     </div>
 </div>
 
 <!-- Filter Bar -->
-<div class="filter-card">
-    <div class="filter-card-header">
-        <div class="filter-card-title">
-            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+<div class="bg-white border border-slate-200 rounded-2xl p-5 mb-6 shadow-xs">
+    <div class="flex justify-between items-center pb-3 mb-4 border-b border-slate-100 flex-wrap gap-2">
+        <div class="flex items-center gap-2 text-xs font-bold text-navy uppercase tracking-wider">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#0284c7" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                 <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
             </svg>
             <span>Parameter Filter Data Mesin ATM</span>
         </div>
-        <div style="font-size: 12px; color: #64748b;">
+        <div class="text-xs text-slate-500">
             Pilih tahun, bulan, cabang, atau cari kode mesin spesifik
         </div>
     </div>
 
     <form action="{{ route('atm.index') }}" method="GET" id="atmFilterForm">
         <input type="hidden" name="per_page" value="{{ $perPage }}">
-        <div class="filter-grid-atm">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-[1fr_1.2fr_1.5fr_1.5fr_auto] gap-4 items-end">
             <!-- Tahun -->
-            <div class="filter-control-group">
-                <label for="filterTahun">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <div class="flex flex-col gap-1.5">
+                <label for="filterTahun" class="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#0284c7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
                         <line x1="16" y1="2" x2="16" y2="6"></line>
                         <line x1="8" y1="2" x2="8" y2="6"></line>
                     </svg>
-                    Tahun
+                    <span>Tahun</span>
                 </label>
-                <div class="custom-select-wrapper">
-                    <select name="tahun" id="filterTahun" onchange="this.form.submit()">
+                <div class="relative flex items-center">
+                    <select name="tahun" id="filterTahun" onchange="this.form.submit()" class="w-full h-[42px] px-3.5 pr-8 text-xs font-semibold text-slate-800 bg-slate-50 border border-slate-200 rounded-xl appearance-none cursor-pointer focus:bg-white focus:border-brand-blue focus:ring-3 focus:ring-brand-blue/15 focus:outline-none transition-all">
                         @foreach($availableYears as $yr)
                             <option value="{{ $yr }}" {{ $selectedYear == $yr ? 'selected' : '' }}>
                                 Tahun {{ $yr }}
                             </option>
                         @endforeach
                     </select>
-                    <div class="select-chevron">
+                    <div class="absolute right-3 pointer-events-none text-slate-400">
                         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
                     </div>
                 </div>
             </div>
 
             <!-- Bulan -->
-            <div class="filter-control-group">
-                <label for="filterBulan">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <div class="flex flex-col gap-1.5">
+                <label for="filterBulan" class="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#0284c7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <circle cx="12" cy="12" r="10"></circle>
                         <polyline points="12 6 12 12 16 14"></polyline>
                     </svg>
-                    Bulan
+                    <span>Bulan</span>
                 </label>
-                <div class="custom-select-wrapper">
-                    <select name="bulan" id="filterBulan" onchange="this.form.submit()">
+                <div class="relative flex items-center">
+                    <select name="bulan" id="filterBulan" onchange="this.form.submit()" class="w-full h-[42px] px-3.5 pr-8 text-xs font-semibold text-slate-800 bg-slate-50 border border-slate-200 rounded-xl appearance-none cursor-pointer focus:bg-white focus:border-brand-blue focus:ring-3 focus:ring-brand-blue/15 focus:outline-none transition-all">
                         <option value="">-- Semua Bulan --</option>
                         @for($m = 1; $m <= 12; $m++)
                             <option value="{{ $m }}" {{ $selectedMonth == $m ? 'selected' : '' }}>
@@ -592,63 +83,70 @@
                             </option>
                         @endfor
                     </select>
-                    <div class="select-chevron">
+                    <div class="absolute right-3 pointer-events-none text-slate-400">
                         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
                     </div>
                 </div>
             </div>
 
             <!-- Cabang -->
-            <div class="filter-control-group">
-                <label for="filterCabang">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <div class="flex flex-col gap-1.5">
+                <label for="filterCabang" class="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#0284c7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M3 21h18"></path>
                         <path d="M5 21V7l8-4v18"></path>
                     </svg>
-                    Kantor Cabang
+                    <span>Kantor Cabang</span>
                 </label>
-                <div class="custom-select-wrapper">
-                    <select name="master_cabang_id" id="filterCabang" onchange="this.form.submit()">
-                        <option value="">-- Seluruh Kantor Cabang --</option>
+                <div class="relative flex items-center">
+                    <select name="master_cabang_id" id="filterCabang" class="w-full h-[42px] px-3.5 pr-8 text-xs font-semibold text-slate-800 bg-slate-50 border border-slate-200 rounded-xl appearance-none cursor-pointer focus:bg-white focus:border-brand-blue focus:ring-3 focus:ring-brand-blue/15 focus:outline-none transition-all">
+                        <option value="" data-kode="">-- Seluruh Kantor Cabang --</option>
                         @foreach($cabangs as $c)
-                            <option value="{{ $c->id }}" {{ $selectedCabang == $c->id ? 'selected' : '' }}>
+                            <option value="{{ $c->id }}" data-kode="{{ $c->kode_cabang }}" {{ $selectedCabang == $c->id ? 'selected' : '' }}>
                                 {{ $c->kode_cabang }} - {{ $c->nama_cabang }}
                             </option>
                         @endforeach
                     </select>
-                    <div class="select-chevron">
+                    <div class="absolute right-3 pointer-events-none text-slate-400">
                         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
                     </div>
                 </div>
             </div>
 
-            <!-- Live Search Terminal -->
-            <div class="filter-control-group">
-                <label for="searchKeyword">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <circle cx="11" cy="11" r="8"></circle>
-                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            <!-- Dropdown Filter Terminal / Mesin ATM -->
+            <div class="flex flex-col gap-1.5">
+                <label for="filterTerminal" class="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#0284c7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect>
+                        <rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect>
                     </svg>
-                    Cari Terminal / Mesin
+                    <span>Terminal / Mesin ATM</span>
                 </label>
-                <input type="text" name="q" id="searchKeyword" value="{{ $searchKeyword }}" placeholder="Contoh: ATM-001 / POSO...">
+                <div class="relative flex items-center">
+                    <select name="q" id="filterTerminal" class="w-full h-[42px] px-3.5 pr-8 text-xs font-semibold text-slate-800 bg-slate-50 border border-slate-200 rounded-xl appearance-none cursor-pointer focus:bg-white focus:border-brand-blue focus:ring-3 focus:ring-brand-blue/15 focus:outline-none transition-all">
+                        <option value="">-- Seluruh Terminal / Mesin --</option>
+                    </select>
+                    <div class="absolute right-3 pointer-events-none text-slate-400">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                    </div>
+                </div>
             </div>
 
             <!-- Tombol Aksi -->
-            <div class="filter-btn-group">
-                <button type="submit" class="btn-filter-apply">
+            <div class="flex items-center gap-2.5 h-[42px]">
+                <button type="submit" class="h-[42px] px-5 rounded-xl bg-gradient-to-r from-navy to-blue-700 hover:from-navy-dark hover:to-blue-800 text-white font-bold text-xs inline-flex items-center gap-2 shadow-sm shadow-navy/20 transition-all cursor-pointer">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                         <circle cx="11" cy="11" r="8"></circle>
                         <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
                     </svg>
-                    Cari
+                    <span>Cari</span>
                 </button>
-                <a href="{{ route('atm.index', ['tahun' => $selectedYear]) }}" class="btn-filter-reset" title="Reset Filter">
+                <a href="{{ route('atm.index', ['tahun' => $selectedYear]) }}" class="h-[42px] px-4 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 hover:text-slate-800 font-semibold text-xs border border-slate-200 inline-flex items-center gap-1.5 transition-colors" title="Reset Filter">
                     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
                         <path d="M3 3v5h5"></path>
                     </svg>
-                    Reset
+                    <span>Reset</span>
                 </a>
             </div>
         </div>
@@ -656,96 +154,160 @@
 </div>
 
 <!-- Table Card -->
-<div class="table-leaderboard-card">
-    <div class="table-leaderboard-header">
-        <h2>
+<div class="bg-white border border-slate-200 rounded-2xl shadow-xs overflow-hidden mb-8">
+    <div class="px-6 py-4.5 bg-slate-50 border-b border-slate-200 flex justify-between items-center flex-wrap gap-3">
+        <h2 class="text-sm font-bold text-navy flex items-center gap-2 m-0">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect>
                 <rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect>
             </svg>
-            Daftar Mesin ATM & Jumlah Keluhan
+            <span>Daftar Mesin ATM & Jumlah Keluhan</span>
         </h2>
         
         <!-- Pilihan Tampilkan Baris (10, 50, 100) -->
-        <div style="display: flex; align-items: center; gap: 16px; flex-wrap: wrap;">
-            <div class="per-page-select-box">
+        <div class="flex items-center gap-4 flex-wrap">
+            <div class="flex items-center gap-2 text-xs text-slate-500">
                 <span>Tampilkan:</span>
-                <select onchange="changePerPage(this.value)">
+                <select onchange="changePerPage(this.value)" class="px-2.5 py-1 rounded-lg border border-slate-300 text-xs font-semibold bg-white text-slate-800 cursor-pointer outline-none focus:border-brand-blue">
                     <option value="10" {{ $perPage == 10 ? 'selected' : '' }}>10 data</option>
                     <option value="50" {{ $perPage == 50 ? 'selected' : '' }}>50 data</option>
                     <option value="100" {{ $perPage == 100 ? 'selected' : '' }}>100 data</option>
                 </select>
             </div>
-            <div style="font-size: 13px; color: #64748b;">
-                Total: <strong>{{ number_format($totalMesin, 0, ',', '.') }}</strong> unit mesin
+            <div class="text-xs text-slate-500">
+                Total: <strong class="text-navy font-bold">{{ number_format($totalMesin, 0, ',', '.') }}</strong> unit mesin
             </div>
         </div>
     </div>
 
-    <div style="overflow-x: auto;">
-        <table class="leaderboard-table">
+    <div class="overflow-x-auto">
+        <table class="w-full border-collapse text-xs text-left">
             <thead>
                 <tr>
-                    <th style="width: 60px; text-align: center;">No</th>
-                    <th>Kode / Nama Terminal ATM</th>
-                    <th>Kantor Cabang Pengelola</th>
-                    <th style="text-align: center;">Jumlah Keluhan</th>
-                    <th style="text-align: right;">Total Nominal (Rp)</th>
-                    <th>Jenis Gangguan Terbanyak</th>
+                    <th class="px-4.5 py-3.5 bg-slate-50 text-slate-600 font-bold text-xs uppercase tracking-wider border-b-2 border-slate-200 w-[60px] text-center">No</th>
+                    <th class="px-4.5 py-3.5 bg-slate-50 text-slate-600 font-bold text-xs uppercase tracking-wider border-b-2 border-slate-200">Kode / Nama Terminal ATM</th>
+                    <th class="px-4.5 py-3.5 bg-slate-50 text-slate-600 font-bold text-xs uppercase tracking-wider border-b-2 border-slate-200">Kantor Cabang Pengelola</th>
+                    <th class="px-4.5 py-3.5 bg-slate-50 text-slate-600 font-bold text-xs uppercase tracking-wider border-b-2 border-slate-200 text-center">Jumlah Keluhan</th>
+                    <th class="px-4.5 py-3.5 bg-slate-50 text-slate-600 font-bold text-xs uppercase tracking-wider border-b-2 border-slate-200 text-right">Total Nominal (Rp)</th>
+                    <th class="px-4.5 py-3.5 bg-slate-50 text-slate-600 font-bold text-xs uppercase tracking-wider border-b-2 border-slate-200">Jenis Gangguan Terbanyak</th>
                 </tr>
             </thead>
             <tbody>
                 @forelse($atms as $atm)
-                    <tr>
+                    <tr class="hover:bg-slate-50/75 transition-colors">
                         <!-- No Urut Biasa -->
-                        <td style="text-align: center; font-weight: 600; color: #64748b;">
+                        <td class="px-4.5 py-3.5 border-b border-slate-100 text-center font-semibold text-slate-500">
                             {{ ($atms->currentPage() - 1) * $atms->perPage() + $loop->iteration }}
                         </td>
 
                         <!-- Kode Terminal -->
-                        <td>
-                            <div class="terminal-name">{{ $atm['terminal'] }}</div>
+                        <td class="px-4.5 py-3.5 border-b border-slate-100">
+                            <div class="font-bold text-navy text-[14px] sm:text-[14.5px]">{{ $atm['terminal'] }}</div>
+                            @if(!empty($atm['atm_info']['id_luno']))
+                                <div class="text-[13px] text-slate-600 mt-1 font-semibold flex items-center gap-1.5">
+                                    <span>Kode Mesin:</span>
+                                    <span class="font-extrabold font-mono text-navy text-[13.5px] px-2 py-0.5 rounded-md bg-sky-50 border border-sky-200">{{ $atm['atm_info']['id_luno'] }}</span>
+                                </div>
+                            @elseif(str_contains(strtoupper($atm['terminal']), 'BANK LAIN'))
+                                <div class="text-[12px] text-slate-500 mt-1 font-semibold">Kanal Transaksi Off-Us (ATM Bank Lain)</div>
+                            @elseif(str_contains(strtoupper($atm['terminal']), 'MOBILE BANKING') || str_contains(strtoupper($atm['terminal']), 'SMS BANKING'))
+                                <div class="text-[12px] text-slate-500 mt-1 font-semibold">Kanal Layanan Perbankan Digital</div>
+                            @endif
                         </td>
 
-                        <!-- Kantor Cabang -->
-                        <td>
-                            <div style="font-weight: 600; color: #334155;">{{ $atm['cabang_nama'] }}</div>
-                            <div style="font-size: 11.5px; color: #94a3b8;">Kode Cabang: {{ $atm['cabang_kode'] }}</div>
+                        <!-- Kantor Cabang (Redesigned) -->
+                        <td class="px-4.5 py-3.5 border-b border-slate-100 min-w-[280px]">
+                            @if(!empty($atm['is_multi_cabang']))
+                                @php
+                                    $branchList = array_values($atm['cabang_list'] ?? []);
+                                    $topBranches = array_slice($branchList, 0, 3);
+                                    $remainingCount = count($branchList) - count($topBranches);
+                                    $maxBranchCount = !empty($branchList) ? max(array_column($branchList, 'count')) : 1;
+                                    $rowIndex = ($atms->currentPage() - 1) * $atms->perPage() + $loop->iteration;
+                                @endphp
+                                <div class="space-y-2 py-0.5">
+                                    <!-- Badge Ringkas Multi-Cabang -->
+                                    <div class="flex items-center justify-between gap-2">
+                                        <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-50 border border-amber-200 text-amber-800 font-bold text-[11px]">
+                                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="text-amber-600">
+                                                <path d="M12 2L2 7l10 5 10-5-10-5z"></path>
+                                                <path d="M2 17l10 5 10-5"></path>
+                                                <path d="M2 12l10 5 10-5"></path>
+                                            </svg>
+                                            <span>Multi-Cabang ({{ count($branchList) }} Cabang)</span>
+                                        </div>
+                                        <span class="text-[10.5px] text-slate-400 font-medium">Top 3 Pelapor:</span>
+                                    </div>
+
+                                    <!-- Mini Horizontal Distribution List (Top 3) -->
+                                    <div class="space-y-1.5 bg-slate-50/90 p-2 rounded-xl border border-slate-100">
+                                        @foreach($topBranches as $tbIdx => $tb)
+                                            @php
+                                                $barWidth = round(($tb['count'] / max($maxBranchCount, 1)) * 100);
+                                            @endphp
+                                            <div class="flex items-center gap-2 text-[11px]">
+                                                <span class="font-semibold text-slate-700 w-32 truncate" title="{{ $tb['nama'] }}">
+                                                    {{ $tb['nama'] }}
+                                                </span>
+                                                <div class="flex-1 h-1.5 bg-slate-200 rounded-full overflow-hidden">
+                                                    <div class="h-full rounded-full {{ $tbIdx == 0 ? 'bg-amber-500' : 'bg-brand-blue' }}" style="width: {{ max($barWidth, 8) }}%;"></div>
+                                                </div>
+                                                <span class="font-bold text-slate-800 text-[10.5px] shrink-0 min-w-[22px] text-right">
+                                                    {{ $tb['count'] }}
+                                                </span>
+                                            </div>
+                                        @endforeach
+                                    </div>
+
+                                    <!-- Progressive Disclosure Action -->
+                                    @if($remainingCount > 0)
+                                        <button type="button" onclick='openMultiBranchDetail(@json($atm['terminal']), @json($branchList), {{ $atm['total_keluhan'] }})' class="inline-flex items-center gap-1 text-[11px] font-bold text-brand-blue hover:text-navy hover:underline cursor-pointer group">
+                                            <span>+{{ $remainingCount }} cabang lainnya</span>
+                                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="group-hover:translate-y-0.5 transition-transform">
+                                                <polyline points="6 9 12 15 18 9"></polyline>
+                                            </svg>
+                                        </button>
+                                    @endif
+                                </div>
+                            @else
+                                <div class="font-semibold text-slate-700">{{ $atm['cabang_nama'] }}</div>
+                                <div class="text-[11.5px] text-slate-400 mt-0.5">Kode Cabang: {{ $atm['cabang_kode'] }}</div>
+                            @endif
                         </td>
 
                         <!-- Jumlah Keluhan -->
-                        <td style="text-align: center;">
-                            <span class="complaint-count-badge">
+                        <td class="px-4.5 py-3.5 border-b border-slate-100 text-center">
+                            <span class="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-sky-100 text-sky-700 font-extrabold text-xs">
                                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                                     <circle cx="12" cy="12" r="10"></circle>
                                     <line x1="12" y1="8" x2="12" y2="12"></line>
                                     <line x1="12" y1="16" x2="12.01" y2="16"></line>
                                 </svg>
-                                {{ $atm['total_keluhan'] }} Keluhan
+                                <span>{{ $atm['total_keluhan'] }} Keluhan</span>
                             </span>
                         </td>
 
                         <!-- Total Nominal -->
-                        <td style="text-align: right; font-weight: 700; color: var(--bs-navy); font-variant-numeric: tabular-nums;">
+                        <td class="px-4.5 py-3.5 border-b border-slate-100 text-right font-bold text-navy tabular-nums">
                             Rp {{ number_format($atm['total_nominal'], 0, ',', '.') }}
                         </td>
 
                         <!-- Jenis Gangguan -->
-                        <td>
-                            <span style="color: #475569; font-size: 12.5px;">
+                        <td class="px-4.5 py-3.5 border-b border-slate-100">
+                            <span class="text-slate-600 text-xs">
                                 {{ $atm['dominant_issues'] ?: '-' }}
                             </span>
                         </td>
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="6" style="text-align: center; padding: 40px 20px; color: #94a3b8;">
-                            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom: 10px; opacity: 0.5;">
+                        <td colspan="6" class="text-center py-10 px-5 text-slate-400">
+                            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="mx-auto mb-2.5 opacity-50">
                                 <rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect>
                                 <rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect>
                             </svg>
-                            <div style="font-weight: 600; font-size: 15px; color: #475569;">Tidak Ada Data Keluhan Mesin ATM</div>
-                            <div style="font-size: 12.5px; margin-top: 4px;">Tidak ditemukan mesin ATM yang sesuai dengan filter pencarian yang Anda tentukan.</div>
+                            <div class="font-semibold text-sm text-slate-700">Tidak Ada Data Keluhan Mesin ATM</div>
+                            <div class="text-xs text-slate-400 mt-1">Tidak ditemukan mesin ATM yang sesuai dengan filter pencarian yang Anda tentukan.</div>
                         </td>
                     </tr>
                 @endforelse
@@ -755,39 +317,144 @@
 
     <!-- Pagination Bar -->
     @if($atms->total() > 0)
-        <div class="pagination-bar-wrapper">
-            <div class="pagination-info">
-                Menampilkan <strong>{{ $atms->firstItem() ?? 0 }}</strong> sampai <strong>{{ $atms->lastItem() ?? 0 }}</strong> dari <strong>{{ $atms->total() }}</strong> total mesin ATM
+        <div class="px-6 py-4 bg-slate-50 border-t border-slate-200 flex justify-between items-center flex-wrap gap-3 text-xs text-slate-500">
+            <div>
+                Halaman <strong>{{ $atms->currentPage() }}</strong> dari <strong>{{ $atms->lastPage() }}</strong>
+                <span class="text-slate-300 mx-1">•</span>
+                Menampilkan <strong>{{ $atms->firstItem() ?? 0 }}</strong> sampai <strong>{{ $atms->lastItem() ?? 0 }}</strong> dari <strong>{{ number_format($atms->total(), 0, ',', '.') }}</strong> total mesin ATM
             </div>
 
             @if($atms->hasPages())
-                <div class="pagination-pills">
-                    {{-- Previous Page Link --}}
+                <nav class="flex items-center gap-1 flex-wrap" aria-label="Navigasi Halaman Data ATM">
+                    @php
+                        $current = $atms->currentPage();
+                        $last = $atms->lastPage();
+                        $start = max(1, $current - 2);
+                        $end = min($last, $current + 2);
+                        if ($end - $start < 4) {
+                            if ($start == 1) $end = min($last, $start + 4);
+                            else if ($end == $last) $start = max(1, $end - 4);
+                        }
+                    @endphp
+
+                    {{-- Tombol Pertama & Sebelumnya --}}
                     @if ($atms->onFirstPage())
-                        <span class="disabled">‹</span>
+                        <span class="inline-flex items-center justify-center min-w-[34px] h-[34px] px-2.5 rounded-lg text-xs font-semibold border border-slate-200 bg-slate-50 text-slate-300 cursor-not-allowed" title="Halaman Pertama">«</span>
+                        <span class="inline-flex items-center justify-center min-w-[34px] h-[34px] px-2.5 rounded-lg text-xs font-semibold border border-slate-200 bg-slate-50 text-slate-300 cursor-not-allowed" title="Halaman Sebelumnya">‹ Sebelumnya</span>
                     @else
-                        <a href="{{ $atms->previousPageUrl() }}" rel="prev">‹</a>
+                        <a href="{{ $atms->url(1) }}" class="inline-flex items-center justify-center min-w-[34px] h-[34px] px-2.5 rounded-lg text-xs font-semibold border border-slate-200 bg-white text-slate-700 hover:bg-sky-50 hover:border-sky-300 hover:text-brand-blue transition-colors" title="Halaman Pertama">«</a>
+                        <a href="{{ $atms->previousPageUrl() }}" class="inline-flex items-center justify-center min-w-[34px] h-[34px] px-2.5 rounded-lg text-xs font-semibold border border-slate-200 bg-white text-slate-700 hover:bg-sky-50 hover:border-sky-300 hover:text-brand-blue transition-colors" title="Halaman Sebelumnya">‹ Sebelumnya</a>
                     @endif
 
-                    {{-- Pagination Elements --}}
-                    @foreach ($atms->getUrlRange(max(1, $atms->currentPage() - 2), min($atms->lastPage(), $atms->currentPage() + 2)) as $page => $url)
-                        @if ($page == $atms->currentPage())
-                            <span class="current">{{ $page }}</span>
-                        @else
-                            <a href="{{ $url }}">{{ $page }}</a>
+                    {{-- Halaman 1 & Ellipsis jika jauh --}}
+                    @if($start > 1)
+                        <a href="{{ $atms->url(1) }}" class="inline-flex items-center justify-center min-w-[34px] h-[34px] px-2.5 rounded-lg text-xs font-semibold border border-slate-200 bg-white text-slate-700 hover:bg-sky-50 hover:border-sky-300 hover:text-brand-blue transition-colors">1</a>
+                        @if($start > 2)
+                            <span class="inline-flex items-center justify-center min-w-[28px] h-[34px] text-slate-400 font-bold">...</span>
                         @endif
-                    @endforeach
-
-                    {{-- Next Page Link --}}
-                    @if ($atms->hasMorePages())
-                        <a href="{{ $atms->nextPageUrl() }}" rel="next">›</a>
-                    @else
-                        <span class="disabled">›</span>
                     @endif
-                </div>
+
+                    {{-- Nomor Halaman Numerik --}}
+                    @for ($i = $start; $i <= $end; $i++)
+                        @if ($i == $current)
+                            <span class="inline-flex items-center justify-center min-w-[34px] h-[34px] px-2.5 rounded-lg text-xs font-bold border border-navy bg-navy text-white shadow-xs">{{ $i }}</span>
+                        @else
+                            <a href="{{ $atms->url($i) }}" class="inline-flex items-center justify-center min-w-[34px] h-[34px] px-2.5 rounded-lg text-xs font-semibold border border-slate-200 bg-white text-slate-700 hover:bg-sky-50 hover:border-sky-300 hover:text-brand-blue transition-colors">{{ $i }}</a>
+                        @endif
+                    @endfor
+
+                    {{-- Halaman Terakhir & Ellipsis jika jauh --}}
+                    @if($end < $last)
+                        @if($end < $last - 1)
+                            <span class="inline-flex items-center justify-center min-w-[28px] h-[34px] text-slate-400 font-bold">...</span>
+                        @endif
+                        <a href="{{ $atms->url($last) }}" class="inline-flex items-center justify-center min-w-[34px] h-[34px] px-2.5 rounded-lg text-xs font-semibold border border-slate-200 bg-white text-slate-700 hover:bg-sky-50 hover:border-sky-300 hover:text-brand-blue transition-colors">{{ $last }}</a>
+                    @endif
+
+                    {{-- Tombol Selanjutnya & Terakhir --}}
+                    @if ($atms->hasMorePages())
+                        <a href="{{ $atms->nextPageUrl() }}" class="inline-flex items-center justify-center min-w-[34px] h-[34px] px-2.5 rounded-lg text-xs font-semibold border border-slate-200 bg-white text-slate-700 hover:bg-sky-50 hover:border-sky-300 hover:text-brand-blue transition-colors" title="Halaman Selanjutnya">Selanjutnya ›</a>
+                        <a href="{{ $atms->url($last) }}" class="inline-flex items-center justify-center min-w-[34px] h-[34px] px-2.5 rounded-lg text-xs font-semibold border border-slate-200 bg-white text-slate-700 hover:bg-sky-50 hover:border-sky-300 hover:text-brand-blue transition-colors" title="Halaman Terakhir (Loncat)">»</a>
+                    @else
+                        <span class="inline-flex items-center justify-center min-w-[34px] h-[34px] px-2.5 rounded-lg text-xs font-semibold border border-slate-200 bg-slate-50 text-slate-300 cursor-not-allowed" title="Halaman Selanjutnya">Selanjutnya ›</span>
+                        <span class="inline-flex items-center justify-center min-w-[34px] h-[34px] px-2.5 rounded-lg text-xs font-semibold border border-slate-200 bg-slate-50 text-slate-300 cursor-not-allowed" title="Halaman Terakhir">»</span>
+                    @endif
+                </nav>
             @endif
         </div>
     @endif
+</div>
+
+<!-- Modal Distribusi Keluhan Multi-Cabang (Progressive Disclosure) -->
+<div id="multiBranchModal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs transition-opacity duration-200">
+    <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-xl max-h-[85vh] flex flex-col overflow-hidden transform transition-all duration-200 scale-95 opacity-0" id="multiBranchModalDialog">
+        <!-- Modal Header -->
+        <div class="px-6 py-4.5 bg-gradient-to-r from-slate-900 via-slate-800 to-navy text-white flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-sky-500/20 border border-sky-400/30 flex items-center justify-center text-sky-300">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+                        <polyline points="2 17 12 22 22 17"></polyline>
+                        <polyline points="2 12 12 17 22 12"></polyline>
+                    </svg>
+                </div>
+                <div>
+                    <div class="flex items-center gap-2">
+                        <h3 class="font-bold text-base text-white">Distribusi Keluhan Multi-Cabang</h3>
+                        <span id="mbBadgeCount" class="px-2 py-0.5 rounded-full bg-amber-400/20 border border-amber-400/40 text-amber-300 font-bold text-xs">
+                            0 Cabang
+                        </span>
+                    </div>
+                    <p class="text-xs text-slate-300 mt-0.5">
+                        Rincian transaksi keluhan untuk <span id="mbTerminalName" class="font-semibold text-white"></span>
+                    </p>
+                </div>
+            </div>
+            <button onclick="closeMultiBranchModal()" class="w-8 h-8 rounded-lg bg-white/10 hover:bg-white/20 text-slate-300 hover:text-white flex items-center justify-center transition-colors">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            </button>
+        </div>
+
+        <!-- Toolbar Pencarian & Filter -->
+        <div class="p-4 bg-slate-50 border-b border-slate-200 space-y-2.5">
+            <div class="flex items-center gap-3">
+                <div class="relative flex-1">
+                    <div class="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                    </div>
+                    <input type="text" id="mbSearchInput" oninput="renderMultiBranchList()" placeholder="Cari nama atau kode cabang..." class="w-full h-9 pl-9 pr-3 text-xs font-medium bg-white border border-slate-300 rounded-xl focus:border-brand-blue focus:ring-2 focus:ring-brand-blue/15 focus:outline-none transition-all placeholder:text-slate-400">
+                </div>
+                <div class="flex items-center gap-1.5 shrink-0">
+                    <select id="mbSortSelect" onchange="renderMultiBranchList()" class="h-9 px-2.5 text-xs font-semibold text-slate-700 bg-white border border-slate-300 rounded-xl focus:border-brand-blue focus:outline-none cursor-pointer">
+                        <option value="count-desc">Keluhan Tertinggi</option>
+                        <option value="count-asc">Keluhan Terendah</option>
+                        <option value="name-asc">Nama Cabang (A-Z)</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="flex items-center justify-between text-[11px] text-slate-500">
+                <span id="mbShowingText">Menampilkan 0 cabang pelapor</span>
+                <span id="mbTotalText">Total: 0 keluhan</span>
+            </div>
+        </div>
+
+        <!-- Scrollable List of Branches -->
+        <div class="flex-1 overflow-y-auto p-4 space-y-2" id="mbListContainer">
+            <!-- Rendered by JS -->
+        </div>
+
+        <!-- Modal Footer -->
+        <div class="px-6 py-3.5 bg-slate-50 border-t border-slate-200 flex items-center justify-between">
+            <div class="text-[11px] text-slate-500 flex items-center gap-1.5">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#0284c7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                <span>Mini bar proporsional terhadap cabang pelapor tertinggi.</span>
+            </div>
+            <button onclick="closeMultiBranchModal()" class="px-4 py-2 text-xs font-semibold text-slate-700 bg-white border border-slate-300 rounded-xl hover:bg-slate-100 transition-colors cursor-pointer">
+                Tutup
+            </button>
+        </div>
+    </div>
 </div>
 @endsection
 
@@ -799,5 +466,204 @@
         url.searchParams.set('page', 1);
         window.location.href = url.toString();
     }
+
+    // Modal Multi-Cabang Progressive Disclosure
+    let activeBranches = [];
+    let activeTotalComplaints = 0;
+
+    function openMultiBranchDetail(terminalName, branchList, totalComplaints) {
+        activeBranches = branchList || [];
+        activeTotalComplaints = totalComplaints || 0;
+
+        document.getElementById('mbTerminalName').textContent = terminalName;
+        document.getElementById('mbBadgeCount').textContent = `${activeBranches.length} Cabang`;
+        document.getElementById('mbTotalText').innerHTML = `Total: <strong>${activeTotalComplaints}</strong> keluhan`;
+        document.getElementById('mbSearchInput').value = '';
+        document.getElementById('mbSortSelect').value = 'count-desc';
+
+        renderMultiBranchList();
+
+        const modal = document.getElementById('multiBranchModal');
+        const dialog = document.getElementById('multiBranchModalDialog');
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+        setTimeout(() => {
+            dialog.classList.remove('scale-95', 'opacity-0');
+            dialog.classList.add('scale-100', 'opacity-100');
+            document.getElementById('mbSearchInput').focus();
+        }, 10);
+    }
+
+    function closeMultiBranchModal() {
+        const modal = document.getElementById('multiBranchModal');
+        const dialog = document.getElementById('multiBranchModalDialog');
+        dialog.classList.remove('scale-100', 'opacity-100');
+        dialog.classList.add('scale-95', 'opacity-0');
+        setTimeout(() => {
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }, 150);
+    }
+
+    function renderMultiBranchList() {
+        const search = (document.getElementById('mbSearchInput').value || '').toLowerCase().trim();
+        const sortBy = document.getElementById('mbSortSelect').value;
+        const container = document.getElementById('mbListContainer');
+
+        let filtered = activeBranches.filter(b => {
+            const name = (b.nama || '').toLowerCase();
+            const code = (b.kode || '').toLowerCase();
+            return name.includes(search) || code.includes(search);
+        });
+
+        if (sortBy === 'count-desc') filtered.sort((a, b) => b.count - a.count);
+        else if (sortBy === 'count-asc') filtered.sort((a, b) => a.count - b.count);
+        else if (sortBy === 'name-asc') filtered.sort((a, b) => (a.nama || '').localeCompare(b.nama || ''));
+
+        const maxCount = Math.max(...activeBranches.map(b => b.count), 1);
+        document.getElementById('mbShowingText').innerHTML = `Menampilkan <strong>${filtered.length}</strong> dari <strong>${activeBranches.length}</strong> cabang pelapor`;
+
+        if (filtered.length === 0) {
+            container.innerHTML = `
+                <div class="py-10 text-center text-slate-400">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="mx-auto mb-2 opacity-50"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                    <div class="text-xs font-semibold text-slate-600">Tidak ada kantor cabang yang cocok</div>
+                    <div class="text-[11px] text-slate-400 mt-0.5">Coba kata kunci pencarian yang lain</div>
+                </div>
+            `;
+            return;
+        }
+
+        let html = '';
+        filtered.forEach((branch, idx) => {
+            const barWidth = Math.round((branch.count / maxCount) * 100);
+            const share = activeTotalComplaints > 0 ? ((branch.count / activeTotalComplaints) * 100).toFixed(1) : 0;
+            const rankClass = idx === 0 
+                ? 'bg-amber-100 text-amber-800 border border-amber-200' 
+                : (idx === 1 ? 'bg-slate-200 text-slate-700' : (idx === 2 ? 'bg-orange-100 text-orange-800' : 'bg-slate-100 text-slate-500'));
+            const barGradient = idx === 0 ? 'bg-amber-500' : (idx < 3 ? 'bg-sky-500' : 'bg-slate-400');
+
+            html += `
+                <div class="p-2.5 rounded-xl hover:bg-slate-50 border border-slate-100 hover:border-slate-200 transition-all flex items-center gap-3">
+                    <span class="w-6 h-6 rounded-lg flex items-center justify-center font-bold text-[10.5px] shrink-0 ${rankClass}">
+                        ${idx + 1}
+                    </span>
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center justify-between gap-2 mb-1.5">
+                            <div class="flex items-center gap-1.5 truncate">
+                                <span class="font-bold text-xs text-slate-800 truncate">${branch.nama}</span>
+                                ${branch.kode ? `<span class="text-[10px] px-1.5 py-0.2 rounded bg-slate-100 text-slate-500 font-mono">${branch.kode}</span>` : ''}
+                            </div>
+                            <div class="flex items-center gap-2 shrink-0">
+                                <span class="text-[11px] text-slate-400 font-medium">(${share}%)</span>
+                                <span class="font-extrabold text-xs text-navy px-2 py-0.5 rounded-md bg-sky-50 border border-sky-100">
+                                    ${branch.count} <span class="font-normal text-[10px] text-slate-500">kasus</span>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                            <div class="h-full rounded-full ${barGradient}" style="width: ${Math.max(barWidth, 6)}%;"></div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        });
+
+        container.innerHTML = html;
+    }
+
+    // Cascading Dropdown Filter Terminal / Mesin ATM
+    const atmsGrouped = @json($atmsGrouped);
+    const initialSelectedTerminal = @json($searchKeyword);
+    const filterCabang = document.getElementById('filterCabang');
+    const filterTerminal = document.getElementById('filterTerminal');
+
+    function isAtmMatch(atm, target) {
+        if (!target) return false;
+        const t = target.toLowerCase().trim();
+        const val = (atm.value || '').toLowerCase().trim();
+        const prof = (atm.profil || '').toLowerCase().trim();
+        const id = (String(atm.id_luno || '')).toLowerCase().trim();
+        return t === val || t === prof || t === id || val.includes(t) || t.includes(prof);
+    }
+
+    function populateFilterTerminal(kodeCabang, targetValue = '') {
+        if (!filterTerminal) return;
+        filterTerminal.innerHTML = '';
+
+        const defaultOpt = document.createElement('option');
+        defaultOpt.value = '';
+        defaultOpt.textContent = '-- Seluruh Terminal / Mesin --';
+        filterTerminal.appendChild(defaultOpt);
+
+        if (kodeCabang) {
+            const atms = atmsGrouped[kodeCabang] || [];
+            atms.forEach(atm => {
+                const opt = document.createElement('option');
+                opt.value = atm.value;
+                opt.textContent = atm.label;
+                if (isAtmMatch(atm, targetValue)) {
+                    opt.selected = true;
+                }
+                filterTerminal.appendChild(opt);
+            });
+        } else {
+            Object.keys(atmsGrouped).forEach(kode => {
+                const atms = atmsGrouped[kode];
+                if (atms && atms.length > 0) {
+                    const optGroup = document.createElement('optgroup');
+                    optGroup.label = atms[0].cabang || `Cabang ${kode}`;
+                    atms.forEach(atm => {
+                        const opt = document.createElement('option');
+                        opt.value = atm.value;
+                        opt.textContent = atm.label;
+                        if (isAtmMatch(atm, targetValue)) {
+                            opt.selected = true;
+                        }
+                        optGroup.appendChild(opt);
+                    });
+                    filterTerminal.appendChild(optGroup);
+                }
+            });
+
+            const generalGroup = document.createElement('optgroup');
+            generalGroup.label = 'Channel Non-ATM';
+            ['BANK LAIN', 'MOBILE BANKING', 'SMS BANKING'].forEach(ch => {
+                const opt = document.createElement('option');
+                opt.value = ch;
+                opt.textContent = ch;
+                if (targetValue && targetValue.toUpperCase().trim() === ch) {
+                    opt.selected = true;
+                }
+                generalGroup.appendChild(opt);
+            });
+            filterTerminal.appendChild(generalGroup);
+        }
+
+        if (targetValue && filterTerminal.selectedIndex <= 0) {
+            const customOpt = document.createElement('option');
+            customOpt.value = targetValue;
+            customOpt.textContent = targetValue;
+            customOpt.selected = true;
+            filterTerminal.appendChild(customOpt);
+        }
+    }
+
+    if (filterCabang) {
+        filterCabang.addEventListener('change', function() {
+            const selectedOpt = this.options[this.selectedIndex];
+            const kode = selectedOpt ? selectedOpt.getAttribute('data-kode') : '';
+            populateFilterTerminal(kode);
+        });
+    }
+
+    window.addEventListener('DOMContentLoaded', function() {
+        if (filterCabang) {
+            const selectedOpt = filterCabang.options[filterCabang.selectedIndex];
+            const kode = selectedOpt ? selectedOpt.getAttribute('data-kode') : '';
+            populateFilterTerminal(kode, initialSelectedTerminal);
+        }
+    });
 </script>
 @endpush
+

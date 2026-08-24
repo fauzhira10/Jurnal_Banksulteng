@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AtmMonitoringController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\JurnalController;
 use App\Http\Controllers\LaporanController;
 use Illuminate\Support\Facades\Route;
@@ -17,8 +18,12 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 // Rute Terproteksi Sistem Jurnal (Wajib Login)
 Route::middleware('auth')->group(function () {
+    // Halaman Dashboard Utama (Home)
+    Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard.home');
+
     // Halaman Form Input Jurnal Keluhan
-    Route::get('/', [JurnalController::class, 'create'])->name('jurnal.create');
+    Route::get('/jurnal/input', [JurnalController::class, 'create'])->name('jurnal.create');
 
     // Halaman Data Keluhan & Pencarian Jurnal
     Route::get('/jurnal/data', [JurnalController::class, 'index'])->name('jurnal.index');
@@ -48,10 +53,12 @@ Route::middleware('auth')->group(function () {
 
     // Route Menu Monitoring & Rekapitulasi Keluhan Mesin ATM
     Route::get('/atm-monitoring', [AtmMonitoringController::class, 'index'])->name('atm.index');
-    Route::get('/atm-monitoring/export-excel', [AtmMonitoringController::class, 'exportExcel'])->name('atm.export_excel');
 
     // Route API AJAX Auto-Fill Biaya Admin & Channel
     Route::get('/api/transaksi/{id}', [JurnalController::class, 'getDetailTransaksi'])->name('api.transaksi.detail');
+
+    // Route API AJAX Daftar Mesin ATM per Cabang
+    Route::get('/api/cabang/{id}/atms', [JurnalController::class, 'getAtmsByCabang'])->name('api.cabang.atms');
 
     // Route API AJAX Rincian Jurnal Keluhan
     Route::get('/api/jurnal/{id}', [JurnalController::class, 'getDetailJurnal'])->name('api.jurnal.detail');
