@@ -251,7 +251,6 @@ function MultiBranchExpandedPanel({ branches, totalCount, onClose, terminalName 
                           </span>
                         </div>
                         <div className="flex items-center gap-2 shrink-0">
-                          <span className="text-[11px] text-slate-400 font-medium">({shareOfTotal}%)</span>
                           <span className="font-extrabold text-xs text-navy px-2 py-0.5 rounded-md bg-sky-50 border border-sky-100">
                             {branch.count} <span className="font-normal text-[10px] text-slate-500">kasus</span>
                           </span>
@@ -355,10 +354,17 @@ function BranchManagerCell({ row }) {
 
           return (
             <div key={branch.id} className="flex items-center gap-2 text-[11px]">
-              {/* Nama Cabang */}
-              <span className="font-semibold text-slate-700 w-36 truncate" title={branch.name}>
-                {branch.name}
-              </span>
+              {/* Branch Code & Name */}
+              <div className="flex items-center gap-1.5 min-w-0 max-w-[170px]" title={branch.id ? `[${branch.id}] ${branch.name}` : branch.name}>
+                {branch.id && (
+                  <span className="px-1.5 py-0.5 rounded bg-slate-200/90 text-slate-700 font-mono font-bold text-[9.5px] shrink-0">
+                    {branch.id}
+                  </span>
+                )}
+                <span className="font-semibold text-slate-700 truncate text-[11px]">
+                  {branch.name}
+                </span>
+              </div>
 
               {/* Mini Horizontal Bar */}
               <div className="flex-1 h-1.5 bg-slate-200 rounded-full overflow-hidden">
@@ -380,15 +386,19 @@ function BranchManagerCell({ row }) {
       </div>
 
       {/* Progressive Disclosure Action: Button to Expand Modal/Drawer */}
-      {remainingCount > 0 && (
-        <button
-          onClick={() => setIsExpanded(true)}
-          className="inline-flex items-center gap-1 text-[11px] font-bold text-brand-blue hover:text-navy hover:underline transition-colors cursor-pointer group"
-        >
-          <span>+{remainingCount} cabang lainnya</span>
-          <ChevronDown className="w-3 h-3 transition-transform group-hover:translate-y-0.5" />
-        </button>
-      )}
+      <button
+        onClick={() => setIsExpanded(true)}
+        className="inline-flex items-center gap-1 text-[11px] font-bold text-brand-blue hover:text-navy hover:underline transition-colors cursor-pointer group"
+      >
+        {remainingCount > 0 ? (
+          <>
+            <span>+{remainingCount} cabang lainnya (lihat semua)</span>
+            <ChevronDown className="w-3 h-3 transition-transform group-hover:translate-y-0.5" />
+          </>
+        ) : (
+          <span>Lihat rincian cabang ›</span>
+        )}
+      </button>
 
       {/* Modal Drawer jika tombol di-klik */}
       {isExpanded && (

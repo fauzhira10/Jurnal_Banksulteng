@@ -93,7 +93,7 @@
                         <option value="">-- Seluruh Kantor Cabang & KCP --</option>
                         @foreach($cabangs as $c)
                             <option value="{{ $c->id }}" {{ $selectedCabang == $c->id ? 'selected' : '' }}>
-                                {{ $c->kode_cabang }} - {{ $c->nama_cabang }}
+                                {{ !empty($c->kode_cabang) && strtoupper(trim($c->nama_cabang)) !== 'CALL CENTER' ? $c->kode_cabang . ' - ' : '' }}{{ $c->nama_cabang }}
                             </option>
                         @endforeach
                     </select>
@@ -203,7 +203,7 @@
                         <div class="grow h-1.5 bg-slate-200 rounded-full overflow-hidden">
                             <div class="h-full bg-gradient-to-r from-sky-600 to-sky-400 rounded-full" style="width: {{ $rk['percentage'] }}%;"></div>
                         </div>
-                        <span class="text-[11px] font-bold text-navy bg-slate-100 px-2 py-0.5 rounded-full shrink-0">{{ $rk['count'] }} ({{ $rk['percentage'] }}%)</span>
+                        <span class="text-[11px] font-bold text-navy bg-slate-100 px-2 py-0.5 rounded-full shrink-0">{{ $rk['count'] }} klaim</span>
                     </div>
                 @endforeach
             </div>

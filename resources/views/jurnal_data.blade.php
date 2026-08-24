@@ -67,8 +67,8 @@
                     <select id="filterCabang" name="master_cabang_id" class="form-control">
                         <option value="" data-kode="">-- Semua Cabang --</option>
                         @foreach($cabangs as $c)
-                            <option value="{{ $c->id }}" data-kode="{{ $c->kode_cabang }}" {{ request('master_cabang_id') == $c->id ? 'selected' : '' }}>
-                                {{ $c->kode_cabang }} - {{ $c->nama_cabang }}
+                            <option value="{{ $c->id }}" data-kode="{{ $c->kode_cabang ?? '' }}" {{ request('master_cabang_id') == $c->id ? 'selected' : '' }}>
+                                {{ !empty($c->kode_cabang) && strtoupper(trim($c->nama_cabang)) !== 'CALL CENTER' ? $c->kode_cabang . ' - ' : '' }}{{ $c->nama_cabang }}
                             </option>
                         @endforeach
                     </select>
@@ -203,17 +203,27 @@
                                     <div class="highlightable" style="font-weight: 700; color: var(--bs-gray-800);">
                                         {{ $jurnal->masterCabang->nama_cabang ?? '-' }}
                                     </div>
-                                    <div class="highlightable" style="font-size: 11.5px; color: var(--bs-gray-500); margin-top: 2px;">
-                                        Kode: {{ $jurnal->masterCabang->kode_cabang ?? '-' }}
-                                    </div>
+                                    @if(!empty($jurnal->masterCabang->kode_cabang) && strtoupper(trim($jurnal->masterCabang->nama_cabang ?? '')) !== 'CALL CENTER')
+                                        <div class="highlightable" style="font-size: 11.5px; color: var(--bs-gray-500); margin-top: 2px;">
+                                            Kode: {{ $jurnal->masterCabang->kode_cabang }}
+                                        </div>
+                                    @endif
                                 </td>
                                 <td>
                                     <div class="highlightable" style="font-weight: 600; color: var(--bs-navy);">
                                         {{ $jurnal->masterTransaksi->jenis_transaksi ?? '-' }}
                                     </div>
                                     @if(!empty($jurnal->terminal_transaksi) && $jurnal->terminal_transaksi !== '-')
-                                        <div style="font-size: 11.5px; color: var(--bs-blue); margin-top: 3px; font-weight: 500;">
-                                            Mesin: <span class="highlightable font-semibold" style="color: var(--bs-navy);">{{ $jurnal->terminal_transaksi }}</span>
+                                        @php
+                                            $atmInfoRow = \App\Models\MasterAtm::findAtmInfo($jurnal->terminal_transaksi);
+                                        @endphp
+                                        <div style="font-size: 12.5px; color: var(--bs-blue); margin-top: 4px; font-weight: 500; display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
+                                            <span>Mesin: <strong class="highlightable font-semibold" style="color: var(--bs-navy); font-size: 13px;">{{ $jurnal->terminal_transaksi }}</strong></span>
+                                            @if(!empty($atmInfoRow['id_luno']))
+                                                <span class="highlightable" style="padding: 2px 7px; background: #e0f2fe; color: #0369a1; border-radius: 5px; font-size: 12px; font-family: monospace; font-weight: 800; border: 1.5px solid #bae6fd; letter-spacing: 0.2px;">
+                                                    ID Mesin: {{ $atmInfoRow['id_luno'] }}
+                                                </span>
+                                            @endif
                                         </div>
                                     @endif
                                 </td>
@@ -897,6 +907,28 @@
 
 @push('scripts')
 <script>
+    // Master ATM Lookup & Cascading Data
+    const atmsGrouped = @json($atmsGrouped);
+
+    function findAtmInfoJs(terminal) {
+        if (!terminal || terminal === '-' || terminal.toUpperCase() === 'BANK LAIN' || terminal.toUpperCase() === 'MOBILE BANKING' || terminal.toUpperCase() === 'SMS BANKING') {
+            return null;
+        }
+        const termClean = terminal.trim().toUpperCase();
+        for (const kode in atmsGrouped) {
+            const atms = atmsGrouped[kode];
+            for (const atm of atms) {
+                const val = (atm.value || '').toUpperCase().trim();
+                const prof = (atm.profil || '').toUpperCase().trim();
+                const id = String(atm.id_luno || '').trim();
+                if (termClean === val || termClean === prof || termClean.includes(prof) || val.includes(termClean) || (id && termClean === id)) {
+                    return atm;
+                }
+            }
+        }
+        return null;
+    }
+
     // Inisialisasi Cache Teks Asli untuk Highlighting
     function initOriginalTextCache() {
         document.querySelectorAll('.highlightable').forEach(el => {
@@ -1182,8 +1214,13 @@
         document.getElementById('modal_no_rekening').textContent = jurnal.no_rekening || '-';
         document.getElementById('modal_no_resi').textContent = jurnal.no_resi || '-';
         document.getElementById('modal_no_kartu').textContent = jurnal.no_kartu || '-';
-        document.getElementById('modal_no_tiket').textContent = jurnal.no_tiket || '-';
-        document.getElementById('modal_cabang').textContent = (jurnal.master_cabang ? jurnal.master_cabang.kode_cabang + ' - ' + jurnal.master_cabang.nama_cabang : '-');
+        let cabangText = '-';
+        if (jurnal.master_cabang) {
+            const cName = jurnal.master_cabang.nama_cabang || '-';
+            const cCode = jurnal.master_cabang.kode_cabang;
+            cabangText = (cCode && cName.toUpperCase().trim() !== 'CALL CENTER') ? `${cCode} - ${cName}` : cName;
+        }
+        document.getElementById('modal_cabang').textContent = cabangText;
         
         document.getElementById('modal_jenis_transaksi').textContent = (jurnal.master_transaksi ? jurnal.master_transaksi.jenis_transaksi : '-');
         document.getElementById('modal_channel').textContent = (jurnal.master_transaksi ? jurnal.master_transaksi.channel : '-');
@@ -1191,10 +1228,26 @@
         const nominal = Number(jurnal.nominal_transaksi) || 0;
         document.getElementById('modal_nominal_transaksi').textContent = 'Rp ' + nominal.toLocaleString('id-ID');
         
-        const admin = Number(jurnal.biaya_admin !== null && jurnal.biaya_admin !== undefined ? jurnal.biaya_admin : (jurnal.master_transaksi ? jurnal.master_transaksi.biaya_admin : 0)) || 0;
-        document.getElementById('modal_biaya_admin').textContent = 'Rp ' + admin.toLocaleString('id-ID');
-        
-        document.getElementById('modal_terminal_transaksi').textContent = jurnal.terminal_transaksi || '-';
+        const term = (jurnal.terminal_transaksi || '-').trim();
+        const atmInfo = findAtmInfoJs(term);
+
+        if (atmInfo && atmInfo.id_luno) {
+            document.getElementById('modal_terminal_transaksi').innerHTML = `
+                <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+                    <span style="font-weight: 700; color: var(--bs-navy); font-size: 15.5px;">${atmInfo.profil || term}</span>
+                    <span style="display: inline-flex; align-items: center; gap: 4px; padding: 3.5px 10px; background: #e0f2fe; color: #0369a1; border-radius: 6px; font-weight: 800; font-size: 13.5px; font-family: monospace; border: 1.5px solid #bae6fd; letter-spacing: 0.3px;">
+                        Kode Mesin: ${atmInfo.id_luno}
+                    </span>
+                </div>
+                ${atmInfo.lokasi ? `<div style="font-size: 12.5px; color: var(--bs-gray-600); margin-top: 4px;">Lokasi: <strong>${atmInfo.lokasi}</strong></div>` : ''}
+            `;
+        } else if (term && term !== '-') {
+            document.getElementById('modal_terminal_transaksi').innerHTML = `
+                <span style="font-weight: 700; color: var(--bs-navy); font-size: 15px;">${term}</span>
+            `;
+        } else {
+            document.getElementById('modal_terminal_transaksi').textContent = '-';
+        }
         
         const rawSt = (jurnal.status || '-').toLowerCase().trim();
         let statusBadgeClass = 'badge-strip';
@@ -1792,7 +1845,6 @@
     }
 
     // Cascading Dropdown Filter Terminal / Mesin ATM di Halaman Data Keluhan
-    const atmsGrouped = @json($atmsGrouped);
     const initialFilterTerminal = @json(request('terminal_transaksi', ''));
     const filterCabangEl = document.getElementById('filterCabang');
     const filterTerminalEl = document.getElementById('filterTerminal');

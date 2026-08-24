@@ -90,8 +90,8 @@
                         <select name="master_cabang_id" id="cabang_id" required class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm bg-white text-slate-800 transition-all duration-200 focus:border-brand-blue focus:ring-3 focus:ring-brand-blue/15 focus:outline-none">
                             <option value="">-- Pilih Kantor Cabang --</option>
                             @foreach($cabangs as $c)
-                                <option value="{{ $c->id }}" data-kode="{{ $c->kode_cabang }}" data-nama="{{ $c->nama_cabang }}" {{ old('master_cabang_id', $jurnal->master_cabang_id) == $c->id ? 'selected' : '' }}>
-                                    {{ $c->kode_cabang }} - {{ $c->nama_cabang }}
+                                <option value="{{ $c->id }}" data-kode="{{ $c->kode_cabang ?? '' }}" data-nama="{{ $c->nama_cabang }}" {{ old('master_cabang_id', $jurnal->master_cabang_id) == $c->id ? 'selected' : '' }}>
+                                    {{ !empty($c->kode_cabang) && strtoupper(trim($c->nama_cabang)) !== 'CALL CENTER' ? $c->kode_cabang . ' - ' : '' }}{{ $c->nama_cabang }}
                                 </option>
                             @endforeach
                         </select>
@@ -259,7 +259,7 @@
         const luno = selectedOpt ? selectedOpt.getAttribute('data-luno') : '';
 
         if (luno) {
-            atmCodeBadgeText.innerHTML = `<strong>Kode Mesin (ID):</strong> ${luno}`;
+            atmCodeBadgeText.innerHTML = `<span class="text-slate-600">Kode Mesin:</span> <strong class="font-mono text-[14.5px] font-extrabold text-navy px-2.5 py-0.5 rounded-md bg-white border border-sky-300 shadow-2xs tracking-wide">${luno}</strong>`;
             atmCodeBadge.classList.remove('hidden');
             atmCodeBadge.classList.add('flex');
         } else {

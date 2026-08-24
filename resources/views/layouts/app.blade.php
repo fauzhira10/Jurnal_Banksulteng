@@ -61,7 +61,7 @@
             <span>Input Jurnal Keluhan</span>
         </a>
 
-        <!-- Menu 2: Data Keluhan & Pencarian -->
+        <!-- Menu 3: Data Keluhan & Pencarian -->
         <a href="{{ route('jurnal.index') }}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-[13.5px] font-medium transition-all duration-200 {{ request()->routeIs('jurnal.index') ? 'text-white bg-gradient-to-r from-brand-blue to-navy-light font-semibold shadow-lg shadow-brand-blue/30 relative before:content-[\'\'] before:absolute before:left-0 before:top-[15%] before:h-[70%] before:w-1 before:bg-brand-gold before:rounded-r' : 'text-slate-300 hover:text-white hover:bg-white/10 hover:translate-x-1' }}">
             <svg class="w-5 h-5 shrink-0 transition-transform group-hover:scale-110" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
@@ -70,16 +70,6 @@
             </svg>
             <span>Data Keluhan</span>
             <span class="ml-auto bg-white/20 px-2 py-0.5 rounded-full text-[11px] font-bold text-white" id="sidebarBadgeCount">{{ number_format(\App\Models\Jurnal::count(), 0, ',', '.') }}</span>
-        </a>
-
-        <!-- Menu 3: Rekap Laporan Keluhan -->
-        <a href="{{ route('laporan.index') }}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-[13.5px] font-medium transition-all duration-200 {{ request()->routeIs('laporan.*') ? 'text-white bg-gradient-to-r from-brand-blue to-navy-light font-semibold shadow-lg shadow-brand-blue/30 relative before:content-[\'\'] before:absolute before:left-0 before:top-[15%] before:h-[70%] before:w-1 before:bg-brand-gold before:rounded-r' : 'text-slate-300 hover:text-white hover:bg-white/10 hover:translate-x-1' }}">
-            <svg class="w-5 h-5 shrink-0 transition-transform group-hover:scale-110" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <line x1="18" y1="20" x2="18" y2="10"></line>
-                <line x1="12" y1="20" x2="12" y2="4"></line>
-                <line x1="6" y1="20" x2="6" y2="14"></line>
-            </svg>
-            <span>Rekap Laporan Keluhan</span>
         </a>
 
         <!-- Menu 4: Monitoring Mesin ATM -->
@@ -91,6 +81,16 @@
                 <line x1="6" y1="18" x2="6.01" y2="18"></line>
             </svg>
             <span>Monitoring Mesin ATM</span>
+        </a>
+
+        <!-- Menu 5: Rekap Laporan Keluhan -->
+        <a href="{{ route('laporan.index') }}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-[13.5px] font-medium transition-all duration-200 {{ request()->routeIs('laporan.*') ? 'text-white bg-gradient-to-r from-brand-blue to-navy-light font-semibold shadow-lg shadow-brand-blue/30 relative before:content-[\'\'] before:absolute before:left-0 before:top-[15%] before:h-[70%] before:w-1 before:bg-brand-gold before:rounded-r' : 'text-slate-300 hover:text-white hover:bg-white/10 hover:translate-x-1' }}">
+            <svg class="w-5 h-5 shrink-0 transition-transform group-hover:scale-110" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="18" y1="20" x2="18" y2="10"></line>
+                <line x1="12" y1="20" x2="12" y2="4"></line>
+                <line x1="6" y1="20" x2="6" y2="14"></line>
+            </svg>
+            <span>Rekap Laporan Keluhan</span>
         </a>
     </div>
 

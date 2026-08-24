@@ -102,8 +102,8 @@
                     <select name="master_cabang_id" id="filterCabang" class="w-full h-[42px] px-3.5 pr-8 text-xs font-semibold text-slate-800 bg-slate-50 border border-slate-200 rounded-xl appearance-none cursor-pointer focus:bg-white focus:border-brand-blue focus:ring-3 focus:ring-brand-blue/15 focus:outline-none transition-all">
                         <option value="" data-kode="">-- Seluruh Kantor Cabang --</option>
                         @foreach($cabangs as $c)
-                            <option value="{{ $c->id }}" data-kode="{{ $c->kode_cabang }}" {{ $selectedCabang == $c->id ? 'selected' : '' }}>
-                                {{ $c->kode_cabang }} - {{ $c->nama_cabang }}
+                            <option value="{{ $c->id }}" data-kode="{{ $c->kode_cabang ?? '' }}" {{ $selectedCabang == $c->id ? 'selected' : '' }}>
+                                {{ !empty($c->kode_cabang) && strtoupper(trim($c->nama_cabang)) !== 'CALL CENTER' ? $c->kode_cabang . ' - ' : '' }}{{ $c->nama_cabang }}
                             </option>
                         @endforeach
                     </select>
@@ -202,11 +202,11 @@
 
                         <!-- Kode Terminal -->
                         <td class="px-4.5 py-3.5 border-b border-slate-100">
-                            <div class="font-bold text-navy text-[14px] sm:text-[14.5px]">{{ $atm['terminal'] }}</div>
+                            <div class="font-bold text-navy text-[15px] sm:text-[15.5px]">{{ $atm['terminal'] }}</div>
                             @if(!empty($atm['atm_info']['id_luno']))
-                                <div class="text-[13px] text-slate-600 mt-1 font-semibold flex items-center gap-1.5">
-                                    <span>Kode Mesin:</span>
-                                    <span class="font-extrabold font-mono text-navy text-[13.5px] px-2 py-0.5 rounded-md bg-sky-50 border border-sky-200">{{ $atm['atm_info']['id_luno'] }}</span>
+                                <div class="text-[13.5px] text-slate-600 mt-1.5 font-semibold flex items-center gap-2">
+                                    <span class="text-slate-500 font-medium text-[13px]">Kode Mesin:</span>
+                                    <span class="font-extrabold font-mono text-navy text-[14.5px] px-2.5 py-0.5 rounded-lg bg-sky-50 border border-sky-300 tracking-wide shadow-2xs">{{ $atm['atm_info']['id_luno'] }}</span>
                                 </div>
                             @elseif(str_contains(strtoupper($atm['terminal']), 'BANK LAIN'))
                                 <div class="text-[12px] text-slate-500 mt-1 font-semibold">Kanal Transaksi Off-Us (ATM Bank Lain)</div>
@@ -244,11 +244,19 @@
                                         @foreach($topBranches as $tbIdx => $tb)
                                             @php
                                                 $barWidth = round(($tb['count'] / max($maxBranchCount, 1)) * 100);
+                                                $hasCode = !empty($tb['kode']) && strtoupper(trim($tb['nama'])) !== 'CALL CENTER';
                                             @endphp
                                             <div class="flex items-center gap-2 text-[11px]">
-                                                <span class="font-semibold text-slate-700 w-32 truncate" title="{{ $tb['nama'] }}">
-                                                    {{ $tb['nama'] }}
-                                                </span>
+                                                <div class="flex items-center gap-1.5 min-w-0 max-w-[170px]" title="{{ $hasCode ? '[' . $tb['kode'] . '] ' . $tb['nama'] : $tb['nama'] }}">
+                                                    @if($hasCode)
+                                                        <span class="px-1.5 py-0.5 rounded bg-slate-200/90 text-slate-700 font-mono font-bold text-[9.5px] shrink-0">
+                                                            {{ $tb['kode'] }}
+                                                        </span>
+                                                    @endif
+                                                    <span class="font-semibold text-slate-700 truncate text-[11px]">
+                                                        {{ $tb['nama'] }}
+                                                    </span>
+                                                </div>
                                                 <div class="flex-1 h-1.5 bg-slate-200 rounded-full overflow-hidden">
                                                     <div class="h-full rounded-full {{ $tbIdx == 0 ? 'bg-amber-500' : 'bg-brand-blue' }}" style="width: {{ max($barWidth, 8) }}%;"></div>
                                                 </div>
@@ -260,18 +268,27 @@
                                     </div>
 
                                     <!-- Progressive Disclosure Action -->
-                                    @if($remainingCount > 0)
+                                    <div class="pt-0.5">
                                         <button type="button" onclick='openMultiBranchDetail(@json($atm['terminal']), @json($branchList), {{ $atm['total_keluhan'] }})' class="inline-flex items-center gap-1 text-[11px] font-bold text-brand-blue hover:text-navy hover:underline cursor-pointer group">
-                                            <span>+{{ $remainingCount }} cabang lainnya</span>
-                                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="group-hover:translate-y-0.5 transition-transform">
-                                                <polyline points="6 9 12 15 18 9"></polyline>
-                                            </svg>
+                                            @if($remainingCount > 0)
+                                                <span>+{{ $remainingCount }} cabang lainnya (lihat semua)</span>
+                                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="group-hover:translate-y-0.5 transition-transform">
+                                                    <polyline points="6 9 12 15 18 9"></polyline>
+                                                </svg>
+                                            @else
+                                                <span>Lihat rincian cabang</span>
+                                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="group-hover:translate-x-0.5 transition-transform">
+                                                    <polyline points="9 18 15 12 9 6"></polyline>
+                                                </svg>
+                                            @endif
                                         </button>
-                                    @endif
+                                    </div>
                                 </div>
                             @else
                                 <div class="font-semibold text-slate-700">{{ $atm['cabang_nama'] }}</div>
-                                <div class="text-[11.5px] text-slate-400 mt-0.5">Kode Cabang: {{ $atm['cabang_kode'] }}</div>
+                                @if(!empty($atm['cabang_kode']) && strtoupper(trim($atm['cabang_nama'])) !== 'CALL CENTER')
+                                    <div class="text-[11.5px] text-slate-400 mt-0.5">Kode Cabang: {{ $atm['cabang_kode'] }}</div>
+                                @endif
                             @endif
                         </td>
 
@@ -552,11 +569,10 @@
                         <div class="flex items-center justify-between gap-2 mb-1.5">
                             <div class="flex items-center gap-1.5 truncate">
                                 <span class="font-bold text-xs text-slate-800 truncate">${branch.nama}</span>
-                                ${branch.kode ? `<span class="text-[10px] px-1.5 py-0.2 rounded bg-slate-100 text-slate-500 font-mono">${branch.kode}</span>` : ''}
+                                ${branch.kode && branch.nama.toUpperCase().trim() !== 'CALL CENTER' ? `<span class="text-[10.5px] px-2 py-0.5 rounded-md bg-slate-200/85 text-slate-700 font-mono font-bold">Kode: ${branch.kode}</span>` : ''}
                             </div>
                             <div class="flex items-center gap-2 shrink-0">
-                                <span class="text-[11px] text-slate-400 font-medium">(${share}%)</span>
-                                <span class="font-extrabold text-xs text-navy px-2 py-0.5 rounded-md bg-sky-50 border border-sky-100">
+                                <span class="font-extrabold text-xs text-navy px-2.5 py-0.5 rounded-md bg-sky-50 border border-sky-100">
                                     ${branch.count} <span class="font-normal text-[10px] text-slate-500">kasus</span>
                                 </span>
                             </div>
