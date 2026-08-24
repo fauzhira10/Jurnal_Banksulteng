@@ -263,7 +263,8 @@ class MasterAtm extends Model
                 'id_luno'      => $atm['id_luno'],
                 'profil'       => $atm['profil'],
                 'lokasi'       => $atm['lokasi'],
-                'kode_cabang'  => $atm['kode_cabang']
+                'kode_cabang'  => $atm['kode_cabang'],
+                'cabang'       => $atm['cabang']
             ];
         }
 

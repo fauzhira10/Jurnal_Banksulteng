@@ -50,7 +50,7 @@
                     <!-- Nama Nasabah -->
                     <div class="flex flex-col gap-1.5">
                         <label class="font-semibold text-[13px] text-slate-700 flex items-center gap-1">Nama Nasabah <span class="text-rose-600 font-bold">*</span></label>
-                        <input type="text" name="nama_nasabah" value="{{ old('nama_nasabah') }}" required placeholder="Contoh: Budi Santoso" class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm bg-white text-slate-800 placeholder-slate-400 transition-all duration-200 focus:border-brand-blue focus:ring-3 focus:ring-brand-blue/15 focus:outline-none">
+                        <input type="text" name="nama_nasabah" value="{{ old('nama_nasabah') }}" required placeholder="Contoh: BUDI SANTOSO" class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm bg-white text-slate-800 placeholder-slate-400 uppercase transition-all duration-200 focus:border-brand-blue focus:ring-3 focus:ring-brand-blue/15 focus:outline-none" oninput="this.value = this.value.toUpperCase()">
                     </div>
 
                     <!-- No. Rekening -->
@@ -74,7 +74,7 @@
                     <!-- Nomor Tiket -->
                     <div class="md:col-span-2 flex flex-col gap-1.5">
                         <label class="font-semibold text-[13px] text-slate-700 flex items-center gap-1">Nomor Tiket CS <span class="text-rose-600 font-bold">*</span></label>
-                        <input type="text" name="no_tiket" value="{{ old('no_tiket') }}" required placeholder="Contoh: TKT-2026-0001" class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm bg-white text-slate-800 placeholder-slate-400 transition-all duration-200 focus:border-brand-blue focus:ring-3 focus:ring-brand-blue/15 focus:outline-none">
+                        <input type="text" name="no_tiket" value="{{ old('no_tiket') }}" required placeholder="Contoh: BS-20260001" class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm bg-white text-slate-800 placeholder-slate-400 transition-all duration-200 focus:border-brand-blue focus:ring-3 focus:ring-brand-blue/15 focus:outline-none">
                     </div>
 
                     <!-- SECTION 2: DETAIL TRANSAKSI & KANTOR CABANG -->
@@ -112,10 +112,32 @@
                         </select>
                     </div>
 
-                    <!-- Channel Transaksi (Auto-fill) -->
+                    <!-- Channel Transaksi (Dropdown) -->
                     <div class="flex flex-col gap-1.5">
-                        <label class="font-semibold text-[13px] text-slate-700">Channel Transaksi (Otomatis)</label>
-                        <input type="text" id="channel" readonly placeholder="Akan terisi otomatis..." class="w-full px-3.5 py-2.5 border border-slate-200 rounded-xl text-sm bg-slate-50 text-slate-600 font-semibold cursor-not-allowed placeholder-slate-400">
+                        <label class="font-semibold text-[13px] text-slate-700 flex items-center gap-1">Channel Transaksi <span class="text-rose-600 font-bold">*</span></label>
+                        <select name="channel" id="channel" required class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm bg-white text-slate-800 transition-all duration-200 focus:border-brand-blue focus:ring-3 focus:ring-brand-blue/15 focus:outline-none">
+                            <option value="">-- Pilih Channel Transaksi --</option>
+                            @php
+                                $channelsList = [
+                                    'ATM LOKAL',
+                                    'ATM BERSAMA',
+                                    'ATM LINK',
+                                    'FINNET',
+                                    'MOBILE BANKING',
+                                    'SMS BANKING',
+                                    'DEBIT',
+                                    'EDC BANK LAIN',
+                                    'LAKU PANDAI',
+                                    'QRIS',
+                                    'CCTV',
+                                    'ATM'
+                                ];
+                                $selectedChannel = old('channel');
+                            @endphp
+                            @foreach($channelsList as $ch)
+                                <option value="{{ $ch }}" {{ $selectedChannel == $ch ? 'selected' : '' }}>{{ $ch }}</option>
+                            @endforeach
+                        </select>
                     </div>
 
                     <!-- Biaya Admin (Dropdown) -->
@@ -146,18 +168,10 @@
                             Terminal Transaksi / Mesin ATM <span class="text-rose-600 font-bold">*</span>
                         </label>
                         <select name="terminal_transaksi" id="terminal_transaksi" required class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm bg-white text-slate-800 transition-all duration-200 focus:border-brand-blue focus:ring-3 focus:ring-brand-blue/15 focus:outline-none">
-                            <option value="">-- Pilih Kantor Cabang Dahulu --</option>
+                            <option value="">-- Pilih Mesin ATM / Terminal --</option>
                         </select>
-                        <div id="atmCodeBadge" class="hidden text-[13px] font-semibold text-sky-900 bg-sky-50 border border-sky-200 rounded-xl px-3.5 py-2 items-center gap-2">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="text-sky-600 shrink-0">
-                                <circle cx="12" cy="12" r="10"></circle>
-                                <line x1="12" y1="16" x2="12" y2="12"></line>
-                                <line x1="12" y1="8" x2="12.01" y2="8"></line>
-                            </svg>
-                            <span id="atmCodeBadgeText"></span>
-                        </div>
                         <span id="terminalHelperText" class="text-[11.5px] text-slate-500">
-                            Pilih kantor cabang di atas untuk memuat daftar mesin ATM.
+                            Pilih mesin ATM langsung atau pilih kantor cabang terlebih dahulu.
                         </span>
                     </div>
 
@@ -186,9 +200,9 @@
                     <div class="flex flex-col gap-1.5">
                         <label class="font-semibold text-[13px] text-slate-700 flex items-center gap-1">
                             Tanggal Selesai Penanganan 
-                            <span class="text-[11.5px] text-slate-500 font-normal">(Opsional jika belum selesai)</span>
+                             <span class ="text-rose-600 font-bold">*</span>
                         </label>
-                        <input type="date" name="tgl_selesai" value="{{ old('tgl_selesai') }}" class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm bg-white text-slate-800 transition-all duration-200 focus:border-brand-blue focus:ring-3 focus:ring-brand-blue/15 focus:outline-none">
+                        <input type="date" name="tgl_selesai" value="{{ old('tgl_selesai') }}" required class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm bg-white text-slate-800 transition-all duration-200 focus:border-brand-blue focus:ring-3 focus:ring-brand-blue/15 focus:outline-none">
                     </div>
 
                     <!-- Status -->
@@ -206,7 +220,7 @@
                     <!-- Keterangan Log -->
                     <div class="md:col-span-2 flex flex-col gap-1.5">
                         <label class="font-semibold text-[13px] text-slate-700">Keterangan Log / Catatan Kronologi Keluhan</label>
-                        <textarea name="keterangan_log" placeholder="Tuliskan catatan, kronologi masalah, atau tindak lanjut petugas di sini..." class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm bg-white text-slate-800 placeholder-slate-400 transition-all duration-200 focus:border-brand-blue focus:ring-3 focus:ring-brand-blue/15 focus:outline-none resize-y min-h-[90px]">{{ old('keterangan_log') }}</textarea>
+                        <textarea name="keterangan_log" placeholder="TULISKAN CATATAN, KRONOLOGI MASALAH, ATAU TINDAK LANJUT PETUGAS DI SINI..." class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm bg-white text-slate-800 placeholder-slate-400 uppercase transition-all duration-200 focus:border-brand-blue focus:ring-3 focus:ring-brand-blue/15 focus:outline-none resize-y min-h-[90px]" oninput="this.value = this.value.toUpperCase()">{{ old('keterangan_log') }}</textarea>
                     </div>
                 </div>
 
@@ -239,137 +253,78 @@
     let currentChannel = '';
     let currentJenisTransaksiText = '';
 
+    // Inisialisasi Data & Elemen
     const transaksiEl = document.getElementById('transaksi_id');
-    const cabangSelect = document.getElementById('cabang_id');
+    const channelSelect = document.getElementById('channel');
     const terminalSelect = document.getElementById('terminal_transaksi');
-    const atmCodeBadge = document.getElementById('atmCodeBadge');
-    const atmCodeBadgeText = document.getElementById('atmCodeBadgeText');
     const helperText = document.getElementById('terminalHelperText');
     const atmsGrouped = @json($atmsGrouped);
     const initialTerminalVal = @json(old('terminal_transaksi', ''));
-
-    function updateAtmCodeBadge() {
-        if (!atmCodeBadge || !atmCodeBadgeText || !terminalSelect) return;
-        const val = terminalSelect.value;
-        if (!val || val === 'MOBILE BANKING' || val === 'ATM BANK LAIN' || val === '-') {
-            atmCodeBadge.classList.add('hidden');
-            atmCodeBadge.classList.remove('flex');
-            return;
-        }
-
-        const selectedOpt = terminalSelect.options[terminalSelect.selectedIndex];
-        const luno = selectedOpt ? selectedOpt.getAttribute('data-luno') : '';
-
-        if (luno) {
-            atmCodeBadgeText.innerHTML = `<span class="text-slate-600">Kode Mesin:</span> <strong class="font-mono text-[14.5px] font-extrabold text-navy px-2.5 py-0.5 rounded-md bg-white border border-sky-300 shadow-2xs tracking-wide">${luno}</strong>`;
-            atmCodeBadge.classList.remove('hidden');
-            atmCodeBadge.classList.add('flex');
-        } else {
-            atmCodeBadge.classList.add('hidden');
-            atmCodeBadge.classList.remove('flex');
-        }
-    }
-
-    function handleChannelAtmAdaptation() {
-        const isMobileBanking = currentChannel.includes('MOBILE') || currentChannel.includes('SMS') || currentJenisTransaksiText.includes('MOBILE') || currentJenisTransaksiText.includes('M-BANKING') || currentJenisTransaksiText.includes('SMS BANKING');
-        const isBankLain = currentChannel.includes('BANK LAIN') || currentJenisTransaksiText.includes('BANK LAIN') || (cabangSelect && cabangSelect.options[cabangSelect.selectedIndex]?.getAttribute('data-kode') === '000');
-
-        if (isMobileBanking) {
-            terminalSelect.innerHTML = '<option value="MOBILE BANKING" selected>MOBILE BANKING</option>';
-            if (atmCodeBadge) {
-                atmCodeBadge.classList.add('hidden');
-                atmCodeBadge.classList.remove('flex');
-            }
-            if (helperText) helperText.textContent = 'Transaksi Mobile Banking (Tanpa mesin fisik). Cabang adalah unit pelapor/asal rekening nasabah.';
-        } else if (isBankLain) {
-            terminalSelect.innerHTML = '<option value="ATM BANK LAIN" selected>ATM BANK LAIN</option>';
-            if (atmCodeBadge) {
-                atmCodeBadge.classList.add('hidden');
-                atmCodeBadge.classList.remove('flex');
-            }
-            if (helperText) helperText.textContent = 'Transaksi Off-Us ATM Bank Lain. Cabang adalah unit pelapor atau kantor terdekat.';
-        } else {
-            const selectedOpt = cabangSelect ? cabangSelect.options[cabangSelect.selectedIndex] : null;
-            const kode = selectedOpt ? selectedOpt.getAttribute('data-kode') : '';
-            populateAtmDropdown(kode, initialTerminalVal);
-        }
-    }
 
     function loadDetailTransaksi(id) {
         if(id) {
             fetch('/api/transaksi/' + id)
                 .then(response => response.json())
                 .then(data => {
-                    const chInput = document.getElementById('channel');
-                    if (chInput) {
-                        chInput.value = data.channel || '-';
+                    if (channelSelect && data.channel) {
+                        channelSelect.value = data.channel.toUpperCase().trim();
                     }
-                    currentChannel = (data.channel || '').toUpperCase();
-                    if (transaksiEl && transaksiEl.selectedIndex >= 0) {
-                        currentJenisTransaksiText = (transaksiEl.options[transaksiEl.selectedIndex].text || '').toUpperCase();
-                    }
-                    handleChannelAtmAdaptation();
                 })
                 .catch(err => {
                     console.error('Gagal memuat detail transaksi:', err);
                 });
-        } else {
-            const chInput = document.getElementById('channel');
-            if (chInput) {
-                chInput.value = '';
-            }
-            currentChannel = '';
-            currentJenisTransaksiText = '';
-            handleChannelAtmAdaptation();
         }
     }
 
-    function populateAtmDropdown(kodeCabang, targetValue = '') {
+    function populateAtmDropdown(targetValue = '') {
+        const currentSelected = targetValue || (terminalSelect ? terminalSelect.value : '');
         terminalSelect.innerHTML = '';
 
-        if (!kodeCabang) {
-            const opt = document.createElement('option');
-            opt.value = '';
-            opt.textContent = '-- Pilih Kantor Cabang Dahulu --';
-            terminalSelect.appendChild(opt);
-            if (helperText) helperText.textContent = 'Pilih kantor cabang di atas untuk memuat daftar mesin ATM.';
-            updateAtmCodeBadge();
-            return;
-        }
-
-        const atms = atmsGrouped[kodeCabang] || [];
-
-        if (atms.length === 0) {
-            const opt = document.createElement('option');
-            opt.value = '-';
-            opt.textContent = '- (Tidak ada mesin ATM terdaftar di cabang ini)';
-            terminalSelect.appendChild(opt);
-            if (helperText) helperText.textContent = 'Tidak ada mesin ATM terdaftar pada cabang ini.';
-            updateAtmCodeBadge();
-            return;
-        }
-
-        // Default placeholder option
+        // Default Placeholder
         const defaultOpt = document.createElement('option');
         defaultOpt.value = '';
-        defaultOpt.textContent = `-- Pilih Mesin ATM (${atms.length} Unit Tersedia) --`;
+        defaultOpt.textContent = '-- Pilih Mesin ATM / Terminal --';
         terminalSelect.appendChild(defaultOpt);
 
-        atms.forEach(atm => {
-            const opt = document.createElement('option');
-            opt.value = atm.value; // e.g. "180 - CRM.PALUBARAT"
-            opt.textContent = atm.label; // e.g. "180 - CRM.PALUBARAT (KANTOR PALU BARAT)"
-            opt.setAttribute('data-luno', atm.id_luno || '');
-            opt.setAttribute('data-profil', atm.profil || '');
-            opt.setAttribute('data-lokasi', atm.lokasi || '');
-            if (targetValue && (targetValue === atm.value || targetValue.trim() === atm.value.trim() || targetValue.includes(atm.profil))) {
-                opt.selected = true;
+        // Selalu tampilkan seluruh mesin ATM terkelompok per cabang
+        Object.keys(atmsGrouped).forEach(kode => {
+            const atms = atmsGrouped[kode];
+            if (atms && atms.length > 0) {
+                const optGroup = document.createElement('optgroup');
+                const namaCabang = atms[0].cabang || '';
+                optGroup.label = (namaCabang && namaCabang.toUpperCase() !== 'CALL CENTER') ? `${kode} - ${namaCabang}` : (namaCabang || `Cabang ${kode}`);
+                atms.forEach(atm => {
+                    const opt = document.createElement('option');
+                    opt.value = atm.value;
+                    opt.textContent = atm.label;
+                    opt.setAttribute('data-luno', atm.id_luno || '');
+                    opt.setAttribute('data-profil', atm.profil || '');
+                    opt.setAttribute('data-lokasi', atm.lokasi || '');
+                    opt.setAttribute('data-kode-cabang', kode || '');
+                    if (currentSelected && (currentSelected === atm.value || currentSelected.trim() === atm.value.trim() || currentSelected.includes(atm.profil))) {
+                        opt.selected = true;
+                    }
+                    optGroup.appendChild(opt);
+                });
+                terminalSelect.appendChild(optGroup);
             }
-            terminalSelect.appendChild(opt);
         });
 
-        if (helperText) helperText.textContent = `Tersedia ${atms.length} mesin ATM terdaftar untuk cabang ini.`;
-        updateAtmCodeBadge();
+        // Channel non-ATM
+        const generalGroup = document.createElement('optgroup');
+        generalGroup.label = 'Channel Non-ATM';
+        ['MOBILE BANKING', 'ATM BANK LAIN', 'SMS BANKING', 'EDC'].forEach(ch => {
+            const opt = document.createElement('option');
+            opt.value = ch;
+            opt.textContent = ch;
+            if (currentSelected && currentSelected.toUpperCase().trim() === ch) {
+                opt.selected = true;
+            }
+            generalGroup.appendChild(opt);
+        });
+        terminalSelect.appendChild(generalGroup);
+
+        if (helperText) helperText.textContent = 'Daftar seluruh mesin ATM Bank Sulteng lengkap (Terkelompok berdasarkan cabang).';
     }
 
     if (transaksiEl) {
@@ -378,24 +333,11 @@
         });
     }
 
-    if (cabangSelect) {
-        cabangSelect.addEventListener('change', function() {
-            handleChannelAtmAdaptation();
-        });
-    }
-
-    if (terminalSelect) {
-        terminalSelect.addEventListener('change', updateAtmCodeBadge);
-    }
-
     // Jalankan saat load pertama kali
     window.addEventListener('DOMContentLoaded', function() {
-        if (transaksiEl && transaksiEl.value) {
+        populateAtmDropdown(initialTerminalVal);
+        if (transaksiEl && transaksiEl.value && channelSelect && !channelSelect.value) {
             loadDetailTransaksi(transaksiEl.value);
-        } else if (cabangSelect && cabangSelect.value) {
-            const selectedOpt = cabangSelect.options[cabangSelect.selectedIndex];
-            const kode = selectedOpt ? selectedOpt.getAttribute('data-kode') : '';
-            populateAtmDropdown(kode, initialTerminalVal);
         }
     });
 </script>

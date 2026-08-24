@@ -614,21 +614,28 @@
 
         if (kodeCabang) {
             const atms = atmsGrouped[kodeCabang] || [];
-            atms.forEach(atm => {
-                const opt = document.createElement('option');
-                opt.value = atm.value;
-                opt.textContent = atm.label;
-                if (isAtmMatch(atm, targetValue)) {
-                    opt.selected = true;
-                }
-                filterTerminal.appendChild(opt);
-            });
+            if (atms.length > 0) {
+                const optGroup = document.createElement('optgroup');
+                const namaCabang = atms[0].cabang || '';
+                optGroup.label = (namaCabang && namaCabang.toUpperCase() !== 'CALL CENTER') ? `${kodeCabang} - ${namaCabang}` : (namaCabang || `Cabang ${kodeCabang}`);
+                atms.forEach(atm => {
+                    const opt = document.createElement('option');
+                    opt.value = atm.value;
+                    opt.textContent = atm.label;
+                    if (isAtmMatch(atm, targetValue)) {
+                        opt.selected = true;
+                    }
+                    optGroup.appendChild(opt);
+                });
+                filterTerminal.appendChild(optGroup);
+            }
         } else {
             Object.keys(atmsGrouped).forEach(kode => {
                 const atms = atmsGrouped[kode];
                 if (atms && atms.length > 0) {
                     const optGroup = document.createElement('optgroup');
-                    optGroup.label = atms[0].cabang || `Cabang ${kode}`;
+                    const namaCabang = atms[0].cabang || '';
+                    optGroup.label = (namaCabang && namaCabang.toUpperCase() !== 'CALL CENTER') ? `${kode} - ${namaCabang}` : (namaCabang || `Cabang ${kode}`);
                     atms.forEach(atm => {
                         const opt = document.createElement('option');
                         opt.value = atm.value;

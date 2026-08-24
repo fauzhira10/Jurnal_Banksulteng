@@ -87,6 +87,18 @@
     font-family: inherit;
 }
 
+input[type="date"]::-webkit-calendar-picker-indicator {
+    cursor: pointer;
+    opacity: 0.65;
+    transition: opacity 0.2s ease;
+    margin-left: auto;
+    padding: 0;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator:hover {
+    opacity: 1;
+}
+
 .form-control:focus,
 .form-group input:focus,
 .form-group select:focus,

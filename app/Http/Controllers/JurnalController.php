@@ -142,7 +142,7 @@ class JurnalController extends Controller
 
         // Ambil data Master untuk pilihan filter
         $cabangs = MasterCabang::orderBy('kode_cabang')->get();
-        $transaksis = MasterTransaksi::orderBy('jenis_transaksi')->get();
+        $transaksis = MasterTransaksi::whereIn('id', range(1, 33))->orderBy('id')->get();
         $atmsGrouped = MasterAtm::getAtmsGroupedByCabang();
 
         // Hitung Ringkasan Statistik
@@ -163,7 +163,7 @@ class JurnalController extends Controller
     public function create()
     {
         $cabangs = MasterCabang::orderBy('kode_cabang')->get();
-        $transaksis = MasterTransaksi::orderBy('jenis_transaksi')->get();
+        $transaksis = MasterTransaksi::whereIn('id', range(1, 33))->orderBy('id')->get();
         $atmsGrouped = MasterAtm::getAtmsGroupedByCabang();
 
         return view('jurnal_form', compact('cabangs', 'transaksis', 'atmsGrouped'));
@@ -187,7 +187,7 @@ class JurnalController extends Controller
             'biaya_admin'        => 'nullable|numeric|min:0',
             'tgl_transaksi'      => 'required|date',
             'tgl_terima'         => 'required|date',
-            'tgl_selesai'        => 'nullable|date',
+            'tgl_selesai'        => 'required|date',
             'status'             => 'required|string|max:50',
             'keterangan_log'     => 'nullable|string'
         ], [
@@ -195,12 +195,30 @@ class JurnalController extends Controller
         ]);
 
         $data = $request->all();
+        $data['nama_nasabah'] = strtoupper(trim($request->nama_nasabah));
         $data['biaya_admin'] = $request->filled('biaya_admin') ? (float)$request->biaya_admin : 0;
         $data['status'] = $request->filled('status') ? $request->status : '-';
         $data['no_kartu'] = $request->filled('no_kartu') ? $request->no_kartu : '-';
         $data['no_tiket'] = $request->filled('no_tiket') ? $request->no_tiket : '-';
         $data['terminal_transaksi'] = $request->filled('terminal_transaksi') ? $request->terminal_transaksi : '-';
-        $data['keterangan_log'] = $request->filled('keterangan_log') ? $request->keterangan_log : '-';
+        $data['keterangan_log'] = $request->filled('keterangan_log') ? strtoupper(trim($request->keterangan_log)) : '-';
+
+        // Sinkronisasi channel yang dipilih dengan master transaksi
+        if ($request->filled('channel') && $request->filled('master_transaksi_id')) {
+            $currentMT = MasterTransaksi::find($request->master_transaksi_id);
+            if ($currentMT && strtoupper(trim($currentMT->channel)) !== strtoupper(trim($request->channel))) {
+                $matchedMT = MasterTransaksi::firstOrCreate(
+                    [
+                        'jenis_transaksi' => $currentMT->jenis_transaksi,
+                        'channel'         => strtoupper(trim($request->channel))
+                    ],
+                    [
+                        'biaya_admin'     => $currentMT->biaya_admin ?? 0
+                    ]
+                );
+                $data['master_transaksi_id'] = $matchedMT->id;
+            }
+        }
 
         Jurnal::create($data);
 
@@ -249,7 +267,7 @@ class JurnalController extends Controller
     {
         $jurnal = Jurnal::with(['masterCabang', 'masterTransaksi'])->findOrFail($id);
         $cabangs = MasterCabang::orderBy('kode_cabang')->get();
-        $transaksis = MasterTransaksi::orderBy('jenis_transaksi')->get();
+        $transaksis = MasterTransaksi::whereIn('id', range(1, 33))->orderBy('id')->get();
         $atmsGrouped = MasterAtm::getAtmsGroupedByCabang();
 
         return view('jurnal_edit', compact('jurnal', 'cabangs', 'transaksis', 'atmsGrouped'));
@@ -275,7 +293,7 @@ class JurnalController extends Controller
             'biaya_admin'        => 'nullable|numeric|min:0',
             'tgl_transaksi'      => 'required|date',
             'tgl_terima'         => 'required|date',
-            'tgl_selesai'        => 'nullable|date',
+            'tgl_selesai'        => 'required|date',
             'status'             => 'required|string|max:50',
             'keterangan_log'     => 'nullable|string'
         ], [
@@ -283,12 +301,30 @@ class JurnalController extends Controller
         ]);
 
         $data = $request->all();
+        $data['nama_nasabah'] = strtoupper(trim($request->nama_nasabah));
         $data['biaya_admin'] = $request->filled('biaya_admin') ? (float)$request->biaya_admin : 0;
         $data['status'] = $request->filled('status') ? $request->status : '-';
         $data['no_kartu'] = $request->filled('no_kartu') ? $request->no_kartu : '-';
         $data['no_tiket'] = $request->filled('no_tiket') ? $request->no_tiket : '-';
         $data['terminal_transaksi'] = $request->filled('terminal_transaksi') ? $request->terminal_transaksi : '-';
-        $data['keterangan_log'] = $request->filled('keterangan_log') ? $request->keterangan_log : '-';
+        $data['keterangan_log'] = $request->filled('keterangan_log') ? strtoupper(trim($request->keterangan_log)) : '-';
+
+        // Sinkronisasi channel yang dipilih dengan master transaksi
+        if ($request->filled('channel') && $request->filled('master_transaksi_id')) {
+            $currentMT = MasterTransaksi::find($request->master_transaksi_id);
+            if ($currentMT && strtoupper(trim($currentMT->channel)) !== strtoupper(trim($request->channel))) {
+                $matchedMT = MasterTransaksi::firstOrCreate(
+                    [
+                        'jenis_transaksi' => $currentMT->jenis_transaksi,
+                        'channel'         => strtoupper(trim($request->channel))
+                    ],
+                    [
+                        'biaya_admin'     => $currentMT->biaya_admin ?? 0
+                    ]
+                );
+                $data['master_transaksi_id'] = $matchedMT->id;
+            }
+        }
 
         $jurnal->update($data);
 

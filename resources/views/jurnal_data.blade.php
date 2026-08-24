@@ -6,92 +6,196 @@
 
 @section('content')
 
-<!-- Card Filter & Pencarian Otomatis -->
-<div class="card">
-    <div class="card-header">
-        <div class="card-title">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
-            </svg>
-            <span>Pencarian Otomatis & Filter Jurnal</span>
+<!-- Card Filter & Pencarian Cerdas -->
+<div class="bg-white rounded-2xl border border-slate-200/80 shadow-xs mb-6 overflow-hidden transition-all duration-200 hover:shadow-md">
+    <!-- Header Card -->
+    <div class="px-6 py-4 border-b border-slate-100 bg-gradient-to-r from-slate-50/80 via-white to-slate-50/50 flex flex-wrap items-center justify-between gap-3">
+        <div class="flex items-center gap-3">
+            <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-brand-blue to-navy text-white flex items-center justify-center shadow-xs shrink-0">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+                </svg>
+            </div>
+            <div>
+                <h3 class="text-[15px] font-bold text-navy leading-tight flex items-center gap-2">
+                    <span>Pencarian & Filter Data Keluhan</span>
+                    <span id="activeFilterBadgeCount" class="hidden text-[11px] font-bold px-2 py-0.5 rounded-full bg-brand-blue/10 text-brand-blue border border-brand-blue/20">0 filter aktif</span>
+                </h3>
+                <p class="text-xs text-slate-500 mt-0.5">Filter cepat berdasarkan kata kunci, kantor cabang, terminal mesin, status, atau periode transaksi</p>
+            </div>
         </div>
-        <div style="display: flex; align-items: center; gap: 8px;">
-            <a href="{{ route('jurnal.index') }}" id="btnResetFilter" class="btn btn-secondary btn-sm" style="display: {{ request()->hasAny(['q', 'status', 'master_cabang_id', 'tgl_dari', 'tgl_sampai']) ? 'inline-flex' : 'none' }};">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <line x1="18" y1="6" x2="6" y2="18"></line>
-                    <line x1="6" y1="6" x2="18" y2="18"></line>
+
+        <!-- Action Header (Reset Filter Button) -->
+        <div class="flex items-center gap-2">
+            <button type="button" onclick="resetAllFilters()" id="btnResetFilter" class="hidden items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold text-rose-600 bg-rose-50 border border-rose-200 hover:bg-rose-100 hover:border-rose-300 transition-all cursor-pointer shadow-2xs">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
+                    <path d="M3 3v5h5"></path>
                 </svg>
                 <span>Reset Filter</span>
-            </a>
+            </button>
         </div>
     </div>
-    <div class="card-body">
+
+    <!-- Body Card -->
+    <div class="p-6 space-y-4">
         <form id="filterForm" method="GET" action="{{ route('jurnal.index') }}" onsubmit="return false;">
-            <div class="filter-grid">
-                <!-- Search Keyword -->
-                <div class="filter-group">
-                    <label for="searchInput">Pencarian Otomatis</label>
-                    <div class="search-input-wrapper">
-                        <span class="search-icon">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <circle cx="11" cy="11" r="8"></circle>
-                                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-                            </svg>
-                        </span>
-                        <input type="text" id="searchInput" name="q" value="{{ request('q') }}" class="form-control search-input" placeholder="Ketik nama, no resi, rekening, tiket..." autocomplete="off">
-                        <button type="button" class="btn-clear-search" id="btnClearSearch" title="Hapus Pencarian" style="display: {{ request('q') ? 'flex' : 'none' }};">
+            <!-- Tier 1: Hero Search Input -->
+            <div class="relative">
+                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="text-brand-blue">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                    </svg>
+                </div>
+                <input 
+                    type="text" 
+                    id="searchInput" 
+                    name="q" 
+                    value="{{ request('q') }}" 
+                    class="w-full h-12 pl-11 pr-24 text-[13.5px] font-medium text-slate-800 bg-slate-50/70 border border-slate-200 rounded-xl placeholder:text-slate-400 placeholder:text-xs sm:placeholder:text-[13px] focus:bg-white focus:border-brand-blue focus:ring-4 focus:ring-brand-blue/10 focus:outline-none transition-all shadow-2xs" 
+                    placeholder="Ketik nama nasabah, nomor resi/trace, nomor rekening, nomor kartu debit, atau nomor tiket CS..." 
+                    autocomplete="off"
+                >
+                <!-- Right Action Buttons inside Search Input -->
+                <div class="absolute inset-y-0 right-0 pr-3 flex items-center gap-1.5">
+                    <button 
+                        type="button" 
+                        id="btnClearSearch" 
+                        title="Hapus Kata Kunci" 
+                        class="hidden w-7 h-7 rounded-lg bg-slate-200/80 hover:bg-slate-300 text-slate-600 items-center justify-center transition-colors cursor-pointer text-xs"
+                    >
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                    </button>
+                    <span class="hidden sm:inline-flex items-center text-[10.5px] font-bold text-slate-400 bg-slate-200/60 px-2 py-0.5 rounded-md border border-slate-300/50">
+                        Live Search
+                    </span>
+                </div>
+            </div>
+
+            <!-- Tier 2: Filter Grid Controls (4 Balanced Columns) -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5 pt-1">
+                <!-- 1. Filter Kantor Cabang -->
+                <div class="flex flex-col gap-1.5">
+                    <label for="filterCabang" class="text-xs font-bold text-slate-700 flex items-center gap-1.5">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="text-brand-blue">
+                            <path d="M3 21h18"></path>
+                            <path d="M5 21V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16"></path>
+                            <path d="M9 9h1"></path>
+                            <path d="M9 13h1"></path>
+                            <path d="M9 17h1"></path>
+                            <path d="M14 9h1"></path>
+                            <path d="M14 13h1"></path>
+                            <path d="M14 17h1"></path>
+                        </svg>
+                        <span>Kantor Cabang</span>
+                    </label>
+                    <div class="relative">
+                        <select id="filterCabang" name="master_cabang_id" class="w-full h-10 px-3 pr-8 text-xs font-semibold text-slate-800 bg-slate-50 border border-slate-200 rounded-xl appearance-none cursor-pointer focus:bg-white focus:border-brand-blue focus:ring-3 focus:ring-brand-blue/15 focus:outline-none transition-all">
+                            <option value="" data-kode="">-- Semua Cabang --</option>
+                            @foreach($cabangs as $c)
+                                <option value="{{ $c->id }}" data-kode="{{ $c->kode_cabang ?? '' }}" {{ request('master_cabang_id') == $c->id ? 'selected' : '' }}>
+                                    {{ !empty($c->kode_cabang) && strtoupper(trim($c->nama_cabang)) !== 'CALL CENTER' ? $c->kode_cabang . ' - ' : '' }}{{ $c->nama_cabang }}
+                                </option>
+                            @endforeach
+                        </select>
+                        <div class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
                             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                                <line x1="18" y1="6" x2="6" y2="18"></line>
-                                <line x1="6" y1="6" x2="18" y2="18"></line>
+                                <polyline points="6 9 12 15 18 9"></polyline>
                             </svg>
-                        </button>
+                        </div>
                     </div>
                 </div>
 
-                <!-- Filter Status -->
-                <div class="filter-group">
-                    <label for="filterStatus">Status</label>
-                    <select id="filterStatus" name="status" class="form-control">
-                        <option value="">-- Semua Status --</option>
-                        <option value="-" {{ request('status') === '-' ? 'selected' : '' }}>- (Belum Ditentukan)</option>
-                        <option value="Menunggu" {{ request('status') == 'Menunggu' ? 'selected' : '' }}>Menunggu</option>
-                        <option value="Success" {{ request('status') == 'Success' ? 'selected' : '' }}>Success</option>
-                        <option value="Done" {{ request('status') == 'Done' ? 'selected' : '' }}>Done</option>
-                        <option value="Rejected" {{ request('status') == 'Rejected' ? 'selected' : '' }}>Rejected</option>
-                    </select>
+                <!-- 2. Filter Terminal / Mesin ATM -->
+                <div class="flex flex-col gap-1.5">
+                    <label for="filterTerminal" class="text-xs font-bold text-slate-700 flex items-center gap-1.5">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="text-brand-blue">
+                            <rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect>
+                            <rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect>
+                            <line x1="6" y1="6" x2="6.01" y2="6"></line>
+                            <line x1="6" y1="18" x2="6.01" y2="18"></line>
+                        </svg>
+                        <span>Terminal / Mesin ATM</span>
+                    </label>
+                    <div class="relative">
+                        <select id="filterTerminal" name="terminal_transaksi" class="w-full h-10 px-3 pr-8 text-xs font-semibold text-slate-800 bg-slate-50 border border-slate-200 rounded-xl appearance-none cursor-pointer focus:bg-white focus:border-brand-blue focus:ring-3 focus:ring-brand-blue/15 focus:outline-none transition-all">
+                            <option value="">-- Semua Terminal / Mesin --</option>
+                        </select>
+                        <div class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="6 9 12 15 18 9"></polyline>
+                            </svg>
+                        </div>
+                    </div>
                 </div>
 
-                <!-- Filter Cabang -->
-                <div class="filter-group">
-                    <label for="filterCabang">Kantor Cabang</label>
-                    <select id="filterCabang" name="master_cabang_id" class="form-control">
-                        <option value="" data-kode="">-- Semua Cabang --</option>
-                        @foreach($cabangs as $c)
-                            <option value="{{ $c->id }}" data-kode="{{ $c->kode_cabang ?? '' }}" {{ request('master_cabang_id') == $c->id ? 'selected' : '' }}>
-                                {{ !empty($c->kode_cabang) && strtoupper(trim($c->nama_cabang)) !== 'CALL CENTER' ? $c->kode_cabang . ' - ' : '' }}{{ $c->nama_cabang }}
-                            </option>
-                        @endforeach
-                    </select>
+                <!-- 3. Filter Status Penanganan -->
+                <div class="flex flex-col gap-1.5">
+                    <label for="filterStatus" class="text-xs font-bold text-slate-700 flex items-center gap-1.5">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="text-brand-blue">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <polyline points="12 6 12 12 14 14"></polyline>
+                        </svg>
+                        <span>Status Keluhan</span>
+                    </label>
+                    <div class="relative">
+                        <select id="filterStatus" name="status" class="w-full h-10 px-3 pr-8 text-xs font-semibold text-slate-800 bg-slate-50 border border-slate-200 rounded-xl appearance-none cursor-pointer focus:bg-white focus:border-brand-blue focus:ring-3 focus:ring-brand-blue/15 focus:outline-none transition-all">
+                            <option value="">-- Semua Status --</option>
+                            <option value="-" {{ request('status') === '-' ? 'selected' : '' }}>⚪ - (Belum Ditentukan)</option>
+                            <option value="Menunggu" {{ request('status') == 'Menunggu' ? 'selected' : '' }}>🟡 Menunggu</option>
+                            <option value="Success" {{ request('status') == 'Success' ? 'selected' : '' }}>🔵 Success</option>
+                            <option value="Done" {{ request('status') == 'Done' ? 'selected' : '' }}>🟢 Done</option>
+                            <option value="Rejected" {{ request('status') == 'Rejected' ? 'selected' : '' }}>🔴 Rejected</option>
+                        </select>
+                        <div class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="6 9 12 15 18 9"></polyline>
+                            </svg>
+                        </div>
+                    </div>
                 </div>
 
-                <!-- Filter Terminal / Mesin ATM -->
-                <div class="filter-group">
-                    <label for="filterTerminal">Terminal / Mesin ATM</label>
-                    <select id="filterTerminal" name="terminal_transaksi" class="form-control">
-                        <option value="">-- Semua Terminal / Mesin --</option>
-                    </select>
+                <!-- 4. Filter Rentang Tanggal Transaksi (Dari s/d Sampai) -->
+                <div class="flex flex-col gap-1.5">
+                    <label class="text-xs font-bold text-slate-700 flex items-center gap-1.5">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="text-brand-blue">
+                            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                            <line x1="16" y1="2" x2="16" y2="6"></line>
+                            <line x1="8" y1="2" x2="8" y2="6"></line>
+                            <line x1="3" y1="10" x2="21" y2="10"></line>
+                        </svg>
+                        <span>Periode Transaksi (Dari - Sampai)</span>
+                    </label>
+                    <div class="grid grid-cols-2 gap-2">
+                        <input 
+                            type="date" 
+                            id="filterTglDari" 
+                            name="tgl_dari" 
+                            value="{{ request('tgl_dari') }}" 
+                            class="w-full h-10 px-2.5 text-xs font-semibold text-slate-800 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-brand-blue focus:ring-3 focus:ring-brand-blue/15 focus:outline-none transition-all cursor-pointer" 
+                            title="Tanggal Transaksi (Dari)"
+                        >
+                        <input 
+                            type="date" 
+                            id="filterTglSampai" 
+                            name="tgl_sampai" 
+                            value="{{ request('tgl_sampai') }}" 
+                            class="w-full h-10 px-2.5 text-xs font-semibold text-slate-800 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-brand-blue focus:ring-3 focus:ring-brand-blue/15 focus:outline-none transition-all cursor-pointer" 
+                            title="Tanggal Transaksi (Sampai)"
+                        >
+                    </div>
                 </div>
+            </div>
 
-                <!-- Tanggal Transaksi Dari -->
-                <div class="filter-group">
-                    <label for="filterTglDari">Tgl Transaksi (Dari)</label>
-                    <input type="date" id="filterTglDari" name="tgl_dari" value="{{ request('tgl_dari') }}" class="form-control" title="Filter awal tanggal transaksi">
-                </div>
-
-                <!-- Tanggal Transaksi Sampai -->
-                <div class="filter-group">
-                    <label for="filterTglSampai">Tgl Transaksi (Sampai)</label>
-                    <input type="date" id="filterTglSampai" name="tgl_sampai" value="{{ request('tgl_sampai') }}" class="form-control" title="Filter batas akhir tanggal transaksi">
+            <!-- Tier 3: Active Filter Chips Bar (Dynamic Pills) -->
+            <div id="activeFilterChipsContainer" class="hidden pt-3 border-t border-slate-100 flex flex-wrap items-center gap-2">
+                <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Filter Aktif:</span>
+                <div id="activeFilterChipsList" class="flex flex-wrap items-center gap-1.5">
+                    <!-- Populated dynamically via JS -->
                 </div>
             </div>
         </form>
@@ -216,12 +320,19 @@
                                     @if(!empty($jurnal->terminal_transaksi) && $jurnal->terminal_transaksi !== '-')
                                         @php
                                             $atmInfoRow = \App\Models\MasterAtm::findAtmInfo($jurnal->terminal_transaksi);
+                                            // Ambil nama profil murni (tanpa prefix ID Mesin, misal "187 - CRM.SALAKAN" -> "CRM.SALAKAN")
+                                            $displayNamaMesin = $atmInfoRow['profil'] ?? $jurnal->terminal_transaksi;
+                                            $displayNamaMesin = preg_replace('/^\d+\s*[-_]\s*/', '', $displayNamaMesin);
+                                            $idMesin = $atmInfoRow['id_luno'] ?? '';
+                                            if (empty($idMesin) && preg_match('/^(\d+)\s*[-_]/', $jurnal->terminal_transaksi, $matches)) {
+                                                $idMesin = $matches[1];
+                                            }
                                         @endphp
-                                        <div style="font-size: 12.5px; color: var(--bs-blue); margin-top: 4px; font-weight: 500; display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
-                                            <span>Mesin: <strong class="highlightable font-semibold" style="color: var(--bs-navy); font-size: 13px;">{{ $jurnal->terminal_transaksi }}</strong></span>
-                                            @if(!empty($atmInfoRow['id_luno']))
-                                                <span class="highlightable" style="padding: 2px 7px; background: #e0f2fe; color: #0369a1; border-radius: 5px; font-size: 12px; font-family: monospace; font-weight: 800; border: 1.5px solid #bae6fd; letter-spacing: 0.2px;">
-                                                    ID Mesin: {{ $atmInfoRow['id_luno'] }}
+                                        <div style="font-size: 12.5px; color: var(--bs-blue); margin-top: 4px; font-weight: 500; display: flex; flex-direction: column; align-items: flex-start; gap: 3px;">
+                                            <span>Mesin: <strong class="highlightable font-semibold" style="color: var(--bs-navy); font-size: 13px;">{{ $displayNamaMesin }}</strong></span>
+                                            @if(!empty($idMesin))
+                                                <span class="highlightable" style="padding: 2px 7px; background: #e0f2fe; color: #0369a1; border-radius: 5px; font-size: 11.5px; font-family: monospace; font-weight: 800; border: 1.5px solid #bae6fd; letter-spacing: 0.2px;">
+                                                    ID Mesin: {{ $idMesin }}
                                                 </span>
                                             @endif
                                         </div>
@@ -1112,8 +1223,121 @@
                 // Terapkan kembali penyorotan kuning pada data baru
                 applyYellowHighlights(document.getElementById('searchInput').value);
                 bindPaginationEvents();
+                updateActiveFilterChips();
             })
             .catch(err => console.error('Gagal mengambil data pencarian:', err));
+    }
+
+    // Dynamic Filter Chips (Pill Badges) & Reset Helpers
+    function updateActiveFilterChips() {
+        const qVal = document.getElementById('searchInput') ? document.getElementById('searchInput').value.trim() : '';
+        const statusVal = document.getElementById('filterStatus') ? document.getElementById('filterStatus').value : '';
+        const cabangEl = document.getElementById('filterCabang');
+        const cabangVal = cabangEl ? cabangEl.value : '';
+        const cabangText = cabangEl && cabangEl.selectedIndex > 0 ? cabangEl.options[cabangEl.selectedIndex].text.trim() : '';
+        const terminalEl = document.getElementById('filterTerminal');
+        const terminalVal = terminalEl ? terminalEl.value : '';
+        const tglDariVal = document.getElementById('filterTglDari') ? document.getElementById('filterTglDari').value : '';
+        const tglSampaiVal = document.getElementById('filterTglSampai') ? document.getElementById('filterTglSampai').value : '';
+
+        const chipsContainer = document.getElementById('activeFilterChipsContainer');
+        const chipsList = document.getElementById('activeFilterChipsList');
+        const badgeCount = document.getElementById('activeFilterBadgeCount');
+        const btnReset = document.getElementById('btnResetFilter');
+
+        if (!chipsContainer || !chipsList) return;
+
+        chipsList.innerHTML = '';
+        let count = 0;
+
+        if (qVal) {
+            count++;
+            chipsList.appendChild(createChipElement('Pencarian', `"${qVal}"`, () => {
+                document.getElementById('searchInput').value = '';
+                const btnClear = document.getElementById('btnClearSearch');
+                if (btnClear) btnClear.style.display = 'none';
+                performClientSideFilter('');
+                fetchServerFilteredData();
+            }));
+        }
+
+        if (cabangVal) {
+            count++;
+            chipsList.appendChild(createChipElement('Cabang', cabangText, () => {
+                cabangEl.value = '';
+                populateFilterTerminalData('');
+                fetchServerFilteredData();
+            }));
+        }
+
+        if (terminalVal) {
+            count++;
+            chipsList.appendChild(createChipElement('Terminal', terminalVal, () => {
+                terminalEl.value = '';
+                fetchServerFilteredData();
+            }));
+        }
+
+        if (statusVal) {
+            count++;
+            chipsList.appendChild(createChipElement('Status', statusVal, () => {
+                document.getElementById('filterStatus').value = '';
+                fetchServerFilteredData();
+            }));
+        }
+
+        if (tglDariVal || tglSampaiVal) {
+            count++;
+            const rangeText = (tglDariVal ? tglDariVal : '...') + ' s/d ' + (tglSampaiVal ? tglSampaiVal : '...');
+            chipsList.appendChild(createChipElement('Periode', rangeText, () => {
+                if (document.getElementById('filterTglDari')) document.getElementById('filterTglDari').value = '';
+                if (document.getElementById('filterTglSampai')) document.getElementById('filterTglSampai').value = '';
+                fetchServerFilteredData();
+            }));
+        }
+
+        if (count > 0) {
+            chipsContainer.classList.remove('hidden');
+            chipsContainer.classList.add('flex');
+            if (badgeCount) {
+                badgeCount.textContent = `${count} filter aktif`;
+                badgeCount.classList.remove('hidden');
+            }
+            if (btnReset) {
+                btnReset.classList.remove('hidden');
+                btnReset.classList.add('inline-flex');
+            }
+        } else {
+            chipsContainer.classList.add('hidden');
+            chipsContainer.classList.remove('flex');
+            if (badgeCount) badgeCount.classList.add('hidden');
+            if (btnReset) {
+                btnReset.classList.add('hidden');
+                btnReset.classList.remove('inline-flex');
+            }
+        }
+    }
+
+    function createChipElement(label, value, onRemove) {
+        const chip = document.createElement('div');
+        chip.className = 'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold bg-brand-blue/10 text-navy border border-brand-blue/20 shadow-2xs transition-all hover:bg-brand-blue/15';
+        chip.innerHTML = `<span class="text-slate-500 font-normal text-[11px]">${label}:</span> <strong class="text-navy font-bold truncate max-w-[220px] text-[11.5px]">${value}</strong>
+            <button type="button" class="w-4 h-4 rounded-full bg-slate-200/80 hover:bg-rose-100 hover:text-rose-600 flex items-center justify-center ml-0.5 transition-colors cursor-pointer text-[10px]" title="Hapus filter ini">✕</button>`;
+        chip.querySelector('button').addEventListener('click', onRemove);
+        return chip;
+    }
+
+    function resetAllFilters() {
+        if (document.getElementById('searchInput')) document.getElementById('searchInput').value = '';
+        if (document.getElementById('btnClearSearch')) document.getElementById('btnClearSearch').style.display = 'none';
+        if (document.getElementById('filterStatus')) document.getElementById('filterStatus').value = '';
+        if (document.getElementById('filterCabang')) document.getElementById('filterCabang').value = '';
+        if (document.getElementById('filterTerminal')) document.getElementById('filterTerminal').value = '';
+        if (document.getElementById('filterTglDari')) document.getElementById('filterTglDari').value = '';
+        if (document.getElementById('filterTglSampai')) document.getElementById('filterTglSampai').value = '';
+        populateFilterTerminalData('');
+        performClientSideFilter('');
+        fetchServerFilteredData();
     }
 
     // Handler Ganti Jumlah Baris Per Halaman (10, 50, 100)
@@ -1199,6 +1423,7 @@
         }
 
         bindPaginationEvents();
+        updateActiveFilterChips();
     });
 
     // Formatting & Modal Detail Functions
@@ -1214,6 +1439,7 @@
         document.getElementById('modal_no_rekening').textContent = jurnal.no_rekening || '-';
         document.getElementById('modal_no_resi').textContent = jurnal.no_resi || '-';
         document.getElementById('modal_no_kartu').textContent = jurnal.no_kartu || '-';
+        document.getElementById('modal_no_tiket').textContent = jurnal.no_tiket || '-';
         let cabangText = '-';
         if (jurnal.master_cabang) {
             const cName = jurnal.master_cabang.nama_cabang || '-';
@@ -1227,24 +1453,35 @@
         
         const nominal = Number(jurnal.nominal_transaksi) || 0;
         document.getElementById('modal_nominal_transaksi').textContent = 'Rp ' + nominal.toLocaleString('id-ID');
+
+        const fee = Number(jurnal.biaya_admin ?? (jurnal.master_transaksi ? jurnal.master_transaksi.biaya_admin : 0)) || 0;
+        document.getElementById('modal_biaya_admin').textContent = fee > 0 ? 'Rp ' + fee.toLocaleString('id-ID') : '- (Rp 0)';
         
         const term = (jurnal.terminal_transaksi || '-').trim();
         const atmInfo = findAtmInfoJs(term);
+        let displayNama = (atmInfo && atmInfo.profil) ? atmInfo.profil : term;
+        displayNama = displayNama.replace(/^\d+\s*[-_]\s*/, '');
+        let idMesin = (atmInfo && atmInfo.id_luno) ? atmInfo.id_luno : '';
+        if (!idMesin) {
+            const m = term.match(/^(\d+)\s*[-_]/);
+            if (m) idMesin = m[1];
+        }
 
-        if (atmInfo && atmInfo.id_luno) {
-            document.getElementById('modal_terminal_transaksi').innerHTML = `
-                <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
-                    <span style="font-weight: 700; color: var(--bs-navy); font-size: 15.5px;">${atmInfo.profil || term}</span>
-                    <span style="display: inline-flex; align-items: center; gap: 4px; padding: 3.5px 10px; background: #e0f2fe; color: #0369a1; border-radius: 6px; font-weight: 800; font-size: 13.5px; font-family: monospace; border: 1.5px solid #bae6fd; letter-spacing: 0.3px;">
-                        Kode Mesin: ${atmInfo.id_luno}
-                    </span>
-                </div>
-                ${atmInfo.lokasi ? `<div style="font-size: 12.5px; color: var(--bs-gray-600); margin-top: 4px;">Lokasi: <strong>${atmInfo.lokasi}</strong></div>` : ''}
-            `;
-        } else if (term && term !== '-') {
-            document.getElementById('modal_terminal_transaksi').innerHTML = `
-                <span style="font-weight: 700; color: var(--bs-navy); font-size: 15px;">${term}</span>
-            `;
+        if (term && term !== '-') {
+            if (idMesin) {
+                document.getElementById('modal_terminal_transaksi').innerHTML = `
+                    <div style="display: flex; flex-direction: column; align-items: flex-start; gap: 4px;">
+                        <span style="font-weight: 700; color: var(--bs-navy); font-size: 15px;">${displayNama}</span>
+                        <span style="display: inline-flex; align-items: center; padding: 2.5px 8px; background: #e0f2fe; color: #0369a1; border-radius: 5px; font-weight: 800; font-size: 12px; font-family: monospace; border: 1.5px solid #bae6fd; letter-spacing: 0.2px;">
+                            ID Mesin: ${idMesin}
+                        </span>
+                    </div>
+                `;
+            } else {
+                document.getElementById('modal_terminal_transaksi').innerHTML = `
+                    <span style="font-weight: 700; color: var(--bs-navy); font-size: 15px;">${displayNama}</span>
+                `;
+            }
         } else {
             document.getElementById('modal_terminal_transaksi').textContent = '-';
         }
@@ -1869,22 +2106,29 @@
 
         if (kodeCabang) {
             const atms = atmsGrouped[kodeCabang] || [];
-            atms.forEach(atm => {
-                const opt = document.createElement('option');
-                opt.value = atm.value;
-                opt.textContent = atm.label;
-                if (isAtmMatchData(atm, targetValue)) {
-                    opt.selected = true;
-                }
-                filterTerminalEl.appendChild(opt);
-            });
+            if (atms.length > 0) {
+                const optGroup = document.createElement('optgroup');
+                const namaCabang = atms[0].cabang || '';
+                optGroup.label = (namaCabang && namaCabang.toUpperCase() !== 'CALL CENTER') ? `${kodeCabang} - ${namaCabang}` : (namaCabang || `Cabang ${kodeCabang}`);
+                atms.forEach(atm => {
+                    const opt = document.createElement('option');
+                    opt.value = atm.value;
+                    opt.textContent = atm.label;
+                    if (isAtmMatchData(atm, targetValue)) {
+                        opt.selected = true;
+                    }
+                    optGroup.appendChild(opt);
+                });
+                filterTerminalEl.appendChild(optGroup);
+            }
         } else {
             // Tampilkan semua mesin terkelompok per cabang
             Object.keys(atmsGrouped).forEach(kode => {
                 const atms = atmsGrouped[kode];
                 if (atms && atms.length > 0) {
                     const optGroup = document.createElement('optgroup');
-                    optGroup.label = atms[0].cabang || `Cabang ${kode}`;
+                    const namaCabang = atms[0].cabang || '';
+                    optGroup.label = (namaCabang && namaCabang.toUpperCase() !== 'CALL CENTER') ? `${kode} - ${namaCabang}` : (namaCabang || `Cabang ${kode}`);
                     atms.forEach(atm => {
                         const opt = document.createElement('option');
                         opt.value = atm.value;
