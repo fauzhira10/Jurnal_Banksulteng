@@ -189,6 +189,7 @@ class JurnalController extends Controller
             'tgl_terima'         => 'required|date',
             'tgl_selesai'        => 'required|date',
             'status'             => 'required|string|max:50',
+            'permasalahan'       => 'nullable|string|max:255',
             'keterangan_log'     => 'nullable|string'
         ], [
             'no_resi.unique' => 'Gagal! Keluhan atas nama nasabah ini dengan No. Resi dan Tanggal tersebut sudah pernah dijurnal.'
@@ -201,6 +202,7 @@ class JurnalController extends Controller
         $data['no_kartu'] = $request->filled('no_kartu') ? $request->no_kartu : '-';
         $data['no_tiket'] = $request->filled('no_tiket') ? $request->no_tiket : '-';
         $data['terminal_transaksi'] = $request->filled('terminal_transaksi') ? $request->terminal_transaksi : '-';
+        $data['permasalahan'] = $request->filled('permasalahan') ? strtoupper(trim($request->permasalahan)) : '-';
         $data['keterangan_log'] = $request->filled('keterangan_log') ? strtoupper(trim($request->keterangan_log)) : '-';
 
         // Sinkronisasi channel yang dipilih dengan master transaksi
@@ -220,9 +222,40 @@ class JurnalController extends Controller
             }
         }
 
-        Jurnal::create($data);
+        $jurnal = Jurnal::create($data);
 
-        return redirect()->route('jurnal.index')->with('success', 'Jurnal keluhan nasabah berhasil disimpan!');
+        return redirect()->route('jurnal.preview', $jurnal->id)
+            ->with('success', 'Jurnal keluhan nasabah berhasil disimpan!');
+    }
+
+    /**
+     * Halaman Pratinjau (Preview) setelah User berhasil Input Jurnal
+     */
+    public function preview($id)
+    {
+        $jurnal = Jurnal::with(['masterCabang', 'masterTransaksi'])->findOrFail($id);
+        
+        // Memanfaatkan logic penamaan ATM
+        $atmsGrouped = MasterAtm::getAtmsGroupedByCabang();
+        $term = trim($jurnal->terminal_transaksi ?? '-');
+        
+        $atmInfo = null;
+        if ($term !== '-' && strtoupper($term) !== 'BANK LAIN' && strtoupper($term) !== 'MOBILE BANKING' && strtoupper($term) !== 'SMS BANKING') {
+            $termClean = strtoupper($term);
+            foreach ($atmsGrouped as $kode => $atms) {
+                foreach ($atms as $atm) {
+                    $val = strtoupper(trim($atm['value'] ?? ''));
+                    $prof = strtoupper(trim($atm['profil'] ?? ''));
+                    $idLuno = trim((string)($atm['id_luno'] ?? ''));
+                    if ($termClean === $val || $termClean === $prof || str_contains($termClean, $prof) || str_contains($val, $termClean) || ($idLuno && $termClean === $idLuno)) {
+                        $atmInfo = $atm;
+                        break 2;
+                    }
+                }
+            }
+        }
+        
+        return view('jurnal_preview', compact('jurnal', 'atmInfo'));
     }
 
     /**
@@ -295,9 +328,10 @@ class JurnalController extends Controller
             'tgl_terima'         => 'required|date',
             'tgl_selesai'        => 'required|date',
             'status'             => 'required|string|max:50',
+            'permasalahan'       => 'nullable|string|max:255',
             'keterangan_log'     => 'nullable|string'
         ], [
-            'no_resi.unique' => 'Gagal! Keluhan atas nama nasabah ini dengan No. Resi dan Tanggal tersebut sudah pernah dijurnal.'
+            'no_resi.unique' => 'Gagal! Keluhan atas nama nasabah ini dengan No. Resi dan Tanggal tersebut sudah pernah dijurnal (Duplikat saat Update).'
         ]);
 
         $data = $request->all();
@@ -307,6 +341,7 @@ class JurnalController extends Controller
         $data['no_kartu'] = $request->filled('no_kartu') ? $request->no_kartu : '-';
         $data['no_tiket'] = $request->filled('no_tiket') ? $request->no_tiket : '-';
         $data['terminal_transaksi'] = $request->filled('terminal_transaksi') ? $request->terminal_transaksi : '-';
+        $data['permasalahan'] = $request->filled('permasalahan') ? strtoupper(trim($request->permasalahan)) : '-';
         $data['keterangan_log'] = $request->filled('keterangan_log') ? strtoupper(trim($request->keterangan_log)) : '-';
 
         // Sinkronisasi channel yang dipilih dengan master transaksi
@@ -1936,5 +1971,389 @@ class JurnalController extends Controller
             return 'ATM LOKAL';
         }
         return '-';
+    }
+
+    /**
+     * Rute Cerdas: Menentukan apakah harus mengunduh LOKAL atau ATMB
+     * berdasarkan jenis channel transaksi.
+     */
+    public function downloadDokumen($id)
+    {
+        $jurnal = \App\Models\Jurnal::with('masterTransaksi')->findOrFail($id);
+        $channel = strtoupper(trim($jurnal->masterTransaksi->channel ?? ''));
+
+        if ($channel === 'ATM BERSAMA') {
+            return $this->downloadDokumenAtmb($id);
+        } else {
+            // Default untuk ATM LOKAL dan lainnya (misal LAKU PANDAI, FINNET)
+            return $this->downloadDokumenLokal($id);
+        }
+    }
+
+    /**
+     * Memproses dan mengunduh otomatis dokumen Excel (Tab LOKAL) dari template
+     * berdasarkan kata kunci di Keterangan Log
+     */
+    public function downloadDokumenLokal($id)
+    {
+        $jurnal = Jurnal::with(['masterCabang', 'masterTransaksi'])->findOrFail($id);
+        
+        $templatePath = public_path('KELUAHAN NASABAH START 24 AGST 26 (1).xlsx');
+        if (!file_exists($templatePath)) {
+            return back()->withErrors('File template Excel LOKAL tidak ditemukan di folder public.');
+        }
+
+        // OPTIMALISASI: Hanya muat tab LOKAL agar proses loading secepat kilat 
+        // dan hasil output file hanya 1 tab saja (siap print)
+        $reader = IOFactory::createReaderForFile($templatePath);
+        $reader->setLoadSheetsOnly('LOKAL');
+        $spreadsheet = $reader->load($templatePath);
+        
+        $sheet = $spreadsheet->getSheetByName('LOKAL');
+        
+        if (!$sheet) {
+            return back()->withErrors('Tab LOKAL tidak ditemukan di dalam template Excel.');
+        }
+
+        // --- 1. Map data dasar ke Cell ---
+        $sheet->setCellValue('F20', $jurnal->nama_nasabah);
+        $sheet->setCellValue('F21', $jurnal->no_rekening);
+        $sheet->setCellValue('F22', $jurnal->no_kartu);
+        $sheet->setCellValue('F23', $jurnal->no_resi);
+        $sheet->setCellValue('F24', $jurnal->nominal_transaksi);
+        $sheet->setCellValue('F25', $jurnal->biaya_admin);
+        
+        // Format Tanggal
+        $tgl_trx = \Carbon\Carbon::parse($jurnal->tgl_transaksi)->translatedFormat('d F Y');
+        $sheet->setCellValue('F26', $tgl_trx);
+        
+        $cabangText = ($jurnal->masterCabang->kode_cabang ?? '') . ' - ' . ($jurnal->masterCabang->nama_cabang ?? '');
+        $sheet->setCellValue('F27', $cabangText);
+        $sheet->setCellValue('F28', $jurnal->terminal_transaksi);
+        
+        $sheet->setCellValue('D12', $jurnal->no_tiket);
+        
+        // Memasukkan input ketikan permasalahan ke sel D17
+        if ($jurnal->permasalahan && $jurnal->permasalahan !== '-') {
+            $sheet->setCellValue('D17', $jurnal->permasalahan);
+        }
+        
+        $tgl_terima = \Carbon\Carbon::parse($jurnal->tgl_terima)->translatedFormat('d F Y');
+        $sheet->setCellValue('G12', $tgl_terima);
+        
+        if ($jurnal->tgl_selesai) {
+            $tgl_selesai = \Carbon\Carbon::parse($jurnal->tgl_selesai)->translatedFormat('d F Y');
+            $sheet->setCellValue('D41', $tgl_selesai);
+        }
+
+        $sheet->setCellValue('F38', $jurnal->nama_nasabah);
+        $sheet->setCellValue('F39', $jurnal->no_rekening);
+
+        // --- 2. Logika Pemilihan Kata Kunci untuk D33 ---
+        $keteranganCells = [
+            'L3', 'L8', 'L12', 'L17', 'L22', 'L27', 'L31', 'L34', 'L42', 'L47', 
+            'L50', 'L54', 'L59', 'L63', 'R3', 'R9', 'R15', 'R21', 'R27', 'R33', 
+            'R40', 'R46', 'R50', 'R57', 'R61', 'R66', 'W3', 'W15', 'W21', 'W27', 
+            'W33', 'W38'
+        ];
+
+        $userKeyword = strtoupper(trim($jurnal->keterangan_log ?? ''));
+        $foundMatch = false;
+
+        if (!empty($userKeyword) && $userKeyword !== '-') {
+            foreach ($keteranganCells as $cellPos) {
+                $cellText = (string) $sheet->getCell($cellPos)->getCalculatedValue();
+                if (empty($cellText)) continue;
+                
+                $cellUpper = strtoupper($cellText);
+                
+                // A. Cek apakah user mengetik murni kata kuncinya (e.g., ketik "TXN TIMEOUT")
+                if (str_contains($cellUpper, $userKeyword)) {
+                    $sheet->setCellValue('D33', $cellText);
+                    $foundMatch = true;
+                    break;
+                }
+                
+                // B. Cek sebaliknya: apakah kata kunci dalam kurung di template (e.g. "(TXN TIMEOUT)") 
+                // ada di dalam kalimat user (e.g. user ketik: "Gagal uang tdk keluar karena TXN TIMEOUT")
+                preg_match_all('/\((.*?)\)/', $cellUpper, $matches);
+                if (!empty($matches[1])) {
+                    foreach ($matches[1] as $insideParens) {
+                        $cleanKeyword = trim($insideParens);
+                        if (strlen($cleanKeyword) > 3 && str_contains($userKeyword, $cleanKeyword)) {
+                            $sheet->setCellValue('D33', $cellText);
+                            $foundMatch = true;
+                            break 2;
+                        }
+                    }
+                }
+            }
+        }
+
+        // Jika tidak ditemukan kecocokan di Bank Kalimat, masukkan mentah apa adanya
+        if (!$foundMatch) {
+            $sheet->setCellValue('D33', $userKeyword);
+        }
+
+        // --- 3. PEMBERSIHAN FILE: Hapus seluruh teks "Bank Kalimat" di luar form (Kolom H s/d Z) ---
+        // Ini agar file output terlihat sangat bersih seperti selembar kertas yang siap di Ctrl + P
+        for ($r = 1; $r <= 85; $r++) {
+            foreach (range('H', 'Z') as $colLetter) {
+                $sheet->setCellValue($colLetter . $r, null);
+            }
+        }
+
+        // Mengunci "Print Area" agar saat ditekan Ctrl + P langsung fokus ke area form
+        $pageSetup = $sheet->getPageSetup();
+        $pageSetup->setPrintArea('A1:G70');
+        $pageSetup->setOrientation(\PhpOffice\PhpSpreadsheet\Worksheet\PageSetup::ORIENTATION_PORTRAIT);
+        $pageSetup->setPaperSize(\PhpOffice\PhpSpreadsheet\Worksheet\PageSetup::PAPERSIZE_A4);
+        
+        // Paksa agar muat tepat 1 halaman lebar dan 1 halaman tinggi
+        $pageSetup->setFitToPage(true);
+        $pageSetup->setFitToWidth(1);
+        $pageSetup->setFitToHeight(1);
+        $pageSetup->setHorizontalCentered(true);
+
+        // Mempersempit Margin Kertas (dalam Inci) agar tabel bisa bernapas
+        $margins = $sheet->getPageMargins();
+        $margins->setTop(0.3);
+        $margins->setRight(0.1);
+        $margins->setLeft(0.1);
+        $margins->setBottom(0.3);
+        
+        // --- 3.5 PENGHANCURAN AREA LUAR (Bottom-to-Top & Right-to-Left) ---
+        // Menghapus dari ujung belakang agar elemen yang di ujung tidak tertarik maju/naik.
+        
+        // Hapus kolom ke-100 mundur sampai kolom ke-8 (Kolom H)
+        for ($c = 100; $c >= 8; $c--) {
+            $colLetter = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($c);
+            $sheet->removeColumn($colLetter);
+        }
+
+        // Hapus baris ke-1000 mundur sampai baris ke-71
+        for ($r = 1000; $r >= 71; $r--) {
+            $sheet->removeRow($r);
+        }
+
+        // Hapus Gambar / Objek Textbox yang mengambang di luar form (A1:G70)
+        // Kita cloning array-nya agar aman saat iterasi dan penghapusan
+        $drawings = $sheet->getDrawingCollection();
+        $drawingsToKeep = [];
+        
+        foreach ($drawings as $drawing) {
+            $coord = $drawing->getCoordinates();
+            $colStr = preg_replace('/[0-9]/', '', $coord);
+            $rowNum = (int) preg_replace('/[A-Z]/', '', $coord);
+            $colIdx = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::columnIndexFromString($colStr);
+            
+            // Hapus gambar/logo yang posisinya di LUAR form (Lebih dari Kolom G, Baris 70)
+            if ($colIdx > 7 || $rowNum > 70) {
+                $drawing->setWorksheet(null, true);
+            }
+        }
+
+        // --- 4. Output Stream Download sebagai PDF ---
+        $fileName = 'BERITA_ACARA_LOKAL_' . preg_replace('/[^A-Za-z0-9\-]/', '_', $jurnal->nama_nasabah) . '.pdf';
+
+        \PhpOffice\PhpSpreadsheet\IOFactory::registerWriter('Pdf', \PhpOffice\PhpSpreadsheet\Writer\Pdf\Mpdf::class);
+        return response()->stream(function() use ($spreadsheet) {
+            $writer = \PhpOffice\PhpSpreadsheet\IOFactory::createWriter($spreadsheet, 'Pdf');
+            $writer->save('php://output');
+        }, 200, [
+            'Content-Type' => 'application/pdf',
+            'Content-Disposition' => 'inline; filename="' . $fileName . '"',
+            'Cache-Control' => 'max-age=0',
+        ]);
+    }
+
+    /**
+     * Unduh Jurnal sebagai File Excel .xlsx (Khusus Tab ATMB)
+     */
+    public function downloadDokumenAtmb($id)
+    {
+        $jurnal = \App\Models\Jurnal::with(['masterCabang', 'masterTransaksi'])->findOrFail($id);
+
+        $filePath = public_path('KELUAHAN NASABAH START 24 AGST 26 (1).xlsx');
+        if (!file_exists($filePath)) {
+            return redirect()->back()->with('error', 'Template Master Excel tidak ditemukan di sistem.');
+        }
+
+        $reader = \PhpOffice\PhpSpreadsheet\IOFactory::createReaderForFile($filePath);
+        $reader->setLoadSheetsOnly(['ATMB', 'J ATMB']);
+        $spreadsheet = $reader->load($filePath);
+        $sheet = $spreadsheet->getSheetByName('ATMB');
+
+        // --- 1. Mapping Data Web ke Cell Excel (ATMB) ---
+        $sheet->setCellValue('D12', $jurnal->no_tiket);
+        
+        if ($jurnal->permasalahan && $jurnal->permasalahan !== '-') {
+            $sheet->setCellValue('D17', $jurnal->permasalahan);
+        }
+        
+        $tgl_terima = \Carbon\Carbon::parse($jurnal->tgl_terima)->translatedFormat('d F Y');
+        $sheet->setCellValue('G12', $tgl_terima);
+        
+        if ($jurnal->tgl_selesai) {
+            $tgl_selesai = \Carbon\Carbon::parse($jurnal->tgl_selesai)->translatedFormat('d F Y');
+            $sheet->setCellValue('D39', $tgl_selesai);
+        }
+
+        $sheet->setCellValue('F19', $jurnal->nama_nasabah);
+        $sheet->setCellValue('F20', $jurnal->no_rekening);
+        $sheet->setCellValue('F21', $jurnal->no_kartu);
+        $sheet->setCellValue('F22', $jurnal->no_resi);
+        
+        $sheet->setCellValue('F23', 'Rp ' . number_format($jurnal->nominal_transaksi, 0, ',', '.'));
+        $sheet->setCellValue('F24', 'Rp ' . number_format($jurnal->biaya_admin, 0, ',', '.'));
+        
+        $tgl_trx = \Carbon\Carbon::parse($jurnal->tgl_transaksi)->translatedFormat('d F Y');
+        $sheet->setCellValue('F25', $tgl_trx);
+        
+        $cabangText = ($jurnal->masterCabang->kode_cabang ?? '') . ' - ' . ($jurnal->masterCabang->nama_cabang ?? '');
+        $sheet->setCellValue('F26', $cabangText);
+        $sheet->setCellValue('F27', $jurnal->terminal_transaksi);
+        
+        $sheet->setCellValue('F36', $jurnal->nama_nasabah);
+        $sheet->setCellValue('F37', $jurnal->no_rekening);
+
+        // --- 2. Logika Pemilihan Kata Kunci untuk D32 ---
+        $keteranganCells = [
+            'L3', 'L6', 'L12', 'L16', 'L21', 'L26', 'L30', 'L35', 'L40', 'L48',
+            'R3', 'R9', 'R20', 'R26', 'R32', 'R38', 'R44'
+        ];
+
+        $userKeyword = strtoupper(trim($jurnal->keterangan_log ?? ''));
+        $foundMatch = false;
+
+        if (!empty($userKeyword) && $userKeyword !== '-') {
+            foreach ($keteranganCells as $cellPos) {
+                $cellText = (string) $sheet->getCell($cellPos)->getCalculatedValue();
+                if (empty($cellText)) continue;
+                
+                $cellUpper = strtoupper($cellText);
+                
+                if (str_contains($cellUpper, $userKeyword)) {
+                    $sheet->setCellValue('D32', $cellText);
+                    $foundMatch = true;
+                    break;
+                }
+                
+                preg_match('/\((.*?)\)/', $cellUpper, $matches);
+                if (!empty($matches[1])) {
+                    $bracketWord = trim($matches[1]);
+                    if (str_contains($bracketWord, $userKeyword) || str_contains($userKeyword, $bracketWord)) {
+                        $sheet->setCellValue('D32', $cellText);
+                        $foundMatch = true;
+                        break;
+                    }
+                }
+            }
+        }
+        
+        if (!$foundMatch) {
+            $sheet->setCellValue('D32', $jurnal->keterangan_log);
+        }
+
+        // --- 3. Pengaturan Printer / Layout Halaman ---
+        $pageSetup = $sheet->getPageSetup();
+        $pageSetup->setPrintArea('A1:G68');
+        $pageSetup->setOrientation(\PhpOffice\PhpSpreadsheet\Worksheet\PageSetup::ORIENTATION_PORTRAIT);
+        $pageSetup->setPaperSize(\PhpOffice\PhpSpreadsheet\Worksheet\PageSetup::PAPERSIZE_A4);
+        
+        $pageSetup->setFitToPage(true);
+        $pageSetup->setFitToWidth(1);
+        $pageSetup->setFitToHeight(1);
+        $pageSetup->setHorizontalCentered(true);
+
+        $margins = $sheet->getPageMargins();
+        $margins->setTop(0.3);
+        $margins->setRight(0.1);
+        $margins->setLeft(0.1);
+        $margins->setBottom(0.3);
+
+        // --- 3.5 PENGHANCURAN AREA LUAR ---
+        for ($c = 100; $c >= 8; $c--) {
+            $colLetter = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($c);
+            $sheet->removeColumn($colLetter);
+        }
+
+        for ($r = 1000; $r >= 69; $r--) {
+            $sheet->removeRow($r);
+        }
+
+        $drawings = $sheet->getDrawingCollection();
+        foreach ($drawings as $drawing) {
+            $coord = $drawing->getCoordinates();
+            $colStr = preg_replace('/[0-9]/', '', $coord);
+            $rowNum = (int) preg_replace('/[A-Z]/', '', $coord);
+            $colIdx = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::columnIndexFromString($colStr);
+            
+            if ($colIdx > 7 || $rowNum > 68) {
+                $drawing->setWorksheet(null, true);
+            }
+        }
+
+        // --- 4. Mapping Data Web ke Cell Excel (SLIP JURNAL: J ATMB) ---
+        $sheetJ = $spreadsheet->getSheetByName('J ATMB');
+        if ($sheetJ) {
+            $sheetJ->setCellValue('L7', $jurnal->nama_nasabah);
+            $sheetJ->setCellValue('L8', $jurnal->no_rekening);
+            
+            $sheetJ->setCellValue('D11', $jurnal->no_kartu);
+            $sheetJ->setCellValue('N11', $jurnal->no_kartu);
+            
+            $sheetJ->setCellValue('D12', $jurnal->no_resi);
+            $sheetJ->setCellValue('N12', $jurnal->no_resi);
+            
+            $sheetJ->setCellValue('D13', $jurnal->no_tiket);
+            $sheetJ->setCellValue('N13', $jurnal->no_tiket);
+            
+            $sheetJ->setCellValue('D14', $tgl_trx);
+            $sheetJ->setCellValue('N14', $tgl_trx);
+            
+            $sheetJ->setCellValue('G15', $jurnal->nominal_transaksi);
+            $sheetJ->setCellValue('G21', $jurnal->biaya_admin);
+            $sheetJ->setCellValue('M15', $jurnal->nominal_transaksi + $jurnal->biaya_admin);
+
+            // Pengaturan Printer / Layout Halaman J ATMB
+            $pageSetupJ = $sheetJ->getPageSetup();
+            $pageSetupJ->setPrintArea('A1:AD37');
+            $pageSetupJ->setOrientation(\PhpOffice\PhpSpreadsheet\Worksheet\PageSetup::ORIENTATION_PORTRAIT);
+            $pageSetupJ->setPaperSize(\PhpOffice\PhpSpreadsheet\Worksheet\PageSetup::PAPERSIZE_A4);
+            $pageSetupJ->setFitToPage(true);
+            $pageSetupJ->setFitToWidth(1);
+            $pageSetupJ->setFitToHeight(1);
+            $pageSetupJ->setHorizontalCentered(true);
+
+            $marginsJ = $sheetJ->getPageMargins();
+            $marginsJ->setTop(0.3);
+            $marginsJ->setRight(0.1);
+            $marginsJ->setLeft(0.1);
+            $marginsJ->setBottom(0.3);
+
+            // Sapu Bersih J ATMB
+            for ($c = 100; $c >= 31; $c--) {
+                $colLetter = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($c);
+                $sheetJ->removeColumn($colLetter);
+            }
+            for ($r = 1000; $r >= 38; $r--) {
+                $sheetJ->removeRow($r);
+            }
+        }
+
+        // --- 5. Output Stream Download sebagai PDF ---
+        $fileName = 'BERITA_ACARA_ATMB_' . preg_replace('/[^A-Za-z0-9\-]/', '_', $jurnal->nama_nasabah) . '.pdf';
+
+        \PhpOffice\PhpSpreadsheet\IOFactory::registerWriter('Pdf', \PhpOffice\PhpSpreadsheet\Writer\Pdf\Mpdf::class);
+        return response()->stream(function() use ($spreadsheet) {
+            $writer = \PhpOffice\PhpSpreadsheet\IOFactory::createWriter($spreadsheet, 'Pdf');
+            $writer->writeAllSheets();
+            $writer->save('php://output');
+        }, 200, [
+            'Content-Type' => 'application/pdf',
+            'Content-Disposition' => 'inline; filename="' . $fileName . '"',
+            'Cache-Control' => 'max-age=0',
+        ]);
     }
 }

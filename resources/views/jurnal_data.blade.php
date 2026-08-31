@@ -375,6 +375,14 @@
                                         </svg>
                                         <span>Detail</span>
                                     </button>
+                                    <a href="/jurnal/{{ $jurnal->id }}/download" target="_blank" class="btn btn-sm" style="background-color: #059669; color: white; padding: 6px 12px; font-size: 12.5px; font-weight: 600; display: inline-flex; align-items: center; gap: 5px; text-decoration: none; border-radius: 4px; margin-left: 5px; border: 1px solid #047857;" title="Preview Cetak Dokumen Jurnal">
+                                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <polyline points="6 9 6 2 18 2 18 9"></polyline>
+                                            <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+                                            <rect x="6" y="14" width="12" height="8"></rect>
+                                        </svg>
+                                        <span>Cetak</span>
+                                    </a>
                                 </td>
                             </tr>
                         @endforeach
@@ -589,6 +597,21 @@
                         <div class="detail-label">Waktu Sistem Dijurnal</div>
                         <div class="detail-value" id="modal_created_at">-</div>
                     </div>
+                </div>
+            </div>
+
+            <!-- Permasalahan -->
+            <div class="detail-section">
+                <div class="detail-section-title">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="12" y1="8" x2="12" y2="12"></line>
+                        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                    </svg>
+                    <span>Permasalahan (Isian Excel D17)</span>
+                </div>
+                <div class="detail-keterangan-box" id="modal_permasalahan">
+                    -
                 </div>
             </div>
 
@@ -1499,6 +1522,7 @@
         document.getElementById('modal_tgl_selesai').textContent = formatDateIndo(jurnal.tgl_selesai);
         document.getElementById('modal_created_at').textContent = formatDateIndo(jurnal.created_at);
         
+        document.getElementById('modal_permasalahan').textContent = jurnal.permasalahan || '-';
         document.getElementById('modal_keterangan_log').textContent = jurnal.keterangan_log || 'Tidak ada keterangan tambahan.';
 
         // Set Link Edit di Modal Detail

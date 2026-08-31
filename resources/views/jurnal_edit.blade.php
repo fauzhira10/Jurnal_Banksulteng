@@ -219,6 +219,12 @@
                         </select>
                     </div>
 
+                    <!-- Permasalahan -->
+                    <div class="md:col-span-2 flex flex-col gap-1.5">
+                        <label class="font-semibold text-[13px] text-slate-700">Permasalahan (Detail Isian Form Excel)</label>
+                        <input type="text" name="permasalahan" value="{{ old('permasalahan', $jurnal->permasalahan) }}" placeholder="Contoh: TARIK TUNAI ATM LOKAL GAGAL, SALDO TERDEBET" class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm bg-white text-slate-800 placeholder-slate-400 uppercase transition-all duration-200 focus:border-brand-blue focus:ring-3 focus:ring-brand-blue/15 focus:outline-none" oninput="this.value = this.value.toUpperCase()">
+                    </div>
+
                     <!-- Keterangan Log -->
                     <div class="md:col-span-2 flex flex-col gap-1.5">
                         <label class="font-semibold text-[13px] text-slate-700">Keterangan Log / Catatan Kronologi Keluhan</label>

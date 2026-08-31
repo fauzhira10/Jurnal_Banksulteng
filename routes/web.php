@@ -28,6 +28,9 @@ Route::middleware('auth')->group(function () {
     // Halaman Data Keluhan & Pencarian Jurnal
     Route::get('/jurnal/data', [JurnalController::class, 'index'])->name('jurnal.index');
 
+    // Halaman Preview Jurnal (Setelah Input)
+    Route::get('/jurnal/{id}/preview', [JurnalController::class, 'preview'])->name('jurnal.preview')->whereNumber('id');
+
     // Route Export Excel (.xlsx) Multi-Sheet
     Route::get('/jurnal/export-excel', [JurnalController::class, 'exportExcel'])->name('jurnal.export_excel');
 
@@ -59,6 +62,9 @@ Route::middleware('auth')->group(function () {
 
     // Route API AJAX Daftar Mesin ATM per Cabang
     Route::get('/api/cabang/{id}/atms', [JurnalController::class, 'getAtmsByCabang'])->name('api.cabang.atms');
+
+    // Route Unduh Dokumen Jurnal (Otomatis deteksi LOKAL / ATMB)
+    Route::get('/jurnal/{id}/download', [JurnalController::class, 'downloadDokumen'])->name('jurnal.download')->whereNumber('id');
 
     // Route API AJAX Rincian Jurnal Keluhan
     Route::get('/api/jurnal/{id}', [JurnalController::class, 'getDetailJurnal'])->name('api.jurnal.detail');
