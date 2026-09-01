@@ -161,16 +161,39 @@
                         <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Catatan Petugas</h3>
                         <div class="space-y-4">
                             <div class="flex flex-col">
-                                <span class="text-xs text-slate-500 mb-1">Permasalahan (Detail)</span>
+                                <span class="text-xs text-slate-500 mb-1">Keterangan Keluhan</span>
                                 <div class="bg-slate-50 border border-slate-200 rounded-lg p-3 text-sm text-slate-700 min-h-[40px]">
                                     {{ $jurnal->permasalahan !== '-' && $jurnal->permasalahan ? $jurnal->permasalahan : 'Tidak ada keterangan permasalahan.' }}
                                 </div>
                             </div>
+                            
+                            @php
+                                $hasLog = !empty($jurnal->keterangan_log) && trim($jurnal->keterangan_log) !== '-' && trim($jurnal->keterangan_log) !== '' && trim(strtolower($jurnal->keterangan_log)) !== 'tidak ada keterangan tambahan.' && trim(strtolower($jurnal->keterangan_log)) !== 'tidak ada catatan log tambahan.';
+                            @endphp
                             <div class="flex flex-col">
-                                <span class="text-xs text-slate-500 mb-1">Keterangan Log / Kronologi</span>
-                                <div class="bg-slate-50 border border-slate-200 rounded-lg p-3 text-sm text-slate-700 min-h-[60px]">
-                                    {{ $jurnal->keterangan_log !== '-' && $jurnal->keterangan_log ? $jurnal->keterangan_log : 'Tidak ada catatan log tambahan.' }}
+                                <div class="flex items-center justify-between mb-1">
+                                    <span class="text-xs text-slate-500">Keterangan Log / Kronologi</span>
+                                    @if(!$hasLog)
+                                        <span class="text-[11px] font-bold text-amber-700 bg-amber-100 px-2 py-0.5 rounded border border-amber-300">Log Belum Diisi</span>
+                                    @endif
                                 </div>
+                                @if($hasLog)
+                                    <div class="bg-slate-50 border border-slate-200 rounded-lg p-3 text-sm text-slate-700 min-h-[60px] leading-relaxed">
+                                        {{ $jurnal->keterangan_log }}
+                                    </div>
+                                @else
+                                    <div class="bg-amber-50/70 border border-dashed border-amber-300 rounded-lg p-3.5 text-xs text-amber-900 flex flex-col gap-2">
+                                        <div class="flex items-start gap-2">
+                                            <span class="text-amber-600 text-sm">⚠️</span>
+                                            <span>Keterangan log hasil pemeriksaan mesin atau switching masih kosong. Lengkapi data ini agar dokumen dapat dicetak.</span>
+                                        </div>
+                                        <div>
+                                            <a href="{{ route('jurnal.edit', $jurnal->id) }}" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs transition-colors">
+                                                <span>⚡ Edit & Isi Keterangan Log</span>
+                                            </a>
+                                        </div>
+                                    </div>
+                                @endif
                             </div>
                         </div>
                     </div>
@@ -178,19 +201,29 @@
             </div>
         </div>
 
-        <div class="bg-slate-50 border-t border-slate-200 p-5 px-6 flex items-center justify-between">
+        <div class="bg-slate-50 border-t border-slate-200 p-5 px-6 flex items-center justify-between flex-wrap gap-3">
             <a href="{{ route('jurnal.index') }}" class="text-sm font-semibold text-slate-600 hover:text-slate-900 transition-colors">
                 ← Kembali ke Data
             </a>
             
-            <a href="{{ route('jurnal.download', $jurnal->id) }}" target="_blank" class="inline-flex items-center gap-2 h-11 px-6 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold shadow-lg shadow-emerald-600/20 transition-all hover:-translate-y-0.5">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                    <polyline points="6 9 6 2 18 2 18 9"></polyline>
-                    <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
-                    <rect x="6" y="14" width="12" height="8"></rect>
-                </svg>
-                <span>Cetak / Preview PDF Dokumen</span>
-            </a>
+            @if($hasLog)
+                <a href="{{ route('jurnal.download', $jurnal->id) }}" target="_blank" class="inline-flex items-center gap-2 h-11 px-6 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold shadow-lg shadow-emerald-600/20 transition-all hover:-translate-y-0.5">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="6 9 6 2 18 2 18 9"></polyline>
+                        <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+                        <rect x="6" y="14" width="12" height="8"></rect>
+                    </svg>
+                    <span>Cetak / Preview PDF Dokumen</span>
+                </a>
+            @else
+                <a href="{{ route('jurnal.edit', $jurnal->id) }}" class="inline-flex items-center gap-2 h-11 px-6 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-bold shadow-lg shadow-amber-500/20 transition-all hover:-translate-y-0.5" title="Keterangan log masih kosong. Lengkapi catatan log terlebih dahulu untuk mencetak formulir.">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                        <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                    </svg>
+                    <span>Lengkapi Log untuk Cetak 🔒</span>
+                </a>
+            @endif
         </div>
     </div>
 </div>

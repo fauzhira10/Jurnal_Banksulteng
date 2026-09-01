@@ -367,6 +367,9 @@
                                     </span>
                                 </td>
                                 <td style="text-align: center; vertical-align: middle; white-space: nowrap;">
+                                    @php
+                                        $hasLog = !empty($jurnal->keterangan_log) && trim($jurnal->keterangan_log) !== '-' && trim($jurnal->keterangan_log) !== '' && trim(strtolower($jurnal->keterangan_log)) !== 'tidak ada keterangan tambahan.';
+                                    @endphp
                                     <button type="button" class="btn btn-secondary btn-sm" onclick="showDetailModal({{ json_encode($jurnal) }})" title="Lihat Rincian & Aksi" style="padding: 6px 12px; font-size: 12.5px; font-weight: 600; display: inline-flex; align-items: center; gap: 5px;">
                                         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                             <circle cx="12" cy="12" r="10"></circle>
@@ -375,14 +378,24 @@
                                         </svg>
                                         <span>Detail</span>
                                     </button>
-                                    <a href="/jurnal/{{ $jurnal->id }}/download" target="_blank" class="btn btn-sm" style="background-color: #059669; color: white; padding: 6px 12px; font-size: 12.5px; font-weight: 600; display: inline-flex; align-items: center; gap: 5px; text-decoration: none; border-radius: 4px; margin-left: 5px; border: 1px solid #047857;" title="Preview Cetak Dokumen Jurnal">
-                                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                            <polyline points="6 9 6 2 18 2 18 9"></polyline>
-                                            <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
-                                            <rect x="6" y="14" width="12" height="8"></rect>
-                                        </svg>
-                                        <span>Cetak</span>
-                                    </a>
+                                    @if($hasLog)
+                                        <a href="/jurnal/{{ $jurnal->id }}/download" target="_blank" class="btn btn-sm btn-cetak-action" data-jurnal-id="{{ $jurnal->id }}" style="background-color: #059669; color: white; padding: 6px 12px; font-size: 12.5px; font-weight: 600; display: inline-flex; align-items: center; gap: 5px; text-decoration: none; border-radius: 4px; margin-left: 5px; border: 1px solid #047857;" title="Preview Cetak Dokumen Jurnal">
+                                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                <polyline points="6 9 6 2 18 2 18 9"></polyline>
+                                                <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+                                                <rect x="6" y="14" width="12" height="8"></rect>
+                                            </svg>
+                                            <span>Cetak</span>
+                                        </a>
+                                    @else
+                                        <button type="button" onclick="openQuickLogModal({{ json_encode($jurnal) }}, true)" class="btn btn-sm btn-cetak-action" data-jurnal-id="{{ $jurnal->id }}" style="background-color: #fff7ed; color: #c2410c; padding: 6px 11px; font-size: 12px; font-weight: 600; display: inline-flex; align-items: center; gap: 4px; border-radius: 4px; margin-left: 5px; border: 1px dashed #ea580c; cursor: pointer;" title="Keterangan log masih kosong. Klik untuk mengisi log & mencetak.">
+                                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                                                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                                            </svg>
+                                            <span>Log Kosong 🔒</span>
+                                        </button>
+                                    @endif
                                 </td>
                             </tr>
                         @endforeach
@@ -608,7 +621,7 @@
                         <line x1="12" y1="8" x2="12" y2="12"></line>
                         <line x1="12" y1="16" x2="12.01" y2="16"></line>
                     </svg>
-                    <span>Permasalahan (Isian Excel D17)</span>
+                    <span>Keterangan Keluhan</span>
                 </div>
                 <div class="detail-keterangan-box" id="modal_permasalahan">
                     -
@@ -623,13 +636,13 @@
                     </svg>
                     <span>Keterangan Log / Catatan Keluhan</span>
                 </div>
-                <div class="detail-keterangan-box" id="modal_keterangan_log">
-                    Tidak ada keterangan tambahan.
+                <div id="modal_keterangan_log" style="margin-top: 4px;">
+                    <!-- Konten dinamis di-render via JavaScript -->
                 </div>
             </div>
         </div>
 
-        <div class="modal-footer" style="padding: 16px 24px; border-top: 1px solid var(--bs-gray-200); display: flex; justify-content: flex-end; align-items: center; gap: 10px; background: var(--bs-gray-50);">
+        <div class="modal-footer" style="padding: 16px 24px; border-top: 1px solid var(--bs-gray-200); display: flex; justify-content: flex-end; align-items: center; gap: 10px; background: var(--bs-gray-50); flex-wrap: wrap;">
             <a id="modalBtnEdit" href="#" class="btn btn-warning" style="background-color: #f59e0b; color: #ffffff; border: 1px solid #d97706; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; font-weight: 600; padding: 8px 16px;">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
@@ -646,6 +659,96 @@
                 </svg>
                 <span>Hapus Data</span>
             </button>
+            <a id="modalBtnCetak" href="#" target="_blank" class="btn" style="background-color: #059669; color: #ffffff; border: 1px solid #047857; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; font-weight: 600; padding: 8px 16px;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="6 9 6 2 18 2 18 9"></polyline>
+                    <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+                    <rect x="6" y="14" width="12" height="8"></rect>
+                </svg>
+                <span id="modalBtnCetakText">Cetak Dokumen</span>
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Pop-Up Cepat Isi Keterangan Log (Quick Log Modal) -->
+<div class="modal-backdrop" id="quickLogModal" style="z-index: 1200;">
+    <div class="modal-content" style="max-width: 580px; border-top: 4px solid #ea580c; animation: modalFadeIn 0.2s ease-out;">
+        <div class="modal-header" style="background-color: #fff7ed; border-bottom: 1px solid #ffedd5;">
+            <h3 style="color: #c2410c; display: flex; align-items: center; gap: 8px; font-size: 15.5px; font-weight: 700;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ea580c" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                    <polyline points="14 2 14 8 20 8"></polyline>
+                    <line x1="16" y1="13" x2="8" y2="13"></line>
+                    <line x1="16" y1="17" x2="8" y2="17"></line>
+                    <polyline points="10 9 9 9 8 9"></polyline>
+                </svg>
+                <span>Isi Keterangan Log Keluhan</span>
+            </h3>
+            <button class="btn-close-modal" onclick="closeQuickLogModal()">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+        </div>
+
+        <div class="modal-body" style="padding: 20px 24px;">
+            <!-- Brief Context Box -->
+            <div style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px 14px; margin-bottom: 14px; font-size: 12px;">
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 8px;">
+                    <div><span style="color: #64748b;">Nasabah:</span> <strong id="quickLogNasabah" style="color: #0f172a;">-</strong></div>
+                    <div><span style="color: #64748b;">No. Resi/Trace:</span> <strong id="quickLogNoResi" style="color: #0284c7;">-</strong></div>
+                    <div><span style="color: #64748b;">Nominal:</span> <strong id="quickLogNominal" style="color: #059669;">-</strong></div>
+                    <div><span style="color: #64748b;">Terminal/Channel:</span> <strong id="quickLogTerminal" style="color: #0f172a;">-</strong></div>
+                </div>
+            </div>
+
+            <div style="background: #fffbeb; border: 1px solid #fde68a; border-radius: 8px; padding: 10px 12px; margin-bottom: 14px; font-size: 11.5px; color: #92400e; display: flex; align-items: flex-start; gap: 8px; line-height: 1.45;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0; margin-top: 1px;">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="8" x2="12" y2="12"></line>
+                    <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                </svg>
+                <span>Format cetak dokumen resmi mewajibkan adanya catatan hasil pemeriksaan log mesin atau switching transaksi sebelum dapat dicetak.</span>
+            </div>
+
+            <!-- Form Control: Textarea Edit Log -->
+            <div style="margin-bottom: 4px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                    <label for="quickLogTextarea" style="font-size: 12px; font-weight: 700; color: #334155;">
+                        ✏️ Keterangan Log Hasil Pemeriksaan:
+                    </label>
+                    <span id="quickLogCharCount" style="font-size: 11px; color: #94a3b8; font-weight: 600;">0 karakter</span>
+                </div>
+                <textarea id="quickLogTextarea" rows="4" oninput="updateQuickLogCharCount()" style="width: 100%; padding: 10px 12px; border-radius: 8px; border: 1.5px solid #cbd5e1; font-size: 12.5px; color: #1e293b; outline: none; resize: vertical; box-sizing: border-box; line-height: 1.5;" placeholder="Ketik keterangan hasil pemeriksaan log transaksi di sini..."></textarea>
+            </div>
+
+            <div id="quickLogFeedback" style="display: none; font-size: 12px; font-weight: 600; padding: 8px 12px; border-radius: 6px; margin-top: 10px;"></div>
+        </div>
+
+        <div class="modal-footer" style="background-color: #fafafa; border-top: 1px solid var(--bs-gray-200); padding: 14px 24px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+            <button type="button" class="btn btn-secondary" onclick="closeQuickLogModal()">
+                <span>Batal</span>
+            </button>
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <button type="button" id="btnSaveQuickLogOnly" onclick="saveQuickLog(false)" class="btn" style="background-color: #0284c7; color: #ffffff; border: 1px solid #0369a1; font-weight: 700; display: inline-flex; align-items: center; gap: 6px; padding: 8px 15px; cursor: pointer;">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+                        <polyline points="17 21 17 13 7 13 7 21"></polyline>
+                        <polyline points="7 3 7 8 15 8"></polyline>
+                    </svg>
+                    <span>Simpan Log</span>
+                </button>
+                <button type="button" id="btnSaveQuickLogAndPrint" onclick="saveQuickLog(true)" class="btn" style="background-color: #059669; color: #ffffff; border: 1px solid #047857; font-weight: 700; display: inline-flex; align-items: center; gap: 6px; padding: 8px 15px; cursor: pointer;">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="6 9 6 2 18 2 18 9"></polyline>
+                        <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+                        <rect x="6" y="14" width="12" height="8"></rect>
+                    </svg>
+                    <span>Simpan & Buka Cetak</span>
+                </button>
+            </div>
         </div>
     </div>
 </div>
@@ -1449,6 +1552,23 @@
         updateActiveFilterChips();
     });
 
+    // State Manajemen Modal
+    let currentDetailJurnal = null;
+    let currentQuickLogJurnal = null;
+
+    function escapeHtml(text) {
+        if (!text) return '';
+        return String(text).replace(/[&<>"']/g, function(m) {
+            return ({
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#039;'
+            })[m];
+        });
+    }
+
     // Formatting & Modal Detail Functions
     function formatDateIndo(dateStr) {
         if(!dateStr || dateStr === '-' || dateStr === 'null') return '-';
@@ -1458,6 +1578,7 @@
     }
 
     function showDetailModal(jurnal) {
+        currentDetailJurnal = jurnal;
         document.getElementById('modal_nama_nasabah').textContent = jurnal.nama_nasabah || '-';
         document.getElementById('modal_no_rekening').textContent = jurnal.no_rekening || '-';
         document.getElementById('modal_no_resi').textContent = jurnal.no_resi || '-';
@@ -1494,15 +1615,15 @@
             if (idMesin) {
                 document.getElementById('modal_terminal_transaksi').innerHTML = `
                     <div style="display: flex; flex-direction: column; align-items: flex-start; gap: 4px;">
-                        <span style="font-weight: 700; color: var(--bs-navy); font-size: 15px;">${displayNama}</span>
+                        <span style="font-weight: 700; color: var(--bs-navy); font-size: 15px;">${escapeHtml(displayNama)}</span>
                         <span style="display: inline-flex; align-items: center; padding: 2.5px 8px; background: #e0f2fe; color: #0369a1; border-radius: 5px; font-weight: 800; font-size: 12px; font-family: monospace; border: 1.5px solid #bae6fd; letter-spacing: 0.2px;">
-                            ID Mesin: ${idMesin}
+                            ID Mesin: ${escapeHtml(idMesin)}
                         </span>
                     </div>
                 `;
             } else {
                 document.getElementById('modal_terminal_transaksi').innerHTML = `
-                    <span style="font-weight: 700; color: var(--bs-navy); font-size: 15px;">${displayNama}</span>
+                    <span style="font-weight: 700; color: var(--bs-navy); font-size: 15px;">${escapeHtml(displayNama)}</span>
                 `;
             }
         } else {
@@ -1523,7 +1644,86 @@
         document.getElementById('modal_created_at').textContent = formatDateIndo(jurnal.created_at);
         
         document.getElementById('modal_permasalahan').textContent = jurnal.permasalahan || '-';
-        document.getElementById('modal_keterangan_log').textContent = jurnal.keterangan_log || 'Tidak ada keterangan tambahan.';
+
+        // Validasi Keterangan Log secara Cerdas
+        const hasLog = Boolean(jurnal.keterangan_log && jurnal.keterangan_log.trim() !== '' && jurnal.keterangan_log.trim() !== '-' && jurnal.keterangan_log.trim().toLowerCase() !== 'tidak ada keterangan tambahan.');
+        const logContainer = document.getElementById('modal_keterangan_log');
+
+        if (hasLog) {
+            logContainer.innerHTML = `
+                <div style="background: #f8fafc; border: 1.5px solid #e2e8f0; border-radius: 12px; padding: 14px 18px; display: flex; justify-content: space-between; align-items: flex-start; gap: 14px; box-shadow: 0 1px 2px rgba(0,0,0,0.03);">
+                    <div style="display: flex; gap: 12px; align-items: flex-start;">
+                        <div style="width: 32px; height: 32px; border-radius: 8px; background: #ecfdf5; color: #059669; display: flex; align-items: center; justify-content: center; flex-shrink: 0; border: 1px solid #a7f3d0; margin-top: 1px;">
+                            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="20 6 9 17 4 12"></polyline>
+                            </svg>
+                        </div>
+                        <div>
+                            <div style="font-size: 11px; font-weight: 700; color: #059669; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 3px;">
+                                Catatan Hasil Pemeriksaan Log Transaksi:
+                            </div>
+                            <div style="color: #1e293b; line-height: 1.55; font-size: 13px; font-weight: 500; white-space: pre-wrap;">${escapeHtml(jurnal.keterangan_log)}</div>
+                        </div>
+                    </div>
+                    <button type="button" onclick="openQuickLogFromDetail(false)" style="background: #ffffff; color: #0284c7; border: 1px solid #cbd5e1; border-radius: 8px; padding: 6px 12px; font-size: 11.5px; font-weight: 600; cursor: pointer; white-space: nowrap; transition: all 0.2s; display: inline-flex; align-items: center; gap: 5px; box-shadow: 0 1px 2px rgba(0,0,0,0.04);" onmouseover="this.style.backgroundColor='#f0f9ff'; this.style.borderColor='#0284c7';" onmouseout="this.style.backgroundColor='#ffffff'; this.style.borderColor='#cbd5e1';">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                        </svg>
+                        <span>Edit Log</span>
+                    </button>
+                </div>
+            `;
+        } else {
+            logContainer.innerHTML = `
+                <div style="background: linear-gradient(135deg, #fffdf7 0%, #fff7ed 100%); border: 1.5px solid #fed7aa; border-radius: 12px; padding: 16px 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.02);">
+                    <!-- Header Card: Icon + Title + Badge -->
+                    <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;">
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                            <div style="width: 38px; height: 38px; border-radius: 10px; background: #ffedd5; color: #ea580c; display: flex; align-items: center; justify-content: center; flex-shrink: 0; border: 1px solid #fdba74;">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                                    <line x1="12" y1="9" x2="12" y2="13"></line>
+                                    <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                                </svg>
+                            </div>
+                            <div>
+                                <div style="font-weight: 700; color: #1e293b; font-size: 14px; line-height: 1.2;">
+                                    Keterangan Log Belum Diisi
+                                </div>
+                                <div style="font-size: 11.5px; color: #64748b; margin-top: 2px;">
+                                    Catatan hasil pemeriksaan switching / mesin ATM wajib dilengkapi
+                                </div>
+                            </div>
+                        </div>
+                        <span style="display: inline-flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 700; color: #b45309; background: #fef3c7; border: 1px solid #fde68a; padding: 4px 10px; border-radius: 20px;">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                            </svg>
+                            Wajib untuk Cetak
+                        </span>
+                    </div>
+
+                    <!-- Divider Halus -->
+                    <div style="height: 1px; background: #fed7aa; margin: 12px 0; opacity: 0.7;"></div>
+
+                    <!-- Bottom Action Row -->
+                    <div style="display: flex; align-items: center; justify-content: space-between; gap: 14px; flex-wrap: wrap;">
+                        <p style="font-size: 12px; color: #475569; margin: 0; line-height: 1.45; flex: 1; min-width: 220px;">
+                            Formulir keluhan resmi nasabah belum dapat dicetak sebelum hasil pemeriksaan log dimasukkan.
+                        </p>
+                        <button type="button" onclick="openQuickLogFromDetail(false)" style="background: linear-gradient(135deg, #ea580c 0%, #c2410c 100%); color: #ffffff; border: none; border-radius: 8px; padding: 8px 18px; font-size: 12px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 2px 5px rgba(234, 88, 12, 0.25); white-space: nowrap; transition: all 0.15s ease;" onmouseover="this.style.transform='translateY(-1px)'; this.style.boxShadow='0 4px 10px rgba(234, 88, 12, 0.35)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 5px rgba(234, 88, 12, 0.25)';">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                            </svg>
+                            <span>Isi Keterangan Log</span>
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
 
         // Set Link Edit di Modal Detail
         const editBtn = document.getElementById('modalBtnEdit');
@@ -1540,11 +1740,183 @@
             };
         }
 
+        // Set Handler Cetak di Modal Detail
+        const cetakBtn = document.getElementById('modalBtnCetak');
+        const cetakBtnText = document.getElementById('modalBtnCetakText');
+        if (cetakBtn) {
+            if (hasLog) {
+                cetakBtn.href = '/jurnal/' + jurnal.id + '/download';
+                cetakBtn.target = '_blank';
+                cetakBtn.onclick = null;
+                cetakBtn.style.backgroundColor = '#059669';
+                cetakBtn.style.borderColor = '#047857';
+                cetakBtn.style.color = '#ffffff';
+                cetakBtn.style.cursor = 'pointer';
+                cetakBtn.title = 'Preview Cetak Dokumen Jurnal';
+                if (cetakBtnText) cetakBtnText.textContent = 'Cetak Dokumen';
+            } else {
+                cetakBtn.removeAttribute('href');
+                cetakBtn.removeAttribute('target');
+                cetakBtn.onclick = function(e) {
+                    e.preventDefault();
+                    openQuickLogFromDetail(true);
+                };
+                cetakBtn.style.backgroundColor = '#fff7ed';
+                cetakBtn.style.borderColor = '#ea580c';
+                cetakBtn.style.color = '#c2410c';
+                cetakBtn.style.cursor = 'pointer';
+                cetakBtn.title = 'Keterangan log masih kosong. Klik untuk mengisi log & langsung mencetak.';
+                if (cetakBtnText) cetakBtnText.textContent = 'Cetak (Isi Log Dahulu 🔒)';
+            }
+        }
+
         document.getElementById('detailModal').classList.add('show');
     }
 
     function closeDetailModal() {
         document.getElementById('detailModal').classList.remove('show');
+    }
+
+    // Quick Log Modal Handlers
+    function openQuickLogModal(jurnal, autoPrint = false) {
+        currentQuickLogJurnal = jurnal;
+        
+        document.getElementById('quickLogNasabah').textContent = jurnal.nama_nasabah || '-';
+        document.getElementById('quickLogNoResi').textContent = jurnal.no_resi || '-';
+        const nom = Number(jurnal.nominal_transaksi) || 0;
+        document.getElementById('quickLogNominal').textContent = 'Rp ' + nom.toLocaleString('id-ID');
+        const ch = (jurnal.master_transaksi ? jurnal.master_transaksi.channel : '') || '';
+        const tm = (jurnal.terminal_transaksi || '-').trim();
+        document.getElementById('quickLogTerminal').textContent = ch ? `${tm} (${ch})` : tm;
+
+        const rawLog = (jurnal.keterangan_log && jurnal.keterangan_log.trim() !== '-' && jurnal.keterangan_log.trim().toLowerCase() !== 'tidak ada keterangan tambahan.') ? jurnal.keterangan_log : '';
+        const textarea = document.getElementById('quickLogTextarea');
+        textarea.value = rawLog;
+        updateQuickLogCharCount();
+
+        const feedback = document.getElementById('quickLogFeedback');
+        if (feedback) feedback.style.display = 'none';
+
+        const modal = document.getElementById('quickLogModal');
+        if (modal) modal.classList.add('show');
+        textarea.focus();
+    }
+
+    function closeQuickLogModal() {
+        const modal = document.getElementById('quickLogModal');
+        if (modal) modal.classList.remove('show');
+    }
+
+    function updateQuickLogCharCount() {
+        const textarea = document.getElementById('quickLogTextarea');
+        const counter = document.getElementById('quickLogCharCount');
+        if (textarea && counter) {
+            counter.textContent = `${textarea.value.length} karakter`;
+        }
+    }
+
+    function openQuickLogFromDetail(autoPrint = false) {
+        if (!currentDetailJurnal) return;
+        openQuickLogModal(currentDetailJurnal, autoPrint);
+    }
+
+    function saveQuickLog(autoPrint = false) {
+        if (!currentQuickLogJurnal) return;
+
+        const val = document.getElementById('quickLogTextarea').value.trim();
+        const feedback = document.getElementById('quickLogFeedback');
+
+        if (!val) {
+            if (feedback) {
+                feedback.style.display = 'block';
+                feedback.style.background = '#fef2f2';
+                feedback.style.border = '1px solid #fecdd3';
+                feedback.style.color = '#991b1b';
+                feedback.innerHTML = '⚠️ Silakan ketik catatan hasil pemeriksaan log terlebih dahulu.';
+            }
+            return;
+        }
+
+        if (feedback) {
+            feedback.style.display = 'block';
+            feedback.style.background = '#f0f9ff';
+            feedback.style.border = '1px solid #bae6fd';
+            feedback.style.color = '#0369a1';
+            feedback.innerHTML = '⏳ Menyimpan keterangan log ke database...';
+        }
+
+        const btnSave = document.getElementById('btnSaveQuickLogOnly');
+        const btnSavePrint = document.getElementById('btnSaveQuickLogAndPrint');
+        if (btnSave) btnSave.disabled = true;
+        if (btnSavePrint) btnSavePrint.disabled = true;
+
+        fetch('/jurnal/' + currentQuickLogJurnal.id + '/update-log', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            body: JSON.stringify({
+                keterangan_log: val
+            })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (btnSave) btnSave.disabled = false;
+            if (btnSavePrint) btnSavePrint.disabled = false;
+
+            if (data.status === 'success') {
+                currentQuickLogJurnal.keterangan_log = val;
+
+                // Perbarui tombol aksi di baris tabel yang bersangkutan jika ada di DOM
+                const tableRowBtn = document.querySelector(`.btn-cetak-action[data-jurnal-id="${currentQuickLogJurnal.id}"]`);
+                if (tableRowBtn) {
+                    tableRowBtn.outerHTML = `
+                        <a href="/jurnal/${currentQuickLogJurnal.id}/download" target="_blank" class="btn btn-sm btn-cetak-action" data-jurnal-id="${currentQuickLogJurnal.id}" style="background-color: #059669; color: white; padding: 6px 12px; font-size: 12.5px; font-weight: 600; display: inline-flex; align-items: center; gap: 5px; text-decoration: none; border-radius: 4px; margin-left: 5px; border: 1px solid #047857;" title="Preview Cetak Dokumen Jurnal">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="6 9 6 2 18 2 18 9"></polyline>
+                                <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+                                <rect x="6" y="14" width="12" height="8"></rect>
+                            </svg>
+                            <span>Cetak</span>
+                        </a>
+                    `;
+                }
+
+                // Perbarui modal detail jika sedang aktif
+                if (currentDetailJurnal && currentDetailJurnal.id === currentQuickLogJurnal.id) {
+                    currentDetailJurnal.keterangan_log = val;
+                    showDetailModal(currentDetailJurnal);
+                }
+
+                closeQuickLogModal();
+
+                if (autoPrint) {
+                    window.open('/jurnal/' + currentQuickLogJurnal.id + '/download', '_blank');
+                }
+            } else {
+                if (feedback) {
+                    feedback.style.display = 'block';
+                    feedback.style.background = '#fef2f2';
+                    feedback.style.border = '1px solid #fecdd3';
+                    feedback.style.color = '#991b1b';
+                    feedback.innerHTML = '❌ ' + (data.message || 'Gagal menyimpan keterangan log.');
+                }
+            }
+        })
+        .catch(err => {
+            console.error(err);
+            if (btnSave) btnSave.disabled = false;
+            if (btnSavePrint) btnSavePrint.disabled = false;
+            if (feedback) {
+                feedback.style.display = 'block';
+                feedback.style.background = '#fef2f2';
+                feedback.style.border = '1px solid #fecdd3';
+                feedback.style.color = '#991b1b';
+                feedback.innerHTML = '❌ Terjadi kesalahan jaringan saat menyimpan data.';
+            }
+        });
     }
 
     // Modal Konfirmasi Hapus Data Ekstra
@@ -1563,12 +1935,14 @@
     // Close on click outside modal
     document.addEventListener('click', function(e) {
         const detailModal = document.getElementById('detailModal');
+        const quickModal = document.getElementById('quickLogModal');
         const deleteModal = document.getElementById('deleteConfirmModal');
         const importModal = document.getElementById('importModal');
         const successModal = document.getElementById('importSuccessModal');
         const errorModal = document.getElementById('importErrorModal');
         const resetModal = document.getElementById('resetAllModal');
         if (e.target === detailModal) closeDetailModal();
+        if (e.target === quickModal) closeQuickLogModal();
         if (e.target === deleteModal) closeDeleteConfirmModal();
         if (e.target === importModal) closeImportModal();
         if (e.target === successModal) closeImportSuccessModal();
@@ -1580,6 +1954,7 @@
     document.addEventListener('keydown', function(e) {
         if(e.key === 'Escape') {
             closeDetailModal();
+            closeQuickLogModal();
             closeDeleteConfirmModal();
             closeImportModal();
             closeImportSuccessModal();

@@ -66,6 +66,9 @@ Route::middleware('auth')->group(function () {
     // Route Unduh Dokumen Jurnal (Otomatis deteksi LOKAL / ATMB)
     Route::get('/jurnal/{id}/download', [JurnalController::class, 'downloadDokumen'])->name('jurnal.download')->whereNumber('id');
 
+    // Route Update Keterangan Log (AJAX dari Halaman Cetak/Data)
+    Route::post('/jurnal/{id}/update-log', [JurnalController::class, 'updateLog'])->name('jurnal.update_log')->whereNumber('id');
+
     // Route API AJAX Rincian Jurnal Keluhan
     Route::get('/api/jurnal/{id}', [JurnalController::class, 'getDetailJurnal'])->name('api.jurnal.detail');
 });
