@@ -379,14 +379,14 @@
                                         <span>Detail</span>
                                     </button>
                                     @if($hasLog)
-                                        <a href="/jurnal/{{ $jurnal->id }}/download" target="_blank" class="btn btn-sm btn-cetak-action" data-jurnal-id="{{ $jurnal->id }}" style="background-color: #059669; color: white; padding: 6px 12px; font-size: 12.5px; font-weight: 600; display: inline-flex; align-items: center; gap: 5px; text-decoration: none; border-radius: 4px; margin-left: 5px; border: 1px solid #047857;" title="Preview Cetak Dokumen Jurnal">
+                                        <button type="button" onclick="openPrintChoiceModal({{ json_encode($jurnal) }})" class="btn btn-sm btn-cetak-action" data-jurnal-id="{{ $jurnal->id }}" style="background-color: #0284c7; color: white; padding: 6px 12px; font-size: 12.5px; font-weight: 600; display: inline-flex; align-items: center; gap: 5px; text-decoration: none; border-radius: 4px; margin-left: 5px; border: 1px solid #0369a1; cursor: pointer;" title="Pilih Format Cetak Dokumen">
                                             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                                 <polyline points="6 9 6 2 18 2 18 9"></polyline>
                                                 <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
                                                 <rect x="6" y="14" width="12" height="8"></rect>
                                             </svg>
-                                            <span>Cetak</span>
-                                        </a>
+                                            <span>Cetak ▾</span>
+                                        </button>
                                     @else
                                         <button type="button" onclick="openQuickLogModal({{ json_encode($jurnal) }}, true)" class="btn btn-sm btn-cetak-action" data-jurnal-id="{{ $jurnal->id }}" style="background-color: #fff7ed; color: #c2410c; padding: 6px 11px; font-size: 12px; font-weight: 600; display: inline-flex; align-items: center; gap: 4px; border-radius: 4px; margin-left: 5px; border: 1px dashed #ea580c; cursor: pointer;" title="Keterangan log masih kosong. Klik untuk mengisi log & mencetak.">
                                             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -643,30 +643,108 @@
         </div>
 
         <div class="modal-footer" style="padding: 16px 24px; border-top: 1px solid var(--bs-gray-200); display: flex; justify-content: flex-end; align-items: center; gap: 10px; background: var(--bs-gray-50); flex-wrap: wrap;">
-            <a id="modalBtnEdit" href="#" class="btn btn-warning" style="background-color: #f59e0b; color: #ffffff; border: 1px solid #d97706; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; font-weight: 600; padding: 8px 16px;">
+            <a id="modalBtnEdit" href="#" class="btn btn-warning" style="background-color: #f59e0b; color: #ffffff; border: 1px solid #d97706; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; font-weight: 600; padding: 8px 18px; border-radius: 6px;">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
                     <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
                 </svg>
-                <span>Edit Data Jurnal</span>
+                <span>Edit Data</span>
             </a>
-            <button type="button" id="modalBtnDelete" class="btn" style="background-color: #dc2626; color: #ffffff; border: 1px solid #b91c1c; display: inline-flex; align-items: center; gap: 6px; font-weight: 600; padding: 8px 16px; cursor: pointer;">
+            <button type="button" id="modalBtnDelete" class="btn" style="background-color: #dc2626; color: #ffffff; border: 1px solid #b91c1c; display: inline-flex; align-items: center; gap: 6px; font-weight: 600; padding: 8px 18px; border-radius: 6px; cursor: pointer;">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <polyline points="3 6 5 6 21 6"></polyline>
                     <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
                     <line x1="10" y1="11" x2="10" y2="17"></line>
                     <line x1="14" y1="11" x2="14" y2="17"></line>
                 </svg>
-                <span>Hapus Data</span>
+                <span>Hapus</span>
             </button>
-            <a id="modalBtnCetak" href="#" target="_blank" class="btn" style="background-color: #059669; color: #ffffff; border: 1px solid #047857; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; font-weight: 600; padding: 8px 16px;">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        </div>
+    </div>
+</div>
+
+<!-- Modal Pop-Up Pilihan Format Cetak Dokumen (Penyelesaian / Penolakan) -->
+<div class="modal-backdrop" id="printChoiceModal" style="z-index: 1250;">
+    <div class="modal-content" style="max-width: 580px; border-top: 4px solid #0284c7; animation: modalFadeIn 0.2s ease-out;">
+        <div class="modal-header" style="background-color: #f0f9ff; border-bottom: 1px solid #e0f2fe;">
+            <h3 style="color: #0369a1; display: flex; align-items: center; gap: 8px; font-size: 16px; font-weight: 700;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0284c7" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                     <polyline points="6 9 6 2 18 2 18 9"></polyline>
                     <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
                     <rect x="6" y="14" width="12" height="8"></rect>
                 </svg>
-                <span id="modalBtnCetakText">Cetak Dokumen</span>
-            </a>
+                <span>Pilih Format Cetak Dokumen</span>
+            </h3>
+            <button class="btn-close-modal" onclick="closePrintChoiceModal()">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+        </div>
+
+        <div class="modal-body" style="padding: 20px 24px;">
+            <!-- Context Box -->
+            <div style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 12px 16px; margin-bottom: 16px; font-size: 12px;">
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 8px;">
+                    <div><span style="color: #64748b;">Nasabah:</span> <strong id="printChoiceNasabah" style="color: #0f172a;">-</strong></div>
+                    <div><span style="color: #64748b;">No. Resi/Trace:</span> <strong id="printChoiceNoResi" style="color: #0284c7;">-</strong></div>
+                    <div><span style="color: #64748b;">Nominal:</span> <strong id="printChoiceNominal" style="color: #059669;">-</strong></div>
+                    <div><span style="color: #64748b;">Channel:</span> <strong id="printChoiceChannel" style="color: #0f172a;">-</strong></div>
+                </div>
+            </div>
+
+            <p style="font-size: 12.5px; color: #475569; margin: 0 0 14px 0; font-weight: 500;">
+                Silakan tentukan jenis formulir yang ingin Anda cetak:
+            </p>
+
+            <div style="display: flex; flex-direction: column; gap: 12px;">
+                <!-- Opsi 1: Form Normal / Penyelesaian -->
+                <a id="linkPrintNormal" href="#" target="_blank" onclick="closePrintChoiceModal()" style="display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 14px 18px; background: #ffffff; border: 1.5px solid #10b981; border-radius: 12px; text-decoration: none; transition: all 0.2s; box-shadow: 0 1px 3px rgba(16, 185, 129, 0.08);" onmouseover="this.style.backgroundColor='#ecfdf5'; this.style.transform='translateY(-1px)';" onmouseout="this.style.backgroundColor='#ffffff'; this.style.transform='translateY(0)';">
+                    <div style="display: flex; align-items: center; gap: 14px;">
+                        <div style="width: 42px; height: 42px; border-radius: 10px; background: #d1fae5; color: #059669; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 20px;">
+                            📄
+                        </div>
+                        <div>
+                            <div style="font-size: 13.5px; font-weight: 700; color: #065f46; margin-bottom: 2px;">
+                                Form Penyelesaian Keluhan (Klaim Diterima)
+                            </div>
+                            <div style="font-size: 11.5px; color: #047857; line-height: 1.35;">
+                                Formulir penyelesaian keluhan standar sesuai kanal transaksi.
+                            </div>
+                        </div>
+                    </div>
+                    <span style="background: #059669; color: #ffffff; font-weight: 700; font-size: 11.5px; padding: 7px 13px; border-radius: 8px; white-space: nowrap;">
+                        Cetak →
+                    </span>
+                </a>
+
+                <!-- Opsi 2: Form Penolakan Klaim -->
+                <a id="linkPrintPenolakan" href="#" target="_blank" onclick="closePrintChoiceModal()" style="display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 14px 18px; background: #ffffff; border: 1.5px solid #ef4444; border-radius: 12px; text-decoration: none; transition: all 0.2s; box-shadow: 0 1px 3px rgba(239, 68, 68, 0.08);" onmouseover="this.style.backgroundColor='#fff1f2'; this.style.transform='translateY(-1px)';" onmouseout="this.style.backgroundColor='#ffffff'; this.style.transform='translateY(0)';">
+                    <div style="display: flex; align-items: center; gap: 14px;">
+                        <div style="width: 42px; height: 42px; border-radius: 10px; background: #fee2e2; color: #dc2626; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 20px;">
+                            🚫
+                        </div>
+                        <div>
+                            <div style="font-size: 13.5px; font-weight: 700; color: #991b1b; margin-bottom: 2px;">
+                                Form Penolakan Klaim (Klaim Ditolak)
+                            </div>
+                            <div style="font-size: 11.5px; color: #b91c1c; line-height: 1.35;">
+                                Format penolakan (Tindak Lanjut: <strong>KLAIM DITOLAK</strong>, tanpa slip & tabel kredit).
+                            </div>
+                        </div>
+                    </div>
+                    <span style="background: #dc2626; color: #ffffff; font-weight: 700; font-size: 11.5px; padding: 7px 13px; border-radius: 8px; white-space: nowrap;">
+                        Cetak →
+                    </span>
+                </a>
+            </div>
+        </div>
+
+        <div class="modal-footer" style="padding: 12px 24px; border-top: 1px solid var(--bs-gray-200); background: #fafafa; display: flex; justify-content: flex-end;">
+            <button type="button" class="btn btn-secondary" onclick="closePrintChoiceModal()">
+                Tutup
+            </button>
         </div>
     </div>
 </div>
@@ -1740,41 +1818,43 @@
             };
         }
 
-        // Set Handler Cetak di Modal Detail
-        const cetakBtn = document.getElementById('modalBtnCetak');
-        const cetakBtnText = document.getElementById('modalBtnCetakText');
-        if (cetakBtn) {
-            if (hasLog) {
-                cetakBtn.href = '/jurnal/' + jurnal.id + '/download';
-                cetakBtn.target = '_blank';
-                cetakBtn.onclick = null;
-                cetakBtn.style.backgroundColor = '#059669';
-                cetakBtn.style.borderColor = '#047857';
-                cetakBtn.style.color = '#ffffff';
-                cetakBtn.style.cursor = 'pointer';
-                cetakBtn.title = 'Preview Cetak Dokumen Jurnal';
-                if (cetakBtnText) cetakBtnText.textContent = 'Cetak Dokumen';
-            } else {
-                cetakBtn.removeAttribute('href');
-                cetakBtn.removeAttribute('target');
-                cetakBtn.onclick = function(e) {
-                    e.preventDefault();
-                    openQuickLogFromDetail(true);
-                };
-                cetakBtn.style.backgroundColor = '#fff7ed';
-                cetakBtn.style.borderColor = '#ea580c';
-                cetakBtn.style.color = '#c2410c';
-                cetakBtn.style.cursor = 'pointer';
-                cetakBtn.title = 'Keterangan log masih kosong. Klik untuk mengisi log & langsung mencetak.';
-                if (cetakBtnText) cetakBtnText.textContent = 'Cetak (Isi Log Dahulu 🔒)';
-            }
-        }
-
         document.getElementById('detailModal').classList.add('show');
     }
 
     function closeDetailModal() {
         document.getElementById('detailModal').classList.remove('show');
+    }
+
+    // Handlers Modal Pilihan Format Cetak Dokumen
+    let currentPrintChoiceJurnal = null;
+
+    function openPrintChoiceModal(jurnal) {
+        currentPrintChoiceJurnal = jurnal;
+        document.getElementById('printChoiceNasabah').textContent = jurnal.nama_nasabah || '-';
+        document.getElementById('printChoiceNoResi').textContent = jurnal.no_resi || '-';
+        const nom = Number(jurnal.nominal_transaksi) || 0;
+        document.getElementById('printChoiceNominal').textContent = 'Rp ' + nom.toLocaleString('id-ID');
+        const ch = (jurnal.master_transaksi ? jurnal.master_transaksi.channel : '') || '';
+        const tm = (jurnal.terminal_transaksi || '-').trim();
+        document.getElementById('printChoiceChannel').textContent = ch ? `${ch} (${tm})` : tm;
+
+        const linkNormal = document.getElementById('linkPrintNormal');
+        if (linkNormal) {
+            linkNormal.href = '/jurnal/' + jurnal.id + '/download?format=normal';
+        }
+
+        const linkPenolakan = document.getElementById('linkPrintPenolakan');
+        if (linkPenolakan) {
+            linkPenolakan.href = '/jurnal/' + jurnal.id + '/download?format=penolakan';
+        }
+
+        const modal = document.getElementById('printChoiceModal');
+        if (modal) modal.classList.add('show');
+    }
+
+    function closePrintChoiceModal() {
+        const modal = document.getElementById('printChoiceModal');
+        if (modal) modal.classList.remove('show');
     }
 
     // Quick Log Modal Handlers
@@ -1873,14 +1953,14 @@
                 const tableRowBtn = document.querySelector(`.btn-cetak-action[data-jurnal-id="${currentQuickLogJurnal.id}"]`);
                 if (tableRowBtn) {
                     tableRowBtn.outerHTML = `
-                        <a href="/jurnal/${currentQuickLogJurnal.id}/download" target="_blank" class="btn btn-sm btn-cetak-action" data-jurnal-id="${currentQuickLogJurnal.id}" style="background-color: #059669; color: white; padding: 6px 12px; font-size: 12.5px; font-weight: 600; display: inline-flex; align-items: center; gap: 5px; text-decoration: none; border-radius: 4px; margin-left: 5px; border: 1px solid #047857;" title="Preview Cetak Dokumen Jurnal">
+                        <button type="button" onclick='openPrintChoiceModal(${JSON.stringify(currentQuickLogJurnal)})' class="btn btn-sm btn-cetak-action" data-jurnal-id="${currentQuickLogJurnal.id}" style="background-color: #0284c7; color: white; padding: 6px 12px; font-size: 12.5px; font-weight: 600; display: inline-flex; align-items: center; gap: 5px; text-decoration: none; border-radius: 4px; margin-left: 5px; border: 1px solid #0369a1; cursor: pointer;" title="Pilih Format Cetak Dokumen">
                             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <polyline points="6 9 6 2 18 2 18 9"></polyline>
                                 <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
                                 <rect x="6" y="14" width="12" height="8"></rect>
                             </svg>
-                            <span>Cetak</span>
-                        </a>
+                            <span>Cetak ▾</span>
+                        </button>
                     `;
                 }
 
@@ -1893,7 +1973,7 @@
                 closeQuickLogModal();
 
                 if (autoPrint) {
-                    window.open('/jurnal/' + currentQuickLogJurnal.id + '/download', '_blank');
+                    openPrintChoiceModal(currentQuickLogJurnal);
                 }
             } else {
                 if (feedback) {

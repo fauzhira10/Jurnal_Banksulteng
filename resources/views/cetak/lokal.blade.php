@@ -173,7 +173,7 @@
 
     <!-- Toolbar Aksi Layar -->
     <div class="no-print">
-        <a href="javascript:history.back()" class="btn btn-back">⬅ Kembali</a>
+        <button type="button" onclick="handleKembali()" class="btn btn-back">⬅ Kembali</button>
         <span style="font-weight: bold; font-size: 13px; color: #1e293b;">📄 Cetak Keluhan ATM Lokal &mdash; No. Tiket: {{ $jurnal->no_tiket }}</span>
         <button type="button" onclick="window.print()" class="btn btn-print">🖨️ Cetak Form Ini</button>
     </div>
@@ -391,5 +391,17 @@
             </tr>
         </table>
     </div>
+
+    <script>
+        function handleKembali() {
+            if (window.opener && !window.opener.closed) {
+                window.close();
+            } else if (window.history.length > 1) {
+                window.history.back();
+            } else {
+                window.location.href = "{{ route('jurnal.index') }}";
+            }
+        }
+    </script>
 </body>
 </html>

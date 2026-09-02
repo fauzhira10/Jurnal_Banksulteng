@@ -12,6 +12,10 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+
+    <!-- ApexCharts CDN (Chart Library) -->
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts@3.54.1/dist/apexcharts.min.js" defer></script>
+
     @stack('styles')
 </head>
 <body class="font-sans bg-slate-100 text-slate-800 min-h-screen flex flex-col overflow-x-hidden antialiased">

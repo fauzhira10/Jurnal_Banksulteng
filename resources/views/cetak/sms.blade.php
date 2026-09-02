@@ -197,7 +197,7 @@
 
     <!-- Tombol Navigasi Layar -->
     <div class="no-print">
-        <a href="javascript:history.back()" class="btn btn-back">⬅ Kembali</a>
+        <button type="button" onclick="handleKembali()" class="btn btn-back">⬅ Kembali</button>
         <button onclick="window.print()" class="btn btn-print">🖨️ Cetak Form & Slip Jurnal</button>
     </div>
 
@@ -548,9 +548,15 @@
     </div>
 
     <script>
-        window.onload = function() {
-            window.print();
-        };
+        function handleKembali() {
+            if (window.opener && !window.opener.closed) {
+                window.close();
+            } else if (window.history.length > 1) {
+                window.history.back();
+            } else {
+                window.location.href = "{{ route('jurnal.index') }}";
+            }
+        }
     </script>
 </body>
 </html>

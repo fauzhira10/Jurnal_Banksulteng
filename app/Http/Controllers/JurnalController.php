@@ -1980,26 +1980,69 @@ class JurnalController extends Controller
 
     /**
      * Rute Cerdas: Merender Formulir Penyelesaian Keluhan Nasabah (Blade View Cetak)
-     * berdasarkan jenis channel transaksi secara dinamis langsung dari Database.
+     * berdasarkan jenis channel transaksi secara dinamis langsung dari Database,
+     * atau format penolakan klaim (?format=penolakan).
      */
-    public function downloadDokumen($id)
+    public function downloadDokumen(Request $request, $id)
     {
         $jurnal = Jurnal::with(['masterCabang', 'masterTransaksi'])->findOrFail($id);
+        $format = strtolower(trim($request->query('format', '')));
+
+        if ($format === 'penolakan' || $format === 'tolak') {
+            return view('cetak.penolakan', compact('jurnal'));
+        }
+
         $channel = strtoupper(trim($jurnal->masterTransaksi->channel ?? ''));
+        $jenis = strtoupper(trim($jurnal->masterTransaksi->jenis_transaksi ?? ''));
+        $permasalahan = strtoupper(trim($jurnal->permasalahan ?? ''));
         $logOptions = config('keluhan_logs.atm_lokal', []);
 
-        return match ($channel) {
-            'ATM BERSAMA'                   => view('cetak.atmb', compact('jurnal')),
-            'ATM LINK'                      => view('cetak.link', compact('jurnal')),
-            'MOBILE BANKING', 'M-BANKING'   => view('cetak.mbanking', compact('jurnal')),
-            'QRIS'                          => view('cetak.qris', compact('jurnal')),
-            'SMS BANKING'                   => view('cetak.sms', compact('jurnal')),
-            'CCTV'                          => view('cetak.cctv', compact('jurnal')),
-            'FINNET', 'PULSA'               => view('cetak.pulsa', compact('jurnal')),
-            'EDC BANK LAIN', 'DEBIT', 'EDC' => view('cetak.edc', compact('jurnal')),
-            'ATM LOKAL', 'LOKAL', 'ATM'     => view('cetak.lokal', compact('jurnal', 'logOptions')),
-            default                         => view('cetak.lokal', compact('jurnal', 'logOptions')),
-        };
+        // 1. EDC / DEBIT / EDC BANK LAIN (Prioritas utama untuk semua jenis EDC)
+        if (str_contains($jenis, 'EDC') || str_contains($channel, 'EDC') || str_contains($permasalahan, 'EDC') || $channel === 'DEBIT' || $channel === 'EDC BANK LAIN') {
+            return view('cetak.edc', compact('jurnal'));
+        }
+
+        // 2. QRIS (Prioritas utama jika jenis transaksi, channel, atau permasalahan mengandung QRIS)
+        if (str_contains($jenis, 'QRIS') || str_contains($channel, 'QRIS') || str_contains($permasalahan, 'QRIS')) {
+            return view('cetak.qris', compact('jurnal'));
+        }
+
+        // 3. ATM LINK
+        if (str_contains($jenis, 'LINK') || $channel === 'ATM LINK') {
+            return view('cetak.link', compact('jurnal'));
+        }
+
+        // 4. ATM BERSAMA
+        if (str_contains($jenis, 'BERSAMA') || str_contains($jenis, 'BANK LAIN') || $channel === 'ATM BERSAMA') {
+            return view('cetak.atmb', compact('jurnal'));
+        }
+
+        // 5. SMS BANKING
+        if (str_contains($jenis, 'SMS') || $channel === 'SMS BANKING') {
+            return view('cetak.sms', compact('jurnal'));
+        }
+
+        // 6. CCTV
+        if (str_contains($jenis, 'CCTV') || $channel === 'CCTV') {
+            return view('cetak.cctv', compact('jurnal'));
+        }
+
+        // 7. FINNET / PULSA
+        if (str_contains($jenis, 'FINNET') || str_contains($jenis, 'PULSA') || $channel === 'FINNET' || $channel === 'PULSA') {
+            return view('cetak.pulsa', compact('jurnal'));
+        }
+
+        // 8. MOBILE BANKING
+        if (str_contains($jenis, 'MBANKING') || str_contains($jenis, 'M-BANKING') || $channel === 'MOBILE BANKING' || $channel === 'M-BANKING') {
+            return view('cetak.mbanking', compact('jurnal'));
+        }
+
+        // 9. ATM LOKAL & DEFAULT
+        if (str_contains($jenis, 'ATM') || str_contains($jenis, 'CRM') || $channel === 'ATM LOKAL' || $channel === 'LOKAL' || $channel === 'ATM') {
+            return view('cetak.lokal', compact('jurnal', 'logOptions'));
+        }
+
+        return view('cetak.lokal', compact('jurnal', 'logOptions'));
     }
 
     public function updateLog(Request $request, $id)

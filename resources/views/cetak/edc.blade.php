@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Form Keluhan Transaksi EDC / Debit - {{ $jurnal->no_tiket }}</title>
+    <title>Slip Jurnal EDC (Nota Debet) - {{ $jurnal->no_tiket }}</title>
     <style>
         * {
             box-sizing: border-box;
@@ -18,100 +18,17 @@
             color: #000;
         }
 
-        /* Container Formulir Cetak */
+        /* Container Slip Cetak A4 */
         .form-wrapper {
             background: #ffffff;
-            width: 210mm; /* Standar A4 */
-            min-height: 297mm;
+            width: 210mm;
             margin: 0 auto 35px auto;
-            padding: 28px 30px;
+            padding: 25px 30px;
             border: 2px solid #000;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
         }
 
-        .table-form {
-            width: 100%;
-            border-collapse: collapse;
-            border: 1.5px solid #000;
-        }
-
-        .table-form td, .table-form th {
-            border: 1px solid #000;
-            padding: 5px 8px;
-            vertical-align: middle;
-        }
-
-        /* Header Logo & Title */
-        .logo-cell {
-            width: 25%;
-            text-align: center;
-            padding: 10px !important;
-        }
-
-        .logo-img {
-            max-width: 140px;
-            height: auto;
-        }
-
-        .title-cell {
-            text-align: center;
-            font-size: 14px;
-            font-weight: bold;
-            letter-spacing: 0.5px;
-        }
-
-        .section-title {
-            font-weight: bold;
-            background-color: #ffffff;
-            text-transform: uppercase;
-        }
-
-        /* Detail Data Table */
-        .label-col {
-            width: 25%;
-        }
-
-        .separator-col {
-            width: 2%;
-            text-align: center;
-        }
-
-        .highlight-yellow {
-            background-color: #ffff00 !important;
-            font-weight: bold;
-        }
-
-        .text-red {
-            color: #dc2626;
-            font-weight: bold;
-        }
-
-        /* Tanda Tangan Footer */
-        .sig-header {
-            text-align: center;
-            font-weight: bold;
-            padding: 4px !important;
-        }
-
-        .sig-body {
-            height: 75px;
-            text-align: center;
-            vertical-align: bottom !important;
-            padding-bottom: 8px !important;
-        }
-
-        .sig-name {
-            font-weight: bold;
-            text-decoration: underline;
-            text-transform: uppercase;
-        }
-
-        .sig-title {
-            font-size: 9.5px;
-            color: #333;
-        }
-
-        /* Tombol Aksi Layar Monitor */
+        /* Toolbar Aksi Layar Monitor */
         .no-print {
             width: 210mm;
             margin: 0 auto 15px auto;
@@ -137,17 +54,17 @@
 
         @page {
             size: A4 portrait;
-            margin: 12mm 15mm;
+            margin: 15mm 18mm 15mm 18mm;
         }
 
         @media print {
             .no-print { display: none !important; }
             html, body { padding: 0 !important; margin: 0 !important; background: none !important; }
             .form-wrapper {
-                border: 1.5px solid #000 !important;
+                border: none !important;
                 width: 100% !important;
                 max-width: 100% !important;
-                padding: 18px 20px !important;
+                padding: 10px 15px !important;
                 margin: 0 auto !important;
                 box-shadow: none !important;
             }
@@ -156,217 +73,335 @@
 </head>
 <body>
 
-    <!-- Tombol Navigasi Layar -->
+    <!-- Toolbar Aksi Layar -->
     <div class="no-print">
-        <a href="javascript:history.back()" class="btn btn-back">⬅ Kembali</a>
-        <button onclick="window.print()" class="btn btn-print">🖨️ Cetak Form Ini</button>
+        <button type="button" onclick="handleKembali()" class="btn btn-back">⬅ Kembali</button>
+        <span style="font-weight: bold; font-size: 13px; color: #1e293b;">📄 Cetak Slip Jurnal EDC (Nota Debet) &mdash; No. Tiket: {{ $jurnal->no_tiket }}</span>
+        <button type="button" onclick="window.print()" class="btn btn-print">🖨️ Cetak Slip Jurnal</button>
     </div>
 
+    <!-- ================= SLIP JURNAL / NOTA DEBET DIVISI IT (EDC) ================= -->
     <div class="form-wrapper">
-        <table class="table-form">
-            <!-- HEADER / KOP FORM -->
+        <!-- KOP SLIP JURNAL (TANPA BORDER LUAR) -->
+        <table style="width: 100%; border-collapse: collapse; margin-bottom: 12px;">
             <tr>
-                <td class="logo-cell">
-                    <img src="{{ asset('images/logo_bank_sulteng.png') }}" alt="Bank Sulteng" class="logo-img" onerror="this.outerHTML='<strong style=\'font-size:16px;color:#0284c7;\'>Bank Sulteng</strong>'">
+                <td style="width: 32%; text-align: left; vertical-align: middle; border: none; padding: 0;">
+                    <img src="{{ asset('images/logo_bank_sulteng.png') }}" alt="Bank Sulteng" class="logo-img" style="max-width: 150px; height: auto;" onerror="this.outerHTML='<strong style=\'font-size:16px;color:#0284c7;\'>Bank Sulteng</strong>'">
                 </td>
-                <td class="title-cell">
-                    FORM PENYELESAIAN KELUHAN NASABAH (EDC / DEBIT)
+                <td style="width: 36%; text-align: center; vertical-align: middle; border: none; padding: 0;">
+                    <div style="font-weight: bold; font-size: 13.5px; letter-spacing: 0.5px;">NOTA DEBET</div>
                 </td>
-            </tr>
-
-            <!-- DESKRIPSI -->
-            <tr>
-                <td colspan="2">
-                    <table style="width: 100%; border-collapse: collapse;">
-                        <tr>
-                            <td style="width: 15%; border: none; padding: 2px 0;">Deskripsi</td>
-                            <td style="width: 2%; border: none; padding: 2px 0;">:</td>
-                            <td style="border: none; padding: 2px 0; font-weight: bold;">Permintaan</td>
-                        </tr>
-                        <tr>
-                            <td style="border: none; padding: 2px 0;">Permintaan</td>
-                            <td style="border: none; padding: 2px 0;">:</td>
-                            <td style="border: none; padding: 2px 0; font-style: italic;">Terlampir Keluhan Nasabah</td>
-                        </tr>
-                    </table>
-                </td>
-            </tr>
-
-            <!-- LEMBAR HELPDESK -->
-            <tr>
-                <td colspan="2" class="section-title">LEMBAR HELPDESK:</td>
-            </tr>
-            <tr>
-                <td colspan="2" style="padding: 0;">
-                    <table style="width: 100%; border-collapse: collapse;">
-                        <tr>
-                            <td style="width: 15%; border-right: 1px solid #000; border-bottom: 1px solid #000;">No. Tiket</td>
-                            <td style="width: 35%; border-right: 1px solid #000; border-bottom: 1px solid #000; font-weight: bold;">: {{ $jurnal->no_tiket }}</td>
-                            <td style="width: 15%; border-right: 1px solid #000; border-bottom: 1px solid #000;">Tanggal Terima</td>
-                            <td style="width: 35%; border-bottom: 1px solid #000;">: {{ \Carbon\Carbon::parse($jurnal->tgl_terima)->translatedFormat('d F Y') }}</td>
-                        </tr>
-                        <tr>
-                            <td style="border-right: 1px solid #000;">Nama Penerima</td>
-                            <td style="border-right: 1px solid #000;">: {{ auth()->user()->name ?? 'Mujadid' }}</td>
-                            <td style="border-right: 1px solid #000;">Status</td>
-                            <td style="font-weight: bold; text-transform: uppercase;">: {{ $jurnal->status == 'Done' ? 'SELESAI' : $jurnal->status }}</td>
-                        </tr>
-                    </table>
-                </td>
-            </tr>
-
-            <!-- PERMASALAHAN -->
-            <tr>
-                <td colspan="2" class="section-title">PERMASALAHAN:</td>
-            </tr>
-            <tr>
-                <td colspan="2" style="padding: 10px;">
-                    <div style="font-weight: bold; margin-bottom: 12px; text-transform: uppercase;">
-                        : {{ $jurnal->masterTransaksi->jenis_transaksi ?? 'TRANSAKSI EDC / DEBIT GAGAL, SALDO TERDEBET' }}
+                <td style="width: 32%; text-align: right; vertical-align: middle; border: none; padding: 0;">
+                    <div style="font-weight: bold; font-size: 10px; line-height: 1.35; text-align: center; display: inline-block;">
+                        SLIP JURNAL<br>DIVISI IT
                     </div>
-
-                    <table style="width: 100%; border-collapse: collapse; margin-left: 0;">
-                        <tr>
-                            <td class="label-col" style="border: none; padding: 3px 0;">Nama</td>
-                            <td class="separator-col" style="border: none; padding: 3px 0;">:</td>
-                            <td style="border: none; padding: 3px 0; font-weight: bold;">{{ $jurnal->nama_nasabah }}</td>
-                        </tr>
-                        <tr>
-                            <td class="label-col" style="border: none; padding: 3px 0;">No Rekening</td>
-                            <td class="separator-col" style="border: none; padding: 3px 0;">:</td>
-                            <td style="border: none; padding: 3px 0; font-weight: bold;">{{ $jurnal->no_rekening }}</td>
-                        </tr>
-                        <tr>
-                            <td class="label-col" style="border: none; padding: 3px 0;">No Kartu ATM/Debit</td>
-                            <td class="separator-col" style="border: none; padding: 3px 0;">:</td>
-                            <td style="border: none; padding: 3px 0;">{{ $jurnal->no_kartu }}</td>
-                        </tr>
-                        <tr>
-                            <td class="label-col" style="border: none; padding: 3px 0;">Trace & Resi / Ref</td>
-                            <td class="separator-col" style="border: none; padding: 3px 0;">:</td>
-                            <td style="border: none; padding: 3px 0;"><span class="highlight-yellow">{{ $jurnal->no_resi }}</span></td>
-                        </tr>
-                        <tr>
-                            <td class="label-col" style="border: none; padding: 3px 0;">Nominal Transaksi Keluhan</td>
-                            <td class="separator-col" style="border: none; padding: 3px 0;">:</td>
-                            <td style="border: none; padding: 3px 0; font-weight: bold;">Rp {{ number_format($jurnal->nominal_transaksi, 0, ',', '.') }}</td>
-                        </tr>
-                        <tr>
-                            <td class="label-col" style="border: none; padding: 3px 0;">Biaya Admin</td>
-                            <td class="separator-col" style="border: none; padding: 3px 0;">:</td>
-                            <td style="border: none; padding: 3px 0;">Rp {{ number_format($jurnal->masterTransaksi->biaya_admin ?? 0, 0, ',', '.') ?: '-' }}</td>
-                        </tr>
-                        <tr>
-                            <td class="label-col" style="border: none; padding: 3px 0;">Tanggal Transaksi</td>
-                            <td class="separator-col" style="border: none; padding: 3px 0;">:</td>
-                            <td style="border: none; padding: 3px 0; font-weight: bold;">{{ \Carbon\Carbon::parse($jurnal->tgl_transaksi)->translatedFormat('d F Y') }}</td>
-                        </tr>
-                        <tr>
-                            <td class="label-col" style="border: none; padding: 3px 0;">Cabang Pelapor</td>
-                            <td class="separator-col" style="border: none; padding: 3px 0;">:</td>
-                            <td style="border: none; padding: 3px 0;">{{ $jurnal->masterCabang->kode_cabang ?? '-' }} - {{ $jurnal->masterCabang->nama_cabang ?? '-' }}</td>
-                        </tr>
-                        <tr>
-                            <td class="label-col" style="border: none; padding: 3px 0;">Terminal / Merchant EDC</td>
-                            <td class="separator-col" style="border: none; padding: 3px 0;">:</td>
-                            <td style="border: none; padding: 3px 0;"><span class="highlight-yellow">{{ $jurnal->terminal_transaksi }}</span></td>
-                        </tr>
-                    </table>
-                </td>
-            </tr>
-
-            <!-- STATUS KLAIM & KETERANGAN LOG -->
-            <tr>
-                <td colspan="2" style="padding: 10px;">
-                    <table style="width: 100%; border-collapse: collapse;">
-                        <tr>
-                            <td style="width: 25%; border: none; padding: 4px 0; font-weight: bold;">STATUS KLAIM</td>
-                            <td style="width: 2%; border: none; padding: 4px 0; font-weight: bold; text-align: center;">:</td>
-                            <td style="border: none; padding: 4px 0;" class="text-red">
-                                {{ strtolower($jurnal->status) == 'rejected' ? 'KLAIM DITOLAK' : 'KLAIM DITERIMA' }}
-                            </td>
-                        </tr>
-                        <tr>
-                            <td style="width: 25%; border: none; padding: 4px 0; font-weight: bold; vertical-align: top;">KETERANGAN</td>
-                            <td style="width: 2%; border: none; padding: 4px 0; font-weight: bold; vertical-align: top; text-align: center;">:</td>
-                            <td style="border: none; padding: 4px 0; line-height: 1.5; white-space: pre-wrap;">{{ $jurnal->keterangan_log ?? 'Berdasarkan hasil pemeriksaan log settlement/switching status transaksi gagal, klaim diterima.' }}</td>
-                        </tr>
-                    </table>
-
-                    @if(strtolower($jurnal->status) != 'rejected')
-                    <div style="margin-top: 15px; font-size: 10.5px; color: #444;">
-                        Maka akan di kreditkan kepada Nasabah Bank Sulteng sebagai berikut:
-                        <table style="width: 100%; border-collapse: collapse; margin-top: 4px; margin-left: 0;">
-                            <tr>
-                                <td style="width: 25%; border: none; padding: 2px 0;">Nama</td>
-                                <td style="width: 2%; border: none; padding: 2px 0; text-align: center;">:</td>
-                                <td style="border: none; padding: 2px 0; font-weight: bold;">{{ $jurnal->nama_nasabah }}</td>
-                            </tr>
-                            <tr>
-                                <td style="width: 25%; border: none; padding: 2px 0;">No Rekening</td>
-                                <td style="width: 2%; border: none; padding: 2px 0; text-align: center;">:</td>
-                                <td style="border: none; padding: 2px 0; font-weight: bold;">{{ $jurnal->no_rekening }}</td>
-                            </tr>
-                        </table>
-                    </div>
-                    @endif
-                </td>
-            </tr>
-
-            <!-- TANGGAL SELESAI -->
-            <tr>
-                <td colspan="2" style="padding: 6px 10px;">
-                    <table style="width: 100%; border-collapse: collapse;">
-                        <tr>
-                            <td style="width: 25%; border: none; padding: 0;">Tanggal selesai</td>
-                            <td style="width: 2%; border: none; padding: 0; text-align: center;">:</td>
-                            <td style="border: none; padding: 0; font-weight: bold;">{{ $jurnal->tgl_selesai ? \Carbon\Carbon::parse($jurnal->tgl_selesai)->translatedFormat('d F Y') : '-' }}</td>
-                        </tr>
-                    </table>
-                </td>
-            </tr>
-
-            <!-- FOOTER BLOCK TANDA TANGAN (4 KOLOM) -->
-            <tr>
-                <td colspan="2" style="padding: 0;">
-                    <table style="width: 100%; border-collapse: collapse;">
-                        <tr>
-                            <td colspan="3" class="sig-header" style="width: 75%; border-right: 1px solid #000;">Di Selesaikan Oleh,</td>
-                            <td class="sig-header" style="width: 25%;">Di ketahui Oleh,</td>
-                        </tr>
-                        <tr>
-                            <!-- Pejabat 1 -->
-                            <td class="sig-body" style="width: 25%; border-right: 1px solid #000;">
-                                <div class="sig-name">MUJADID</div>
-                                <div class="sig-title">Staf Layanan Keluhan dan Monitoring Transaksi Kartu</div>
-                            </td>
-                            <!-- Pejabat 2 -->
-                            <td class="sig-body" style="width: 25%; border-right: 1px solid #000;">
-                                <div class="sig-name">AYU FEBRIANTI</div>
-                                <div class="sig-title">Pemimpin Unit Layanan Keluhan dan Monitoring Transaksi Kartu</div>
-                            </td>
-                            <!-- Pejabat 3 -->
-                            <td class="sig-body" style="width: 25%; border-right: 1px solid #000;">
-                                <div class="sig-name">WACHYUNI MADARAYU</div>
-                                <div class="sig-title">PINBAG E- CHANNEL</div>
-                            </td>
-                            <!-- Pejabat 4 -->
-                            <td class="sig-body" style="width: 25%;">
-                                <div class="sig-name">DIANA, ST</div>
-                                <div class="sig-title">Pemimpin Divisi IT</div>
-                            </td>
-                        </tr>
-                    </table>
                 </td>
             </tr>
         </table>
+
+        <!-- TABEL UTAMA SLIP DENGAN GRID BORDER PRESISI SESUAI PDF -->
+        <table style="width: 100%; border-collapse: collapse; border: 1.5px solid #000; font-size: 10.5px;">
+            <!-- HEADER KOLOM -->
+            <thead>
+                <tr>
+                    <th style="width: 44%; border: 1.5px solid #000; padding: 4px; text-align: center; font-weight: bold; letter-spacing: 3px;">D E B E T</th>
+                    <th colspan="5" style="width: 12%; border: 1.5px solid #000; padding: 4px; text-align: center; font-weight: bold; font-size: 10px; white-space: nowrap;">Jumlah dalam Rp.</th>
+                    <th style="width: 44%; border: 1.5px solid #000; padding: 4px; text-align: center; font-weight: bold; letter-spacing: 3px;">K R E D I T</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- BARIS 1: NAMA AKUN -->
+                <tr>
+                    <td style="border-left: 1.5px solid #000; border-right: 1px solid #000; border-top: 1.5px solid #000; border-bottom: none; padding: 2px 6px; text-align: center; font-weight: bold;">KEWAJIBAN PURCHASE & VOID MESIN EDC ATMB</td>
+                    <td style="border: 1px solid #000; width: 2.4%;"></td>
+                    <td style="border: 1px solid #000; width: 2.4%;"></td>
+                    <td style="border: 1px solid #000; width: 2.4%;"></td>
+                    <td style="border: 1px solid #000; width: 2.4%;"></td>
+                    <td style="border: 1px solid #000; width: 2.4%;"></td>
+                    <td style="border-left: 1px solid #000; border-right: 1.5px solid #000; border-top: 1.5px solid #000; border-bottom: none; padding: 2px 6px; text-align: center; font-weight: bold; text-transform: uppercase;">{{ $jurnal->nama_nasabah }}</td>
+                </tr>
+
+                <!-- BARIS 2: NOMOR REKENING / AKUN -->
+                <tr>
+                    <td style="border-left: 1.5px solid #000; border-right: 1px solid #000; border-top: none; border-bottom: 1px solid #000; padding: 2px 6px 4px 6px; text-align: center; font-weight: bold;">000.00.2310713.001.360</td>
+                    <td style="border: 1px solid #000;"></td>
+                    <td style="border: 1px solid #000;"></td>
+                    <td style="border: 1px solid #000;"></td>
+                    <td style="border: 1px solid #000;"></td>
+                    <td style="border: 1px solid #000;"></td>
+                    <td style="border-left: 1px solid #000; border-right: 1.5px solid #000; border-top: none; border-bottom: 1px solid #000; padding: 2px 6px 4px 6px; text-align: center; font-weight: bold;">{{ $jurnal->no_rekening }}</td>
+                </tr>
+
+                <!-- BARIS 3: HEADER REV. TRANSAKSI -->
+                <tr>
+                    <td style="border-left: 1.5px solid #000; border-right: 1px solid #000; border-top: 1px solid #000; border-bottom: 1px solid #000; padding: 2px 6px;">Rev. Transaksi EDC</td>
+                    <td style="border: 1px solid #000;"></td>
+                    <td style="border: 1px solid #000;"></td>
+                    <td style="border: 1px solid #000;"></td>
+                    <td style="border: 1px solid #000;"></td>
+                    <td style="border: 1px solid #000;"></td>
+                    <td style="border-left: 1px solid #000; border-right: 1.5px solid #000; border-top: 1px solid #000; border-bottom: 1px solid #000; padding: 2px 6px;">Rev. Transaksi EDC</td>
+                </tr>
+
+                <!-- BARIS 4: NO KARTU ATM -->
+                <tr>
+                    <td style="border-left: 1.5px solid #000; border-right: 1px solid #000; border-top: 1px solid #000; border-bottom: 1px solid #000; padding: 2px 6px;">
+                        <table style="width: 100%; border-collapse: collapse; border: none;">
+                            <tr>
+                                <td style="width: 38%; border: none; padding: 0;">No Kartu ATM</td>
+                                <td style="width: 4%; border: none; padding: 0; text-align: center;">:</td>
+                                <td style="border: none; padding: 0; font-weight: bold;">{{ $jurnal->no_kartu }}</td>
+                            </tr>
+                        </table>
+                    </td>
+                    <td style="border: 1px solid #000;"></td>
+                    <td style="border: 1px solid #000;"></td>
+                    <td style="border: 1px solid #000;"></td>
+                    <td style="border: 1px solid #000;"></td>
+                    <td style="border: 1px solid #000;"></td>
+                    <td style="border-left: 1px solid #000; border-right: 1.5px solid #000; border-top: 1px solid #000; border-bottom: 1px solid #000; padding: 2px 6px;">
+                        <table style="width: 100%; border-collapse: collapse; border: none;">
+                            <tr>
+                                <td style="width: 38%; border: none; padding: 0;">No Kartu ATM</td>
+                                <td style="width: 4%; border: none; padding: 0; text-align: center;">:</td>
+                                <td style="border: none; padding: 0; font-weight: bold;">{{ $jurnal->no_kartu }}</td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+
+                <!-- BARIS 5: NO RESI ATM -->
+                <tr>
+                    <td style="border-left: 1.5px solid #000; border-right: 1px solid #000; border-top: 1px solid #000; border-bottom: 1px solid #000; padding: 2px 6px;">
+                        <table style="width: 100%; border-collapse: collapse; border: none;">
+                            <tr>
+                                <td style="width: 38%; border: none; padding: 0;">No Resi ATM</td>
+                                <td style="width: 4%; border: none; padding: 0; text-align: center;">:</td>
+                                <td style="border: none; padding: 0; font-weight: bold;">{{ $jurnal->no_resi }}</td>
+                            </tr>
+                        </table>
+                    </td>
+                    <td style="border: 1px solid #000;"></td>
+                    <td style="border: 1px solid #000;"></td>
+                    <td style="border: 1px solid #000;"></td>
+                    <td style="border: 1px solid #000;"></td>
+                    <td style="border: 1px solid #000;"></td>
+                    <td style="border-left: 1px solid #000; border-right: 1.5px solid #000; border-top: 1px solid #000; border-bottom: 1px solid #000; padding: 2px 6px;">
+                        <table style="width: 100%; border-collapse: collapse; border: none;">
+                            <tr>
+                                <td style="width: 38%; border: none; padding: 0;">No Resi ATM</td>
+                                <td style="width: 4%; border: none; padding: 0; text-align: center;">:</td>
+                                <td style="border: none; padding: 0; font-weight: bold;">{{ $jurnal->no_resi }}</td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+
+                <!-- BARIS 6: NO TIKET -->
+                <tr>
+                    <td style="border-left: 1.5px solid #000; border-right: 1px solid #000; border-top: 1px solid #000; border-bottom: 1px solid #000; padding: 2px 6px;">
+                        <table style="width: 100%; border-collapse: collapse; border: none;">
+                            <tr>
+                                <td style="width: 38%; border: none; padding: 0;">No Tiket</td>
+                                <td style="width: 4%; border: none; padding: 0; text-align: center;">:</td>
+                                <td style="border: none; padding: 0; font-weight: bold;">{{ $jurnal->no_tiket }}</td>
+                            </tr>
+                        </table>
+                    </td>
+                    <td style="border: 1px solid #000;"></td>
+                    <td style="border: 1px solid #000;"></td>
+                    <td style="border: 1px solid #000;"></td>
+                    <td style="border: 1px solid #000;"></td>
+                    <td style="border: 1px solid #000;"></td>
+                    <td style="border-left: 1px solid #000; border-right: 1.5px solid #000; border-top: 1px solid #000; border-bottom: 1px solid #000; padding: 2px 6px;">
+                        <table style="width: 100%; border-collapse: collapse; border: none;">
+                            <tr>
+                                <td style="width: 38%; border: none; padding: 0;">No Tiket</td>
+                                <td style="width: 4%; border: none; padding: 0; text-align: center;">:</td>
+                                <td style="border: none; padding: 0; font-weight: bold;">{{ $jurnal->no_tiket }}</td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+
+                <!-- BARIS 7: TGL TRANSAKSI -->
+                <tr>
+                    <td style="border-left: 1.5px solid #000; border-right: 1px solid #000; border-top: 1px solid #000; border-bottom: 1px solid #000; padding: 2px 6px;">
+                        <table style="width: 100%; border-collapse: collapse; border: none;">
+                            <tr>
+                                <td style="width: 38%; border: none; padding: 0;">Tgl Transaksi</td>
+                                <td style="width: 4%; border: none; padding: 0; text-align: center;">:</td>
+                                <td style="border: none; padding: 0; font-weight: bold;">{{ \Carbon\Carbon::parse($jurnal->tgl_transaksi)->translatedFormat('d F Y') }}</td>
+                            </tr>
+                        </table>
+                    </td>
+                    <td style="border: 1px solid #000;"></td>
+                    <td style="border: 1px solid #000;"></td>
+                    <td style="border: 1px solid #000;"></td>
+                    <td style="border: 1px solid #000;"></td>
+                    <td style="border: 1px solid #000;"></td>
+                    <td style="border-left: 1px solid #000; border-right: 1.5px solid #000; border-top: 1px solid #000; border-bottom: 1px solid #000; padding: 2px 6px;">
+                        <table style="width: 100%; border-collapse: collapse; border: none;">
+                            <tr>
+                                <td style="width: 38%; border: none; padding: 0;">Tgl Transaksi</td>
+                                <td style="width: 4%; border: none; padding: 0; text-align: center;">:</td>
+                                <td style="border: none; padding: 0; font-weight: bold;">{{ \Carbon\Carbon::parse($jurnal->tgl_transaksi)->translatedFormat('d F Y') }}</td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+
+                <!-- BARIS 8: JUMLAH TRANSAKSI & NOMINAL KREDIT -->
+                <tr>
+                    <td style="border-left: 1.5px solid #000; border-right: 1px solid #000; border-top: 1px solid #000; border-bottom: 1.5px solid #000; padding: 2px 6px;">
+                        <table style="width: 100%; border-collapse: collapse; border: none;">
+                            <tr>
+                                <td style="width: 38%; border: none; padding: 0;">Jumlah Transaksi</td>
+                                <td style="width: 4%; border: none; padding: 0; text-align: center;">:</td>
+                                <td style="border: none; padding: 0;"></td>
+                            </tr>
+                        </table>
+                    </td>
+                    <!-- KOLOM LEDGER DENGAN RP & NOMINAL -->
+                    <td style="border: 1px solid #000; border-bottom: 1.5px solid #000; padding: 2px; text-align: center; font-weight: bold;">Rp</td>
+                    <td style="border: 1px solid #000; border-bottom: 1.5px solid #000;"></td>
+                    <td style="border: 1px solid #000; border-bottom: 1.5px solid #000;"></td>
+                    <td colspan="2" style="border: 1px solid #000; border-bottom: 1.5px solid #000; padding: 2px 4px; text-align: right; font-weight: bold; white-space: nowrap;">{{ number_format($jurnal->nominal_transaksi, 0, ',', '.') }}</td>
+                    <!-- KREDIT NOMINAL (SEJAJAR DI BAWAH NILAI TGL TRANSAKSI) -->
+                    <td style="border-left: 1px solid #000; border-right: 1.5px solid #000; border-top: 1px solid #000; border-bottom: 1.5px solid #000; padding: 2px 6px;">
+                        <table style="width: 100%; border-collapse: collapse; border: none;">
+                            <tr>
+                                <td style="width: 38%; border: none; padding: 0;"></td>
+                                <td style="width: 4%; border: none; padding: 0;"></td>
+                                <td style="border: none; padding: 0; font-weight: bold;">
+                                    <div style="display: flex; justify-content: space-between;">
+                                        <span>Rp</span>
+                                        <span>{{ number_format($jurnal->nominal_transaksi, 0, ',', '.') }}</span>
+                                    </div>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+
+                <!-- BARIS 9: SPACER ROW DENGAN LEDGER GRID -->
+                <tr>
+                    <td style="border-left: 1.5px solid #000; border-right: 1px solid #000; border-top: 1.5px solid #000; border-bottom: 1px solid #000; height: 16px;">&nbsp;</td>
+                    <td style="border: 1px solid #000; border-top: 1.5px solid #000; height: 16px;"></td>
+                    <td style="border: 1px solid #000; border-top: 1.5px solid #000; height: 16px;"></td>
+                    <td style="border: 1px solid #000; border-top: 1.5px solid #000; height: 16px;"></td>
+                    <td style="border: 1px solid #000; border-top: 1.5px solid #000; height: 16px;"></td>
+                    <td style="border: 1px solid #000; border-top: 1.5px solid #000; height: 16px;"></td>
+                    <td style="border-left: 1px solid #000; border-right: 1.5px solid #000; border-top: 1.5px solid #000; border-bottom: 1px solid #000; height: 16px;">&nbsp;</td>
+                </tr>
+
+                <!-- BARIS 10: SPACER ROW DENGAN LEDGER GRID -->
+                <tr>
+                    <td style="border-left: 1.5px solid #000; border-right: 1px solid #000; border-top: 1px solid #000; border-bottom: 1px solid #000; height: 16px;">&nbsp;</td>
+                    <td style="border: 1px solid #000; height: 16px;"></td>
+                    <td style="border: 1px solid #000; height: 16px;"></td>
+                    <td style="border: 1px solid #000; height: 16px;"></td>
+                    <td style="border: 1px solid #000; height: 16px;"></td>
+                    <td style="border: 1px solid #000; height: 16px;"></td>
+                    <td style="border-left: 1px solid #000; border-right: 1.5px solid #000; border-top: 1px solid #000; border-bottom: 1px solid #000; height: 16px;">&nbsp;</td>
+                </tr>
+
+                <!-- BARIS 11: SPACER ROW DENGAN LEDGER GRID -->
+                <tr>
+                    <td style="border-left: 1.5px solid #000; border-right: 1px solid #000; border-top: 1px solid #000; border-bottom: 1px solid #000; height: 16px;">&nbsp;</td>
+                    <td style="border: 1px solid #000; height: 16px;"></td>
+                    <td style="border: 1px solid #000; height: 16px;"></td>
+                    <td style="border: 1px solid #000; height: 16px;"></td>
+                    <td style="border: 1px solid #000; height: 16px;"></td>
+                    <td style="border: 1px solid #000; height: 16px;"></td>
+                    <td style="border-left: 1px solid #000; border-right: 1.5px solid #000; border-top: 1px solid #000; border-bottom: 1px solid #000; height: 16px;">&nbsp;</td>
+                </tr>
+
+                <!-- BARIS 12: SPACER ROW DENGAN LEDGER GRID (RP -) -->
+                <tr>
+                    <td style="border-left: 1.5px solid #000; border-right: 1px solid #000; border-top: 1px solid #000; border-bottom: 1px solid #000; height: 16px;">&nbsp;</td>
+                    <td style="border: 1px solid #000; padding: 2px; text-align: center; font-weight: bold;">Rp</td>
+                    <td style="border: 1px solid #000;"></td>
+                    <td style="border: 1px solid #000;"></td>
+                    <td colspan="2" style="border: 1px solid #000; padding: 2px 4px; text-align: right; font-weight: bold; white-space: nowrap;">{{ number_format($jurnal->biaya_admin ?? $jurnal->masterTransaksi->biaya_admin ?? 0, 0, ',', '.') ?: '-' }}</td>
+                    <td style="border-left: 1px solid #000; border-right: 1.5px solid #000; border-top: 1px solid #000; border-bottom: 1px solid #000; height: 16px;">&nbsp;</td>
+                </tr>
+
+                <!-- BARIS 13: EXTRA SPACER ROW DENGAN LEDGER GRID -->
+                <tr>
+                    <td style="border-left: 1.5px solid #000; border-right: 1px solid #000; border-top: 1px solid #000; border-bottom: 1.5px solid #000; height: 16px;">&nbsp;</td>
+                    <td style="border: 1px solid #000; border-bottom: 1.5px solid #000; height: 16px;"></td>
+                    <td style="border: 1px solid #000; border-bottom: 1.5px solid #000; height: 16px;"></td>
+                    <td style="border: 1px solid #000; border-bottom: 1.5px solid #000; height: 16px;"></td>
+                    <td style="border: 1px solid #000; border-bottom: 1.5px solid #000; height: 16px;"></td>
+                    <td style="border: 1px solid #000; border-bottom: 1.5px solid #000; height: 16px;"></td>
+                    <td style="border-left: 1px solid #000; border-right: 1.5px solid #000; border-top: 1px solid #000; border-bottom: 1.5px solid #000; height: 16px;">&nbsp;</td>
+                </tr>
+
+                <!-- BARIS 14: FOOTER PEMBUKUAN & OTORISASI (PRESISI 1:1 SESUAI PDF) -->
+                <tr>
+                    <!-- BLOK KIRI: PEMBUKUAN & DIBUKUKAN (COLSPAN 6) -->
+                    <td colspan="6" style="border-left: 1.5px solid #000; border-right: 1px solid #000; border-top: 1.5px solid #000; border-bottom: 1.5px solid #000; padding: 0; vertical-align: top; height: 125px;">
+                        <table style="width: 100%; height: 100%; border-collapse: collapse; border: none; font-size: 10.5px;">
+                            <tr style="height: 22px;">
+                                <td colspan="2" style="width: 50%; text-align: center; font-weight: bold; border-right: 1px solid #000; border-bottom: 1px solid #000; padding: 2px 0;">Pembukuan</td>
+                                <td colspan="2" style="width: 50%; text-align: center; font-weight: bold; border-bottom: 1px solid #000; padding: 2px 0;">Dibukukan</td>
+                            </tr>
+                            <tr style="height: 22px;">
+                                <td style="width: 25%; text-align: center; border-right: 1px solid #000; border-bottom: 1px solid #000; padding: 2px 0;">Fiat</td>
+                                <td style="width: 25%; text-align: center; border-right: 1px solid #000; border-bottom: 1px solid #000; padding: 2px 0;">Kontr</td>
+                                <td style="width: 25%; text-align: center; border-right: 1px solid #000; border-bottom: 1px solid #000; padding: 2px 0;">Oleh</td>
+                                <td style="width: 25%; text-align: center; border-bottom: 1px solid #000; padding: 2px 0;">Tgl</td>
+                            </tr>
+                            <tr>
+                                <td style="border-right: 1px solid #000; height: 81px;"></td>
+                                <td style="border-right: 1px solid #000;"></td>
+                                <td style="border-right: 1px solid #000;"></td>
+                                <td></td>
+                            </tr>
+                        </table>
+                    </td>
+
+                    <!-- BLOK KANAN: DIBUAT/DITUGASKAN OLEH & PARAF TANGGAL (COLSPAN 1) -->
+                    <td style="border-left: 1px solid #000; border-right: 1.5px solid #000; border-top: 1.5px solid #000; border-bottom: 1.5px solid #000; padding: 0; vertical-align: top; height: 125px;">
+                        <table style="width: 100%; height: 100%; border-collapse: collapse; border: none; font-size: 10.5px;">
+                            <tr style="height: 25px;">
+                                <td style="width: 55%; text-align: center; font-weight: bold; border-right: 1px solid #000; border-bottom: 1px solid #000; padding: 2px 4px;">Dibuat/Ditugaskan Oleh</td>
+                                <td style="width: 45%; text-align: center; font-weight: bold; border-bottom: 1px solid #000; padding: 2px 4px;">Paraf & Tanggal</td>
+                            </tr>
+                            <tr style="height: 25px;">
+                                <td style="border-right: 1px solid #000; border-bottom: 1px solid #000; padding: 2px 6px;">pemimpin Divisi</td>
+                                <td style="border-bottom: 1px solid #000;"></td>
+                            </tr>
+                            <tr style="height: 25px;">
+                                <td style="border-right: 1px solid #000; border-bottom: 1px solid #000; padding: 2px 6px;">Pemimpin Bagian</td>
+                                <td style="border-bottom: 1px solid #000;"></td>
+                            </tr>
+                            <tr style="height: 25px;">
+                                <td style="border-right: 1px solid #000; border-bottom: 1px solid #000; padding: 2px 6px;">Pemimpin Unit</td>
+                                <td style="border-bottom: 1px solid #000;"></td>
+                            </tr>
+                            <tr style="height: 25px;">
+                                <td style="border-right: 1px solid #000; padding: 2px 6px; vertical-align: middle;">Staf</td>
+                                <td style="vertical-align: middle;"></td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
     </div>
 
-    <!-- Panggil Dialog Print Otomatis -->
     <script>
-        window.onload = function() {
-            window.print();
-        };
+        function handleKembali() {
+            if (window.opener && !window.opener.closed) {
+                window.close();
+            } else if (window.history.length > 1) {
+                window.history.back();
+            } else {
+                window.location.href = "{{ route('jurnal.index') }}";
+            }
+        }
     </script>
 </body>
 </html>
