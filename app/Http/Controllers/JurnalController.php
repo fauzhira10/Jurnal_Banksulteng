@@ -6,6 +6,8 @@ use App\Models\Jurnal;
 use App\Models\MasterAtm;
 use App\Models\MasterCabang;
 use App\Models\MasterTransaksi;
+use App\Models\Pengaduan;
+use App\Observers\JurnalObserver;
 use Illuminate\Http\Request;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
@@ -24,7 +26,7 @@ class JurnalController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Jurnal::with(['masterCabang', 'masterTransaksi']);
+        $query = Jurnal::with(['masterCabang', 'masterTransaksi', 'pengaduan:id,jurnal_id,nomor_pengaduan,status']);
 
         // 1. Filter Pencarian Keyword Multi-Field (Case-Insensitive & Multi-Word)
         if ($request->filled('q')) {
@@ -158,15 +160,48 @@ class JurnalController extends Controller
     }
 
     /**
-     * Menampilkan formulir input jurnal keluhan
+     * Menampilkan formulir input jurnal keluhan.
+     * Mendukung ?pengaduan={id} untuk mengisi otomatis dari pengaduan CS cabang.
      */
-    public function create()
+    public function create(Request $request)
     {
         $cabangs = MasterCabang::orderBy('kode_cabang')->get();
         $transaksis = MasterTransaksi::whereIn('id', range(1, 33))->orderBy('id')->get();
         $atmsGrouped = MasterAtm::getAtmsGroupedByCabang();
 
-        return view('jurnal_form', compact('cabangs', 'transaksis', 'atmsGrouped'));
+        $prefill = [];
+        $pengaduan = null;
+
+        if ($request->filled('pengaduan')) {
+            $pengaduan = Pengaduan::with(['cabang', 'transaksi', 'lampirans'])->find((int) $request->input('pengaduan'));
+
+            if ($pengaduan && $pengaduan->jurnal_id !== null) {
+                return redirect()
+                    ->route('admin.pengaduan.show', $pengaduan)
+                    ->with('error', "Pengaduan {$pengaduan->nomor_pengaduan} sudah tertaut ke jurnal keluhan.");
+            }
+
+            if ($pengaduan) {
+                $prefill = [
+                    'pengaduan_id'        => $pengaduan->id,
+                    'nama_nasabah'        => $pengaduan->nama_nasabah,
+                    'no_rekening'         => $pengaduan->no_rekening,
+                    'no_resi'             => $pengaduan->no_resi,
+                    'no_kartu'            => $pengaduan->no_kartu ?? '',
+                    'no_tiket'            => $pengaduan->nomor_pengaduan,
+                    'master_cabang_id'    => $pengaduan->master_cabang_id,
+                    'master_transaksi_id' => $pengaduan->master_transaksi_id,
+                    'channel'             => $pengaduan->channel,
+                    'terminal_transaksi'  => $pengaduan->terminal_transaksi ?? '',
+                    'nominal_transaksi'   => (float) $pengaduan->nominal_transaksi,
+                    'tgl_transaksi'       => optional($pengaduan->tgl_transaksi)->format('Y-m-d'),
+                    'tgl_terima'          => now()->format('Y-m-d'),
+                    'permasalahan'        => strtoupper($pengaduan->kategoriLengkap()),
+                ];
+            }
+        }
+
+        return view('jurnal_form', compact('cabangs', 'transaksis', 'atmsGrouped', 'prefill', 'pengaduan'));
     }
 
     /**
@@ -190,12 +225,24 @@ class JurnalController extends Controller
             'tgl_selesai'        => 'required|date',
             'status'             => 'required|string|max:50',
             'permasalahan'       => 'nullable|string|max:255',
-            'keterangan_log'     => 'nullable|string'
+            'keterangan_log'     => 'nullable|string',
+            'pengaduan_id'       => 'nullable|integer|exists:pengaduans,id'
         ], [
             'no_resi.unique' => 'Gagal! Keluhan atas nama nasabah ini dengan No. Resi dan Tanggal tersebut sudah pernah dijurnal.'
         ]);
 
-        $data = $request->all();
+        // Pengaduan CS cabang yang menjadi sumber (opsional)
+        $pengaduanSumber = null;
+        if ($request->filled('pengaduan_id')) {
+            $pengaduanSumber = Pengaduan::find($request->pengaduan_id);
+            if ($pengaduanSumber && $pengaduanSumber->jurnal_id !== null) {
+                return back()->withInput()->withErrors([
+                    'pengaduan_id' => "Pengaduan {$pengaduanSumber->nomor_pengaduan} sudah tertaut ke jurnal lain."
+                ]);
+            }
+        }
+
+        $data = $request->except('pengaduan_id');
         $data['nama_nasabah'] = strtoupper(trim($request->nama_nasabah));
         $data['biaya_admin'] = $request->filled('biaya_admin') ? (float)$request->biaya_admin : 0;
         $data['status'] = $request->filled('status') ? $request->status : '-';
@@ -224,8 +271,21 @@ class JurnalController extends Controller
 
         $jurnal = Jurnal::create($data);
 
-        return redirect()->route('jurnal.preview', $jurnal->id)
-            ->with('success', 'Jurnal keluhan nasabah berhasil disimpan!');
+        // Tautkan ke pengaduan CS cabang → status pengaduan menjadi "Diproses"
+        if ($pengaduanSumber) {
+            $pengaduanSumber->fill([
+                'diterima_oleh' => $pengaduanSumber->diterima_oleh ?? $request->user()->id,
+                'diterima_at'   => $pengaduanSumber->diterima_at ?? now(),
+            ])->save();
+
+            JurnalObserver::sinkronkan($pengaduanSumber, $jurnal);
+
+            return redirect()->route('admin.pengaduan.show', $pengaduanSumber)
+                ->with('success', "Jurnal keluhan atas nama {$jurnal->nama_nasabah} berhasil disimpan dan pengaduan {$pengaduanSumber->nomor_pengaduan} kini berstatus Dalam Proses.");
+        }
+
+        return redirect()->route('jurnal.index')
+            ->with('success', "Data jurnal keluhan atas nama {$jurnal->nama_nasabah} berhasil disimpan!");
     }
 
     /**
@@ -233,7 +293,7 @@ class JurnalController extends Controller
      */
     public function preview($id)
     {
-        $jurnal = Jurnal::with(['masterCabang', 'masterTransaksi'])->findOrFail($id);
+        $jurnal = Jurnal::with(['masterCabang', 'masterTransaksi', 'pengaduan.cabang', 'pengaduan.lampirans'])->findOrFail($id);
         
         // Memanfaatkan logic penamaan ATM
         $atmsGrouped = MasterAtm::getAtmsGroupedByCabang();
@@ -289,7 +349,7 @@ class JurnalController extends Controller
      */
     public function getDetailJurnal($id)
     {
-        $jurnal = Jurnal::with(['masterCabang', 'masterTransaksi'])->find($id);
+        $jurnal = Jurnal::with(['masterCabang', 'masterTransaksi', 'pengaduan:id,jurnal_id,nomor_pengaduan,status'])->find($id);
         return response()->json($jurnal);
     }
 
@@ -298,7 +358,7 @@ class JurnalController extends Controller
      */
     public function edit($id)
     {
-        $jurnal = Jurnal::with(['masterCabang', 'masterTransaksi'])->findOrFail($id);
+        $jurnal = Jurnal::with(['masterCabang', 'masterTransaksi', 'pengaduan.cabang', 'pengaduan.lampirans'])->findOrFail($id);
         $cabangs = MasterCabang::orderBy('kode_cabang')->get();
         $transaksis = MasterTransaksi::whereIn('id', range(1, 33))->orderBy('id')->get();
         $atmsGrouped = MasterAtm::getAtmsGroupedByCabang();
@@ -1532,6 +1592,18 @@ class JurnalController extends Controller
         $deletedCount = Jurnal::count();
         Jurnal::query()->delete();
 
+        // 1b. Mass delete tidak memicu observer → kembalikan pengaduan CS yang tertaut ke status "Diterima"
+        Pengaduan::whereIn('status', [
+            \App\Enums\PengaduanStatus::Diproses->value,
+            \App\Enums\PengaduanStatus::Selesai->value,
+        ])->update([
+            'jurnal_id'   => null,
+            'status'      => \App\Enums\PengaduanStatus::Diterima->value,
+            'diproses_at' => null,
+            'selesai_at'  => null,
+            'ditolak_at'  => null,
+        ]);
+
         // 2. Hapus file master template jika dipilih
         $resetTemplate = $request->boolean('delete_template', true);
         if ($resetTemplate) {
@@ -1997,44 +2069,50 @@ class JurnalController extends Controller
         $permasalahan = strtoupper(trim($jurnal->permasalahan ?? ''));
         $logOptions = config('keluhan_logs.atm_lokal', []);
 
-        // 1. EDC / DEBIT / EDC BANK LAIN (Prioritas utama untuk semua jenis EDC)
-        if (str_contains($jenis, 'EDC') || str_contains($channel, 'EDC') || str_contains($permasalahan, 'EDC') || $channel === 'DEBIT' || $channel === 'EDC BANK LAIN') {
-            return view('cetak.edc', compact('jurnal'));
+        // 1. MOBILE BANKING / DIGI / BPJS / DANA (M-Banking Pembayaran, Transfer, Pulsa, PLN, BPJS, DANA, Top Up, dll.)
+        if (
+            str_contains($channel, 'MOBILE') || str_contains($channel, 'MBANKING') || str_contains($channel, 'M-BANKING') || str_contains($channel, 'DIGI') ||
+            str_contains($jenis, 'MBANKING') || str_contains($jenis, 'M-BANKING') || str_contains($jenis, 'MOBILE BANKING') || str_contains($jenis, 'DIGI') ||
+            str_contains($jenis, 'BPJS') || str_contains($channel, 'BPJS') || str_contains($permasalahan, 'BPJS') ||
+            str_contains($jenis, 'DANA') || str_contains($channel, 'DANA') || str_contains($permasalahan, 'DANA') ||
+            str_contains($permasalahan, 'MBANKING') || str_contains($permasalahan, 'M-BANKING') || str_contains($permasalahan, 'MOBILE BANKING') || str_contains($permasalahan, 'DIGI')
+        ) {
+            return view('cetak.mbanking', compact('jurnal'));
         }
 
-        // 2. QRIS (Prioritas utama jika jenis transaksi, channel, atau permasalahan mengandung QRIS)
+        // 2. QRIS (Prioritas jika jenis transaksi, channel, atau permasalahan mengandung QRIS)
         if (str_contains($jenis, 'QRIS') || str_contains($channel, 'QRIS') || str_contains($permasalahan, 'QRIS')) {
             return view('cetak.qris', compact('jurnal'));
         }
 
-        // 3. ATM LINK
+        // 3. EDC / DEBIT / EDC BANK LAIN (Untuk semua jenis EDC)
+        if (str_contains($jenis, 'EDC') || str_contains($channel, 'EDC') || str_contains($permasalahan, 'EDC') || $channel === 'DEBIT' || $channel === 'EDC BANK LAIN') {
+            return view('cetak.edc', compact('jurnal'));
+        }
+
+        // 4. ATM LINK
         if (str_contains($jenis, 'LINK') || $channel === 'ATM LINK') {
             return view('cetak.link', compact('jurnal'));
         }
 
-        // 4. ATM BERSAMA
+        // 5. ATM BERSAMA
         if (str_contains($jenis, 'BERSAMA') || str_contains($jenis, 'BANK LAIN') || $channel === 'ATM BERSAMA') {
             return view('cetak.atmb', compact('jurnal'));
         }
 
-        // 5. SMS BANKING
+        // 6. SMS BANKING
         if (str_contains($jenis, 'SMS') || $channel === 'SMS BANKING') {
             return view('cetak.sms', compact('jurnal'));
         }
 
-        // 6. CCTV
+        // 7. CCTV
         if (str_contains($jenis, 'CCTV') || $channel === 'CCTV') {
             return view('cetak.cctv', compact('jurnal'));
         }
 
-        // 7. FINNET / PULSA
-        if (str_contains($jenis, 'FINNET') || str_contains($jenis, 'PULSA') || $channel === 'FINNET' || $channel === 'PULSA') {
+        // 8. FINNET / PULSA ATM / PLN PREPAID
+        if (str_contains($jenis, 'FINNET') || str_contains($jenis, 'PULSA') || str_contains($jenis, 'PLN') || str_contains($jenis, 'PREPAID') || str_contains($jenis, 'LISTRIK') || $channel === 'FINNET' || $channel === 'PULSA' || $channel === 'PLN') {
             return view('cetak.pulsa', compact('jurnal'));
-        }
-
-        // 8. MOBILE BANKING
-        if (str_contains($jenis, 'MBANKING') || str_contains($jenis, 'M-BANKING') || $channel === 'MOBILE BANKING' || $channel === 'M-BANKING') {
-            return view('cetak.mbanking', compact('jurnal'));
         }
 
         // 9. ATM LOKAL & DEFAULT

@@ -544,6 +544,10 @@
                         <div class="detail-label">Cabang Pelapor / Transaksi</div>
                         <div class="detail-value" id="modal_cabang">-</div>
                     </div>
+                    <div class="detail-item" id="modal_pengaduan_wrap" style="display: none;">
+                        <div class="detail-label">Sumber Pengaduan CS Cabang</div>
+                        <div class="detail-value" id="modal_pengaduan">-</div>
+                    </div>
                 </div>
             </div>
 
@@ -1115,15 +1119,6 @@
                     </svg>
                     <span><strong>Peringatan Kritis:</strong> Seluruh baris transaksi yang telah terdaftar saat ini akan dihapus secara permanen. Anda dapat mengimpor kembali berkas Master Excel yang baru setelah proses ini selesai.</span>
                 </div>
-
-                <!-- Opsi Hapus Master Template -->
-                <div style="display: flex; align-items: flex-start; gap: 10px; background: #f8fafc; padding: 12px 14px; border-radius: var(--radius-md); border: 1px solid var(--bs-gray-200);">
-                    <input type="checkbox" id="chkDeleteTemplate" name="delete_template" value="1" checked style="margin-top: 3px; cursor: pointer; width: 16px; height: 16px;">
-                    <label for="chkDeleteTemplate" style="font-size: 12.5px; color: var(--bs-gray-700); cursor: pointer; margin: 0; line-height: 1.4;">
-                        <strong>Hapus juga berkas Master Template tersimpan</strong><br>
-                        <span style="color: var(--bs-gray-500);">Mengembalikan template ekspor ke format bawaan default sistem Bank Sulteng.</span>
-                    </label>
-                </div>
             </div>
 
             <div class="modal-footer" style="background-color: #fafafa; border-top: 1px solid var(--bs-gray-200); padding: 16px 24px; display: flex; justify-content: flex-end; gap: 10px;">
@@ -1669,7 +1664,19 @@
             cabangText = (cCode && cName.toUpperCase().trim() !== 'CALL CENTER') ? `${cCode} - ${cName}` : cName;
         }
         document.getElementById('modal_cabang').textContent = cabangText;
-        
+
+        // Tautan ke pengaduan CS cabang (jika jurnal bersumber dari pengaduan)
+        const pengaduanWrap = document.getElementById('modal_pengaduan_wrap');
+        const pengaduanEl = document.getElementById('modal_pengaduan');
+        if (jurnal.pengaduan && jurnal.pengaduan.id) {
+            const nomor = escapeHtml(jurnal.pengaduan.nomor_pengaduan || ('#' + jurnal.pengaduan.id));
+            pengaduanEl.innerHTML = `<a href="{{ url('/pengaduan-masuk') }}/${jurnal.pengaduan.id}" target="_blank" style="color: var(--bs-blue); font-weight: 700; font-family: monospace; text-decoration: underline;">${nomor}</a> <span style="font-size: 11px; color: #64748b;">(${escapeHtml(jurnal.pengaduan.status || '-')})</span>`;
+            pengaduanWrap.style.display = '';
+        } else {
+            pengaduanEl.textContent = '-';
+            pengaduanWrap.style.display = 'none';
+        }
+
         document.getElementById('modal_jenis_transaksi').textContent = (jurnal.master_transaksi ? jurnal.master_transaksi.jenis_transaksi : '-');
         document.getElementById('modal_channel').textContent = (jurnal.master_transaksi ? jurnal.master_transaksi.channel : '-');
         

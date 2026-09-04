@@ -16,7 +16,28 @@
 @endsection
 
 @section('content')
+@php
+    $prefill = $prefill ?? [];
+    $pengaduan = $pengaduan ?? null;
+@endphp
 <div class="max-w-[950px] mx-auto">
+    @if($pengaduan)
+        <div class="bg-sky-50 border border-sky-200 text-sky-900 rounded-xl p-4 mb-5 text-[13px] flex items-start gap-3 shadow-xs">
+            <span class="text-lg leading-none">📨</span>
+            <div class="grow min-w-0">
+                <div class="font-bold">Diisi otomatis dari pengaduan <span class="font-mono">{{ $pengaduan->nomor_pengaduan }}</span> — {{ $pengaduan->labelCabang() }}</div>
+                <div class="text-[12px] text-sky-800 mt-0.5">Pelapor: {{ $pengaduan->nama_pelapor }} &bull; Kategori: {{ $pengaduan->kategoriLengkap() }}. Periksa kembali seluruh isian, lengkapi No. Tiket / biaya admin, lalu simpan. Status pengaduan di sisi CS otomatis menjadi <strong>Dalam Proses</strong>.</div>
+                @if($pengaduan->lampirans->isNotEmpty())
+                    <div class="flex flex-wrap gap-1.5 mt-2">
+                        @foreach($pengaduan->lampirans as $l)
+                            <a href="{{ route('pengaduan.lampiran.show', [$pengaduan, $l]) }}" target="_blank" class="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-white border border-sky-200 text-[11px] font-semibold text-navy hover:border-brand-blue" title="{{ $l->nama_asli }}">{{ $l->ikon() }} {{ $l->label() }} <span class="text-slate-400 font-normal">{{ $l->labelFormat() }}</span></a>
+                        @endforeach
+                    </div>
+                @endif
+                <a href="{{ route('admin.pengaduan.show', $pengaduan) }}" class="inline-block mt-2 text-[12px] font-bold text-brand-blue hover:underline">Lihat detail pengaduan & kronologi →</a>
+            </div>
+        </div>
+    @endif
     <div class="bg-white rounded-2xl border border-slate-200 shadow-xs mb-6 overflow-hidden">
         <div class="px-6 py-4.5 border-b border-slate-200 flex items-center justify-between bg-white flex-wrap gap-2">
             <div class="text-base font-bold text-navy flex items-center gap-2.5">
@@ -36,6 +57,9 @@
         <div class="p-6">
             <form action="{{ route('jurnal.store') }}" method="POST">
                 @csrf
+                @if(!empty($prefill['pengaduan_id']))
+                    <input type="hidden" name="pengaduan_id" value="{{ $prefill['pengaduan_id'] }}">
+                @endif
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                     <!-- SECTION 1: IDENTITAS NASABAH -->
@@ -50,31 +74,31 @@
                     <!-- Nama Nasabah -->
                     <div class="flex flex-col gap-1.5">
                         <label class="font-semibold text-[13px] text-slate-700 flex items-center gap-1">Nama Nasabah <span class="text-rose-600 font-bold">*</span></label>
-                        <input type="text" name="nama_nasabah" value="{{ old('nama_nasabah') }}" required placeholder="Contoh: BUDI SANTOSO" class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm bg-white text-slate-800 placeholder-slate-400 uppercase transition-all duration-200 focus:border-brand-blue focus:ring-3 focus:ring-brand-blue/15 focus:outline-none" oninput="this.value = this.value.toUpperCase()">
+                        <input type="text" name="nama_nasabah" value="{{ old('nama_nasabah', $prefill['nama_nasabah'] ?? '') }}" required placeholder="Contoh: BUDI SANTOSO" class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm bg-white text-slate-800 placeholder-slate-400 uppercase transition-all duration-200 focus:border-brand-blue focus:ring-3 focus:ring-brand-blue/15 focus:outline-none" oninput="this.value = this.value.toUpperCase()">
                     </div>
 
                     <!-- No. Rekening -->
                     <div class="flex flex-col gap-1.5">
                         <label class="font-semibold text-[13px] text-slate-700 flex items-center gap-1">No. Rekening <span class="text-rose-600 font-bold">*</span></label>
-                        <input type="text" name="no_rekening" value="{{ old('no_rekening') }}" required placeholder="Contoh: 00900000" class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm bg-white text-slate-800 placeholder-slate-400 transition-all duration-200 focus:border-brand-blue focus:ring-3 focus:ring-brand-blue/15 focus:outline-none">
+                        <input type="text" name="no_rekening" value="{{ old('no_rekening', $prefill['no_rekening'] ?? '') }}" required placeholder="Contoh: 00900000" class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm bg-white text-slate-800 placeholder-slate-400 transition-all duration-200 focus:border-brand-blue focus:ring-3 focus:ring-brand-blue/15 focus:outline-none">
                     </div>
 
                     <!-- No. Resi / Trace Number -->
                     <div class="flex flex-col gap-1.5">
                         <label class="font-semibold text-[13px] text-slate-700 flex items-center gap-1">No. Resi / Trace Number <span class="text-rose-600 font-bold">*</span></label>
-                        <input type="text" name="no_resi" value="{{ old('no_resi') }}" required placeholder="Contoh: 00000000" class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm bg-white text-slate-800 placeholder-slate-400 transition-all duration-200 focus:border-brand-blue focus:ring-3 focus:ring-brand-blue/15 focus:outline-none">
+                        <input type="text" name="no_resi" value="{{ old('no_resi', $prefill['no_resi'] ?? '') }}" required placeholder="Contoh: 00000000" class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm bg-white text-slate-800 placeholder-slate-400 transition-all duration-200 focus:border-brand-blue focus:ring-3 focus:ring-brand-blue/15 focus:outline-none">
                     </div>
 
                     <!-- Nomor Kartu -->
                     <div class="flex flex-col gap-1.5">
                         <label class="font-semibold text-[13px] text-slate-700 flex items-center gap-1">Nomor Kartu ATM/Debit <span class="text-rose-600 font-bold">*</span></label>
-                        <input type="text" name="no_kartu" value="{{ old('no_kartu') }}" required placeholder="Contoh: 6019xxxxxxxxxxxx" class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm bg-white text-slate-800 placeholder-slate-400 transition-all duration-200 focus:border-brand-blue focus:ring-3 focus:ring-brand-blue/15 focus:outline-none">
+                        <input type="text" name="no_kartu" value="{{ old('no_kartu', $prefill['no_kartu'] ?? '') }}" required placeholder="Contoh: 6019xxxxxxxxxxxx" class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm bg-white text-slate-800 placeholder-slate-400 transition-all duration-200 focus:border-brand-blue focus:ring-3 focus:ring-brand-blue/15 focus:outline-none">
                     </div>
 
                     <!-- Nomor Tiket -->
                     <div class="md:col-span-2 flex flex-col gap-1.5">
                         <label class="font-semibold text-[13px] text-slate-700 flex items-center gap-1">Nomor Tiket CS <span class="text-rose-600 font-bold">*</span></label>
-                        <input type="text" name="no_tiket" value="{{ old('no_tiket') }}" required placeholder="Contoh: BS-20260001" class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm bg-white text-slate-800 placeholder-slate-400 transition-all duration-200 focus:border-brand-blue focus:ring-3 focus:ring-brand-blue/15 focus:outline-none">
+                        <input type="text" name="no_tiket" value="{{ old('no_tiket', $prefill['no_tiket'] ?? '') }}" required placeholder="Contoh: BS-20260001" class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm bg-white text-slate-800 placeholder-slate-400 transition-all duration-200 focus:border-brand-blue focus:ring-3 focus:ring-brand-blue/15 focus:outline-none">
                     </div>
 
                     <!-- SECTION 2: DETAIL TRANSAKSI & KANTOR CABANG -->
@@ -92,7 +116,7 @@
                         <select name="master_cabang_id" id="cabang_id" required class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm bg-white text-slate-800 transition-all duration-200 focus:border-brand-blue focus:ring-3 focus:ring-brand-blue/15 focus:outline-none">
                             <option value="">-- Pilih Kantor Cabang --</option>
                             @foreach($cabangs as $c)
-                                <option value="{{ $c->id }}" data-kode="{{ $c->kode_cabang ?? '' }}" data-nama="{{ $c->nama_cabang }}" {{ old('master_cabang_id') == $c->id ? 'selected' : '' }}>
+                                <option value="{{ $c->id }}" data-kode="{{ $c->kode_cabang ?? '' }}" data-nama="{{ $c->nama_cabang }}" {{ old('master_cabang_id', $prefill['master_cabang_id'] ?? '') == $c->id ? 'selected' : '' }}>
                                     {{ !empty($c->kode_cabang) && strtoupper(trim($c->nama_cabang)) !== 'CALL CENTER' ? $c->kode_cabang . ' - ' : '' }}{{ $c->nama_cabang }}
                                 </option>
                             @endforeach
@@ -105,7 +129,7 @@
                         <select name="master_transaksi_id" id="transaksi_id" required class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm bg-white text-slate-800 transition-all duration-200 focus:border-brand-blue focus:ring-3 focus:ring-brand-blue/15 focus:outline-none">
                             <option value="">-- Pilih Jenis Transaksi --</option>
                             @foreach($transaksis as $t)
-                                <option value="{{ $t->id }}" {{ old('master_transaksi_id') == $t->id ? 'selected' : '' }}>
+                                <option value="{{ $t->id }}" {{ old('master_transaksi_id', $prefill['master_transaksi_id'] ?? '') == $t->id ? 'selected' : '' }}>
                                     {{ $t->jenis_transaksi }}
                                 </option>
                             @endforeach
@@ -132,7 +156,7 @@
                                     'CCTV',
                                     'ATM'
                                 ];
-                                $selectedChannel = old('channel');
+                                $selectedChannel = old('channel', $prefill['channel'] ?? '');
                             @endphp
                             @foreach($channelsList as $ch)
                                 <option value="{{ $ch }}" {{ $selectedChannel == $ch ? 'selected' : '' }}>{{ $ch }}</option>
@@ -254,7 +278,7 @@
                             <span class="inline-flex items-center px-3.5 py-2.5 bg-slate-50 text-slate-500 font-semibold text-xs border-r border-slate-200 select-none">
                                 Rp
                             </span>
-                            <input type="number" name="nominal_transaksi" value="{{ old('nominal_transaksi') }}" required placeholder="Contoh: 1000000" min="0" step="any" class="block w-full px-3.5 py-2.5 text-sm bg-white text-slate-800 placeholder-slate-400 border-0 focus:outline-none focus:ring-0">
+                            <input type="number" name="nominal_transaksi" value="{{ old('nominal_transaksi', $prefill['nominal_transaksi'] ?? '') }}" required placeholder="Contoh: 1000000" min="0" step="any" class="block w-full px-3.5 py-2.5 text-sm bg-white text-slate-800 placeholder-slate-400 border-0 focus:outline-none focus:ring-0">
                         </div>
                     </div>
 
@@ -283,13 +307,13 @@
                     <!-- Tanggal Transaksi -->
                     <div class="flex flex-col gap-1.5">
                         <label class="font-semibold text-[13px] text-slate-700 flex items-center gap-1">Tanggal Transaksi Bermasalah <span class="text-rose-600 font-bold">*</span></label>
-                        <input type="date" name="tgl_transaksi" value="{{ old('tgl_transaksi') }}" required class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm bg-white text-slate-800 transition-all duration-200 focus:border-brand-blue focus:ring-3 focus:ring-brand-blue/15 focus:outline-none">
+                        <input type="date" name="tgl_transaksi" value="{{ old('tgl_transaksi', $prefill['tgl_transaksi'] ?? '') }}" required class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm bg-white text-slate-800 transition-all duration-200 focus:border-brand-blue focus:ring-3 focus:ring-brand-blue/15 focus:outline-none">
                     </div>
 
                     <!-- Tanggal Terima -->
                     <div class="flex flex-col gap-1.5">
                         <label class="font-semibold text-[13px] text-slate-700 flex items-center gap-1">Tanggal Terima Keluhan <span class="text-rose-600 font-bold">*</span></label>
-                        <input type="date" name="tgl_terima" value="{{ old('tgl_terima', date('Y-m-d')) }}" required class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm bg-white text-slate-800 transition-all duration-200 focus:border-brand-blue focus:ring-3 focus:ring-brand-blue/15 focus:outline-none">
+                        <input type="date" name="tgl_terima" value="{{ old('tgl_terima', $prefill['tgl_terima'] ?? date('Y-m-d')) }}" required class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm bg-white text-slate-800 transition-all duration-200 focus:border-brand-blue focus:ring-3 focus:ring-brand-blue/15 focus:outline-none">
                     </div>
 
                     <!-- Tanggal Selesai -->
@@ -316,7 +340,7 @@
                     <!-- Keterangan Keluhan -->
                     <div class="md:col-span-2 flex flex-col gap-1.5">
                         <label class="font-semibold text-[13px] text-slate-700">Keterangan Keluhan</label>
-                        <input type="text" name="permasalahan" value="{{ old('permasalahan') }}" placeholder="Contoh: TARIK TUNAI ATM LOKAL GAGAL, SALDO TERDEBET" class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm bg-white text-slate-800 placeholder-slate-400 uppercase transition-all duration-200 focus:border-brand-blue focus:ring-3 focus:ring-brand-blue/15 focus:outline-none" oninput="this.value = this.value.toUpperCase()">
+                        <input type="text" name="permasalahan" value="{{ old('permasalahan', $prefill['permasalahan'] ?? '') }}" placeholder="Contoh: TARIK TUNAI ATM LOKAL GAGAL, SALDO TERDEBET" class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm bg-white text-slate-800 placeholder-slate-400 uppercase transition-all duration-200 focus:border-brand-blue focus:ring-3 focus:ring-brand-blue/15 focus:outline-none" oninput="this.value = this.value.toUpperCase()">
                     </div>
 
                     <!-- Keterangan Log -->
@@ -361,7 +385,7 @@
     const terminalSelect = document.getElementById('terminal_transaksi');
     const helperText = document.getElementById('terminalHelperText');
     const atmsGrouped = @json($atmsGrouped);
-    const initialTerminalVal = @json(old('terminal_transaksi', ''));
+    const initialTerminalVal = @json(old('terminal_transaksi', $prefill['terminal_transaksi'] ?? ''));
 
     // ==========================================
     // BIAYA ADMIN COMBOBOX COMPONENT (7-PHASE)

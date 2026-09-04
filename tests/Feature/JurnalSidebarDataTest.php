@@ -8,23 +8,22 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 uses(RefreshDatabase::class);
 
 test('halaman formulir jurnal keluhan dapat diakses dan memuat sidebar', function () {
-    $response = $this->get('/');
+    $response = $this->actingAs(buatAdmin())->get('/jurnal/input');
 
     $response->assertStatus(200);
     $response->assertSee('E-JURNAL KELUHAN');
     $response->assertSee('Input Jurnal Keluhan');
     $response->assertSee('Data Keluhan');
-    $response->assertSee('Formulir Pengaduan & Jurnal Transaksi');
+    $response->assertSee('Formulir Pengaduan & Jurnal Transaksi', false);
 });
 
 test('halaman data keluhan dapat diakses dan menampilkan filter serta statistik', function () {
-    $response = $this->get('/jurnal/data');
+    $response = $this->actingAs(buatAdmin())->get('/jurnal/data');
 
     $response->assertStatus(200);
     $response->assertSee('E-JURNAL KELUHAN');
     $response->assertSee('Data Jurnal Keluhan');
-    $response->assertSee('Filter & Pencarian Jurnal');
-    $response->assertSee('Total Keluhan');
+    $response->assertSee('Pencarian & Filter Data Keluhan', false);
     $response->assertSee('Menunggu');
     $response->assertSee('Success');
     $response->assertSee('Done');
@@ -43,7 +42,7 @@ test('api auto-fill transaksi mengembalikan biaya admin dan channel', function (
         'biaya_admin' => 0
     ]);
 
-    $response = $this->getJson("/api/transaksi/{$transaksi->id}");
+    $response = $this->actingAs(buatAdmin())->getJson("/api/transaksi/{$transaksi->id}");
 
     $response->assertStatus(200);
     $response->assertJson([
@@ -54,6 +53,8 @@ test('api auto-fill transaksi mengembalikan biaya admin dan channel', function (
 });
 
 test('dapat menyimpan jurnal keluhan baru dan tertera pada halaman data keluhan', function () {
+    $admin = buatAdmin();
+
     $cabang = MasterCabang::create([
         'kode_cabang' => '002',
         'nama_cabang' => 'KCP Tinombo'
@@ -73,7 +74,7 @@ test('dapat menyimpan jurnal keluhan baru dan tertera pada halaman data keluhan'
         'no_tiket'           => 'TKT-2026-TEST',
         'tgl_terima'         => '2026-08-20',
         'tgl_transaksi'      => '2026-08-19',
-        'tgl_selesai'        => null,
+        'tgl_selesai'        => '2026-08-21',
         'master_cabang_id'   => $cabang->id,
         'master_transaksi_id'=> $transaksi->id,
         'terminal_transaksi' => 'ATM-TINOMBO-01',
@@ -82,15 +83,15 @@ test('dapat menyimpan jurnal keluhan baru dan tertera pada halaman data keluhan'
         'status'             => 'Menunggu',
     ];
 
-    $response = $this->post('/jurnal/simpan', $postData);
+    $response = $this->actingAs($admin)->post('/jurnal/simpan', $postData);
 
     $response->assertRedirect('/jurnal/data');
     $response->assertSessionHas('success');
 
     // Cek di halaman data keluhan
-    $dataResponse = $this->get('/jurnal/data?q=12345678');
+    $dataResponse = $this->actingAs($admin)->get('/jurnal/data?q=12345678');
     $dataResponse->assertStatus(200);
-    $dataResponse->assertSee('Ahmad Rifai');
+    $dataResponse->assertSee('AHMAD RIFAI');
     $dataResponse->assertSee('12345678');
     $dataResponse->assertSee('500.000');
 });

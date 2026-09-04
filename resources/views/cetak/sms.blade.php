@@ -178,6 +178,27 @@
             margin: 12mm 15mm;
         }
 
+        /* Editable Text Element on Slip */
+        .editable-text {
+            display: inline-block;
+            min-width: 140px;
+            padding: 2px 6px;
+            border-radius: 4px;
+            cursor: text;
+            transition: all 0.2s ease;
+        }
+
+        .editable-text:hover {
+            background-color: #fef08a;
+            box-shadow: 0 0 0 1.5px #ca8a04;
+        }
+
+        .editable-text:focus {
+            background-color: #fef9c3;
+            box-shadow: 0 0 0 2px #0284c7;
+            outline: none;
+        }
+
         @media print {
             .no-print { display: none !important; }
             html, body { padding: 0 !important; margin: 0 !important; background: none !important; }
@@ -189,6 +210,13 @@
                 margin: 0 auto !important;
                 box-shadow: none !important;
             }
+            .editable-text {
+                background: transparent !important;
+                box-shadow: none !important;
+                outline: none !important;
+                border: none !important;
+                padding: 0 !important;
+            }
             .page-break { page-break-before: always; }
         }
     </style>
@@ -198,6 +226,10 @@
     <!-- Tombol Navigasi Layar -->
     <div class="no-print">
         <button type="button" onclick="handleKembali()" class="btn btn-back">⬅ Kembali</button>
+        <div style="text-align: center;">
+            <span style="font-weight: bold; font-size: 13px; color: #1e293b; display: block;">📄 Cetak Keluhan & Slip SMS Banking &mdash; No. Tiket: {{ $jurnal->no_tiket }}</span>
+            <span style="font-size: 11px; color: #0369a1; background: #e0f2fe; padding: 2px 8px; border-radius: 12px; font-weight: 600; display: inline-block; margin-top: 3px;">✏️ Nama akun & no. rekening penampungan pada slip dapat diklik untuk diedit langsung</span>
+        </div>
         <button onclick="window.print()" class="btn btn-print">🖨️ Cetak Form & Slip Jurnal</button>
     </div>
 
@@ -425,8 +457,12 @@
                 <tr>
                     <!-- DEBET UTAMA: SMS BANKING -->
                     <td style="padding: 10px;">
-                        <div style="font-weight: bold; text-align: center; margin-bottom: 4px;">PENAMPUNGAN SELISIH ATM BERSAMA</div>
-                        <div style="font-weight: bold; text-align: center; margin-bottom: 12px;">000.00.2310527.003.360</div>
+                        <div style="font-weight: bold; text-align: center; margin-bottom: 4px;">
+                            <span class="editable-text" contenteditable="true" spellcheck="false" title="Klik untuk mengedit Nama Akun Penampungan">PENAMPUNGAN SELISIH ATM BERSAMA</span>
+                        </div>
+                        <div style="font-weight: bold; text-align: center; margin-bottom: 12px;">
+                            <span class="editable-text" contenteditable="true" spellcheck="false" title="Klik untuk mengedit Nomor Rekening Penampungan">000.00.2310527.003.360</span>
+                        </div>
 
                         <div style="margin-left: 10px; line-height: 1.6;">
                             <div>Rev. Transaksi SMS Banking</div>
@@ -549,13 +585,12 @@
 
     <script>
         function handleKembali() {
-            if (window.opener && !window.opener.closed) {
-                window.close();
-            } else if (window.history.length > 1) {
-                window.history.back();
-            } else {
-                window.location.href = "{{ route('jurnal.index') }}";
-            }
+            window.close();
+            setTimeout(function() {
+                if (!window.closed) {
+                    window.location.href = "{{ route('jurnal.index') }}";
+                }
+            }, 150);
         }
     </script>
 </body>

@@ -58,14 +58,67 @@ Projek **Jurnal_Banksulteng** adalah aplikasi web berbasis **Laravel 12/13** yan
 
 ---
 
-## 🔑 3. Kredensial Administrator
+## 🔑 3. Kredensial & Peran Pengguna
 
-| Parameter | Kredensial |
-|:---|:---|
-| **URL Login** | `http://127.0.0.1:8000/login` |
-| **Username** | `admin` |
-| **Password** | `admin123` |
-| **Hak Akses** | Administrator Penuh (Kelola Jurnal Keluhan & Data Rekapitulasi) |
+| Peran | Username | Password | Hak Akses |
+|:---|:---|:---|:---|
+| **Admin Pusat** (Divisi IT) | `admin` | `admin123` | Kelola Jurnal Keluhan, verifikasi pengaduan cabang, laporan, monitoring ATM, manajemen pengguna. |
+| **CS Cabang** (contoh, Cabang Utama `001`) | `cs.palu` | `cs12345` | Kirim pengaduan nasabah + lampiran, pantau status pengaduan cabangnya sendiri. |
+
+URL login sama untuk kedua peran: `http://127.0.0.1:8000/login`. Setelah login, Admin diarahkan ke `/` dan CS ke `/cs`. Akun CS lain dibuat Admin lewat menu **Manajemen Pengguna** (`/pengguna`) dan wajib terikat ke satu kantor cabang. Akun tidak dihapus, hanya **dinonaktifkan**.
+
+---
+
+## 📨 3a. Modul Pengaduan CS Cabang → Admin Pusat
+
+### Alur & Siklus Status
+
+```text
+CS kirim pengaduan ──► Terkirim ──► Diterima ──► Diproses ──► Selesai
+   (boleh edit/hapus)      │           │   (masuk jurnal)  (jurnal Done/Success)
+                           └───────────┴──► Ditolak (catatan pusat wajib / jurnal Rejected)
+```
+
+| Status | Label di CS | Pemicu |
+|:---|:---|:---|
+| `Terkirim` | Menunggu Verifikasi Pusat | CS mengirim formulir. CS masih boleh mengedit/menghapus. |
+| `Diterima` | Diterima Pusat | Admin klik **Terima**. Data terkunci untuk CS. |
+| `Diproses` | Dalam Proses Jurnal | Admin klik **Input ke Jurnal** → form jurnal terisi otomatis → disimpan (`jurnal_id` terisi). |
+| `Selesai` | Selesai | Status jurnal diubah menjadi `Done` / `Success`. |
+| `Ditolak` | Ditolak | Admin klik **Tolak** (wajib alasan) atau status jurnal `Rejected`. |
+
+Sinkronisasi status jurnal → pengaduan berjalan otomatis (observer). Menghapus jurnal mengembalikan pengaduan ke `Diterima`.
+
+### Field Formulir Pengaduan CS (`/cs/pengaduan/input`)
+
+| Bagian | Field | Keterangan |
+|:---|:---|:---|
+| Data Pelapor | `nama_pelapor`*, `master_cabang_id`* (asal cabang, dipilih manual; default cabang akun CS), `kategori`*, `sub_kategori`, `sub_kategori_2` | Kategori berupa teks bebas. Pengaduan terlihat oleh CS pengirim, CS lain di cabang akun yang sama, dan CS di cabang asal yang dipilih. |
+| Data Nasabah | `nama_nasabah`*, `no_hp`*, `no_ktp`* (16 digit), `no_rekening`*, `no_kartu` | |
+| Data Transaksi | `master_transaksi_id`*, `channel`* (prinsipal), `no_resi`*, `terminal_transaksi`, `nominal_transaksi`* (Rp), `tgl_transaksi`* | Channel terisi otomatis dari jenis transaksi. |
+| Lampiran | `foto_ktp`* , `buku_tabungan`, `kartu_atm`, `form_keluhan`, `lainnya` | Maks 5 berkas / jenis, 5 MB / berkas (JPG/PNG/WEBP/PDF). **Format berkas selalu sama dengan kiriman CS** dan tidak pernah dikonversi ke PDF. Foto beresolusi besar diperkecil otomatis agar hemat penyimpanan. |
+| Keterangan | `kronologi`* (min. 20 karakter) | |
+
+Nomor pengaduan dibuat otomatis: `PGD-{kode_cabang}-{YYYYMMDD}-{urut}`.
+
+### Keamanan & Penyimpanan Lampiran
+Lampiran (berisi KTP) disimpan di disk **privat** `storage/app/private/pengaduan/{id}/` dan hanya dapat dibuka lewat `/pengaduan/{id}/lampiran/{lampiranId}` oleh Admin Pusat atau CS yang berwenang. Tidak diperlukan `storage:link`.
+
+### Format & Optimalisasi Berkas
+**Format berkas selalu dipertahankan**: JPG tetap JPG, PNG tetap PNG, WEBP tetap WEBP, dan PDF tidak pernah disentuh sama sekali. Yang dioptimalkan hanya gambar, yaitu koreksi orientasi foto ponsel (EXIF) dan pengecilan resolusi bila sisi terpanjang melebihi `lebar_maks_gambar` (bawaan 2000 piksel), lalu disimpan ulang dengan format yang sama.
+
+| Berkas | Sebelum | Sesudah |
+|:---|:---|:---|
+| Foto ponsel 4000 × 3000 piksel | 4,3 MB | 0,5 MB (hemat 88%) |
+| Foto/scan ≤ 2000 piksel | tidak diubah | tidak diubah |
+| Berkas PDF | tidak diubah | tidak diubah |
+
+Tiga pengaman agar berkas tidak pernah menjadi lebih buruk:
+1. Gambar yang sudah kecil dan orientasinya benar disimpan apa adanya tanpa dikodekan ulang.
+2. Bila hasil olahan ternyata lebih besar dari berkas asli, berkas asli yang dipakai (kasus PNG berblok warna datar).
+3. Kanal transparansi hanya dipertahankan bila berkas aslinya memang punya transparansi.
+
+Pengaturan ada di `config/pengaduan.php`: `lebar_maks_gambar`, `kualitas_gambar`, `kompresi_png`, `max_ukuran_file_kb`, `max_file_per_jenis`.
 
 ---
 

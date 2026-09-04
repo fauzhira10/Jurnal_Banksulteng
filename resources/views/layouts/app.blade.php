@@ -26,7 +26,7 @@
 <!-- SIDEBAR -->
 <aside class="sidebar fixed top-0 bottom-0 left-0 w-[270px] bg-gradient-to-b from-navy to-navy-dark text-white z-50 flex flex-col shadow-2xl transition-transform duration-300 -translate-x-full lg:translate-x-0" id="sidebar">
     <!-- Brand -->
-    <a href="{{ route('dashboard') }}" class="p-5 flex items-center gap-3 border-b border-white/10 bg-black/15 hover:bg-black/25 transition-colors group cursor-pointer" title="Buka Dashboard Utama">
+    <a href="{{ route(Auth::check() ? Auth::user()->homeRoute() : 'login') }}" class="p-5 flex items-center gap-3 border-b border-white/10 bg-black/15 hover:bg-black/25 transition-colors group cursor-pointer" title="Buka Dashboard Utama">
         <div class="w-10.5 h-10.5 bg-gradient-to-br from-white to-blue-100 rounded-xl flex items-center justify-center text-navy font-extrabold text-lg shadow-md shrink-0 transition-transform group-hover:scale-105">
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                 <rect x="3" y="3" width="18" height="18" rx="2"/>
@@ -43,6 +43,14 @@
 
     <!-- Navigation Menu -->
     <div class="p-3.5 grow overflow-y-auto flex flex-col gap-1.5">
+        @php
+            $navBase   = 'flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-[13.5px] font-medium transition-all duration-200';
+            $navActive = 'text-white bg-gradient-to-r from-brand-blue to-navy-light font-semibold shadow-lg shadow-brand-blue/30 relative before:content-[\'\'] before:absolute before:left-0 before:top-[15%] before:h-[70%] before:w-1 before:bg-brand-gold before:rounded-r';
+            $navIdle   = 'text-slate-300 hover:text-white hover:bg-white/10 hover:translate-x-1';
+            $isAdminNav = Auth::check() && Auth::user()->isAdmin();
+        @endphp
+
+        @if($isAdminNav)
         <div class="text-[11px] uppercase tracking-wider text-slate-400 font-bold px-3 pt-3 pb-1">Menu Utama</div>
 
         <!-- Menu 1: Dashboard Utama -->
@@ -96,6 +104,67 @@
             </svg>
             <span>Rekap Laporan Keluhan</span>
         </a>
+
+        <div class="text-[11px] uppercase tracking-wider text-slate-400 font-bold px-3 pt-4 pb-1">Pengaduan Cabang</div>
+
+        <!-- Menu 6: Pengaduan Masuk dari CS Cabang -->
+        @php $jumlahTerkirim = \App\Models\Pengaduan::where('status', \App\Enums\PengaduanStatus::Terkirim->value)->count(); @endphp
+        <a href="{{ route('admin.pengaduan.index') }}" class="{{ $navBase }} {{ request()->routeIs('admin.pengaduan.*') ? $navActive : $navIdle }}">
+            <svg class="w-5 h-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="22 12 16 12 14 15 10 15 8 12 2 12"></polyline>
+                <path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"></path>
+            </svg>
+            <span>Pengaduan Masuk</span>
+            @if($jumlahTerkirim > 0)
+                <span class="ml-auto bg-amber-400 text-navy px-2 py-0.5 rounded-full text-[11px] font-extrabold" title="Menunggu verifikasi">{{ number_format($jumlahTerkirim, 0, ',', '.') }}</span>
+            @endif
+        </a>
+
+        <!-- Menu 7: Manajemen Pengguna -->
+        <a href="{{ route('admin.pengguna.index') }}" class="{{ $navBase }} {{ request()->routeIs('admin.pengguna.*') ? $navActive : $navIdle }}">
+            <svg class="w-5 h-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                <circle cx="9" cy="7" r="4"></circle>
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+            </svg>
+            <span>Manajemen Pengguna</span>
+        </a>
+        @else
+        <div class="text-[11px] uppercase tracking-wider text-slate-400 font-bold px-3 pt-3 pb-1">Menu Customer Service</div>
+
+        <!-- Menu CS 1: Dashboard -->
+        <a href="{{ route('cs.dashboard') }}" class="{{ $navBase }} {{ request()->routeIs('cs.dashboard') ? $navActive : $navIdle }}">
+            <svg class="w-5 h-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="3" width="7" height="7"></rect>
+                <rect x="14" y="3" width="7" height="7"></rect>
+                <rect x="14" y="14" width="7" height="7"></rect>
+                <rect x="3" y="14" width="7" height="7"></rect>
+            </svg>
+            <span>Dashboard</span>
+        </a>
+
+        <!-- Menu CS 2: Input Pengaduan -->
+        <a href="{{ route('cs.pengaduan.create') }}" class="{{ $navBase }} {{ request()->routeIs('cs.pengaduan.create') || request()->routeIs('cs.pengaduan.edit') ? $navActive : $navIdle }}">
+            <svg class="w-5 h-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+            </svg>
+            <span>Input Pengaduan</span>
+        </a>
+
+        <!-- Menu CS 3: Data Pengaduan Cabang -->
+        @php $jumlahPengaduanCabang = Auth::check() ? \App\Models\Pengaduan::query()->untukCs(Auth::user())->count() : 0; @endphp
+        <a href="{{ route('cs.pengaduan.index') }}" class="{{ $navBase }} {{ request()->routeIs('cs.pengaduan.index') || request()->routeIs('cs.pengaduan.show') ? $navActive : $navIdle }}">
+            <svg class="w-5 h-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                <line x1="3" y1="9" x2="21" y2="9"></line>
+                <line x1="9" y1="21" x2="9" y2="9"></line>
+            </svg>
+            <span>Data Pengaduan</span>
+            <span class="ml-auto bg-white/20 px-2 py-0.5 rounded-full text-[11px] font-bold text-white">{{ number_format($jumlahPengaduanCabang, 0, ',', '.') }}</span>
+        </a>
+        @endif
     </div>
 
     <!-- Sidebar Footer -->
@@ -106,7 +175,7 @@
             </div>
             <div class="overflow-hidden">
                 <div class="text-[12.5px] font-semibold text-white truncate">{{ Auth::user()->name ?? 'Administrator' }}</div>
-                <div class="text-[11px] text-slate-400 truncate">&#64;{{ Auth::user()->username ?? 'admin' }} &bull; Admin</div>
+                <div class="text-[11px] text-slate-400 truncate" title="{{ Auth::check() && Auth::user()->isCs() ? (Auth::user()->cabang->nama_cabang ?? '') : 'Admin Pusat' }}">&#64;{{ Auth::user()->username ?? 'admin' }} &bull; {{ Auth::check() && Auth::user()->isCs() ? 'CS ' . (Auth::user()->cabang->nama_cabang ?? 'Cabang') : 'Admin Pusat' }}</div>
             </div>
         </div>
 
@@ -162,6 +231,20 @@
                 </svg>
                 <div>
                     <strong class="font-bold">Berhasil!</strong> {{ session('success') }}
+                </div>
+            </div>
+        @endif
+
+        <!-- Flash Alert Error (session) -->
+        @if(session('error'))
+            <div class="bg-rose-50 border border-rose-200 text-rose-900 rounded-xl p-4 mb-5 text-[13.5px] flex items-start gap-3 shadow-xs">
+                <svg class="w-5 h-5 text-rose-600 shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="8" x2="12" y2="12"></line>
+                    <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                </svg>
+                <div>
+                    <strong class="font-bold">Perhatian!</strong> {{ session('error') }}
                 </div>
             </div>
         @endif

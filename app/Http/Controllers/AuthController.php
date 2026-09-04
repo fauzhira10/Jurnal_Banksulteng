@@ -8,19 +8,19 @@ use Illuminate\Support\Facades\Auth;
 class AuthController extends Controller
 {
     /**
-     * Menampilkan halaman login admin
+     * Menampilkan halaman login (Admin Pusat & CS Cabang memakai halaman yang sama)
      */
     public function showLoginForm()
     {
         if (Auth::check()) {
-            return redirect()->route('dashboard');
+            return redirect()->route(Auth::user()->homeRoute());
         }
 
         return view('auth.login');
     }
 
     /**
-     * Memproses autentikasi login berbasis Username
+     * Memproses autentikasi login berbasis Username, lalu mengarahkan sesuai peran
      */
     public function login(Request $request)
     {
@@ -36,9 +36,24 @@ class AuthController extends Controller
 
         // Otentikasi berbasis kolom username
         if (Auth::attempt(['username' => $credentials['username'], 'password' => $credentials['password']], $remember)) {
+            $user = Auth::user();
+
+            // Akun nonaktif tidak boleh masuk
+            if (! $user->is_active) {
+                Auth::logout();
+                $request->session()->invalidate();
+                $request->session()->regenerateToken();
+
+                return back()->withErrors([
+                    'username' => 'Akun Anda telah dinonaktifkan. Silakan hubungi Admin Pusat.',
+                ])->onlyInput('username');
+            }
+
             $request->session()->regenerate();
-            $userName = Auth::user()->name;
-            return redirect()->intended(route('dashboard'))->with('success', "Selamat datang kembali, {$userName}!");
+
+            return redirect()
+                ->intended(route($user->homeRoute()))
+                ->with('success', "Selamat datang kembali, {$user->name}!");
         }
 
         return back()->withErrors([

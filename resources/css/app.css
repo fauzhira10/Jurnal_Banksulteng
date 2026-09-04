@@ -284,6 +284,37 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
     font-weight: 600;
 }
 
+/* Badge status pengaduan CS cabang (Terkirim → Diterima → Diproses → Selesai / Ditolak) */
+.badge-terkirim {
+    background-color: #fef3c7;
+    color: #b45309;
+    border: 1px solid #fde68a;
+}
+
+.badge-diterima {
+    background-color: #e0f2fe;
+    color: #0369a1;
+    border: 1px solid #bae6fd;
+}
+
+.badge-diproses {
+    background-color: #ede9fe;
+    color: #6d28d9;
+    border: 1px solid #ddd6fe;
+}
+
+.badge-selesai {
+    background-color: #d1fae5;
+    color: #047857;
+    border: 1px solid #a7f3d0;
+}
+
+.badge-ditolak {
+    background-color: #fee2e2;
+    color: #b91c1c;
+    border: 1px solid #fca5a5;
+}
+
 /* Alerts */
 .alert {
     padding: 14px 18px;

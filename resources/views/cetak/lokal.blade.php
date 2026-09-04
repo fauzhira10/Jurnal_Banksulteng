@@ -394,13 +394,12 @@
 
     <script>
         function handleKembali() {
-            if (window.opener && !window.opener.closed) {
-                window.close();
-            } else if (window.history.length > 1) {
-                window.history.back();
-            } else {
-                window.location.href = "{{ route('jurnal.index') }}";
-            }
+            window.close();
+            setTimeout(function() {
+                if (!window.closed) {
+                    window.location.href = "{{ route('jurnal.index') }}";
+                }
+            }, 150);
         }
     </script>
 </body>

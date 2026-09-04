@@ -16,6 +16,23 @@
 
 @section('content')
 <div class="max-w-[950px] mx-auto">
+    @if($jurnal->pengaduan)
+        <div class="bg-sky-50 border border-sky-200 text-sky-900 rounded-xl p-4 mb-5 text-[13px] flex items-start gap-3 shadow-xs">
+            <span class="text-lg leading-none">📨</span>
+            <div class="grow min-w-0">
+                <div class="font-bold">Jurnal ini bersumber dari pengaduan CS <span class="font-mono">{{ $jurnal->pengaduan->nomor_pengaduan }}</span> — {{ $jurnal->pengaduan->labelCabang() }}</div>
+                <div class="text-[12px] text-sky-800 mt-0.5">Mengubah <strong>Status Keluhan</strong> di sini otomatis memperbarui status yang dilihat CS cabang (Done/Success → Selesai, Rejected → Ditolak).</div>
+                @if($jurnal->pengaduan->lampirans->isNotEmpty())
+                    <div class="flex flex-wrap gap-1.5 mt-2">
+                        @foreach($jurnal->pengaduan->lampirans as $l)
+                            <a href="{{ route('pengaduan.lampiran.show', [$jurnal->pengaduan, $l]) }}" target="_blank" class="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-white border border-sky-200 text-[11px] font-semibold text-navy hover:border-brand-blue" title="{{ $l->nama_asli }}">{{ $l->ikon() }} {{ $l->label() }} <span class="text-slate-400 font-normal">{{ $l->labelFormat() }}</span></a>
+                        @endforeach
+                    </div>
+                @endif
+                <a href="{{ route('admin.pengaduan.show', $jurnal->pengaduan) }}" class="inline-block mt-2 text-[12px] font-bold text-brand-blue hover:underline">Lihat detail pengaduan & kronologi →</a>
+            </div>
+        </div>
+    @endif
     <div class="bg-white rounded-2xl border border-slate-200 shadow-xs mb-6 overflow-hidden">
         <div class="px-6 py-4.5 border-b border-slate-200 flex items-center justify-between bg-white flex-wrap gap-2">
             <div class="text-base font-bold text-navy flex items-center gap-2.5">

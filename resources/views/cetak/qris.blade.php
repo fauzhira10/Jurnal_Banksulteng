@@ -115,6 +115,27 @@
             padding: 0 2px;
         }
 
+        /* Editable Text Element on Slip */
+        .editable-text {
+            display: inline-block;
+            min-width: 140px;
+            padding: 2px 6px;
+            border-radius: 4px;
+            cursor: text;
+            transition: all 0.2s ease;
+        }
+
+        .editable-text:hover {
+            background-color: #fef08a;
+            box-shadow: 0 0 0 1.5px #ca8a04;
+        }
+
+        .editable-text:focus {
+            background-color: #fef9c3;
+            box-shadow: 0 0 0 2px #0284c7;
+            outline: none;
+        }
+
         /* SLIP JURNAL / NOTA DEBET STYLING */
         .page-break {
             page-break-before: always;
@@ -161,6 +182,13 @@
                 box-shadow: none !important;
                 min-height: auto !important;
             }
+            .editable-text {
+                background: transparent !important;
+                box-shadow: none !important;
+                outline: none !important;
+                border: none !important;
+                padding: 0 !important;
+            }
         }
     </style>
 </head>
@@ -169,7 +197,10 @@
     <!-- Toolbar Aksi Layar -->
     <div class="no-print">
         <button type="button" onclick="handleKembali()" class="btn btn-back">⬅ Kembali</button>
-        <span style="font-weight: bold; font-size: 13px; color: #1e293b;">📄 Cetak Keluhan & Slip QRIS &mdash; No. Tiket: {{ $jurnal->no_tiket }}</span>
+        <div style="text-align: center;">
+            <span style="font-weight: bold; font-size: 13px; color: #1e293b; display: block;">📄 Cetak Keluhan & Slip QRIS &mdash; No. Tiket: {{ $jurnal->no_tiket }}</span>
+            <span style="font-size: 11px; color: #0369a1; background: #e0f2fe; padding: 2px 8px; border-radius: 12px; font-weight: 600; display: inline-block; margin-top: 3px;">✏️ Nama akun & no. rekening penampungan pada slip dapat diklik untuk diedit langsung</span>
+        </div>
         <button type="button" onclick="window.print()" class="btn btn-print">🖨️ Cetak Form & Slip Jurnal</button>
     </div>
 
@@ -424,7 +455,9 @@
             <tbody>
                 <!-- BARIS 1: NAMA AKUN -->
                 <tr>
-                    <td style="border-left: 1.5px solid #000; border-right: 1px solid #000; border-top: 1.5px solid #000; border-bottom: none; padding: 2px 6px; text-align: center; font-weight: bold;">PENAMPUNGAN SELISIH QRIS JALIN</td>
+                    <td style="border-left: 1.5px solid #000; border-right: 1px solid #000; border-top: 1.5px solid #000; border-bottom: none; padding: 2px 6px; text-align: center; font-weight: bold;">
+                        <span class="editable-text" contenteditable="true" spellcheck="false" title="Klik untuk mengedit Nama Akun Penampungan">PENAMPUNGAN SELISIH QRIS JALIN</span>
+                    </td>
                     <td style="border: 1px solid #000; width: 2.4%;"></td>
                     <td style="border: 1px solid #000; width: 2.4%;"></td>
                     <td style="border: 1px solid #000; width: 2.4%;"></td>
@@ -435,7 +468,9 @@
 
                 <!-- BARIS 2: NOMOR REKENING / AKUN -->
                 <tr>
-                    <td style="border-left: 1.5px solid #000; border-right: 1px solid #000; border-top: none; border-bottom: 1px solid #000; padding: 2px 6px 4px 6px; text-align: center; font-weight: bold;">000002310711013360</td>
+                    <td style="border-left: 1.5px solid #000; border-right: 1px solid #000; border-top: none; border-bottom: 1px solid #000; padding: 2px 6px 4px 6px; text-align: center; font-weight: bold;">
+                        <span class="editable-text" contenteditable="true" spellcheck="false" title="Klik untuk mengedit Nomor Rekening Penampungan">000002310711013360</span>
+                    </td>
                     <td style="border: 1px solid #000;"></td>
                     <td style="border: 1px solid #000;"></td>
                     <td style="border: 1px solid #000;"></td>
@@ -706,13 +741,12 @@
 
     <script>
         function handleKembali() {
-            if (window.opener && !window.opener.closed) {
-                window.close();
-            } else if (window.history.length > 1) {
-                window.history.back();
-            } else {
-                window.location.href = "{{ route('jurnal.index') }}";
-            }
+            window.close();
+            setTimeout(function() {
+                if (!window.closed) {
+                    window.location.href = "{{ route('jurnal.index') }}";
+                }
+            }, 150);
         }
     </script>
 </body>
