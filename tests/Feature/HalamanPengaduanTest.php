@@ -76,6 +76,41 @@ test('tindakan penting memakai modal konfirmasi sistem, bukan dialog bawaan brow
     expect($lampiran->exists)->toBeTrue();
 });
 
+test('halaman tidak menampilkan sintaks blade mentah', function () {
+    Storage::fake('local');
+    $cabang = buatCabang();
+    $cs = buatCs($cabang, ['username' => 'cs.uji']);
+    $admin = buatAdmin();
+    $pengaduan = buatPengaduan($cs, buatTransaksi());
+    buatLampiran($pengaduan);
+
+    // Penulisan @{{ ... }} pada Blade berarti "tampilkan kurung kurawal apa adanya",
+    // sehingga mudah keliru dipakai saat ingin menampilkan tanda @ sebelum username.
+    $halaman = [
+        route('admin.pengaduan.show', $pengaduan),
+        route('admin.pengaduan.index'),
+        route('admin.pengguna.index'),
+    ];
+
+    foreach ($halaman as $url) {
+        $response = $this->actingAs($admin)->get($url);
+        $response->assertStatus(200);
+        $response->assertDontSee('{{', false);
+        $response->assertDontSee('$pengaduan->', false);
+    }
+
+    // Username pelapor tampil sebagai nilai, bukan sebagai kode.
+    // Tanda @ ditulis sebagai entitas &#64; karena "@{{" pada Blade berarti
+    // menampilkan kurung kurawal apa adanya.
+    $this->actingAs($admin)->get(route('admin.pengaduan.show', $pengaduan))
+        ->assertSee('&#64;cs.uji', false)
+        ->assertDontSee("username ?? '-'", false);
+
+    foreach ([route('cs.dashboard'), route('cs.pengaduan.index'), route('cs.pengaduan.show', $pengaduan)] as $url) {
+        $this->actingAs($cs)->get($url)->assertStatus(200)->assertDontSee('{{', false);
+    }
+});
+
 test('panel status manual sudah tidak ada pada halaman pengaduan masuk', function () {
     $cabang = buatCabang();
     $cs = buatCs($cabang);

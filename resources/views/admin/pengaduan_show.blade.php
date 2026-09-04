@@ -104,7 +104,7 @@
             {{-- Informasi verifikasi --}}
             <div class="bg-white rounded-2xl border border-slate-200 shadow-xs p-5 text-[0.78125rem] space-y-2.5">
                 <div class="font-bold text-navy text-[0.8125rem] mb-1">Informasi Verifikasi</div>
-                <div class="flex justify-between gap-3"><span class="text-slate-500">Dikirim oleh</span><span class="font-semibold text-right">{{ $pengaduan->user->name ?? $pengaduan->nama_pelapor }}<br><span class="text-[0.71875rem] text-slate-500">@{{ $pengaduan->user->username ?? '-' }}</span></span></div>
+                <div class="flex justify-between gap-3"><span class="text-slate-500">Dikirim oleh</span><span class="font-semibold text-right">{{ $pengaduan->user->name ?? $pengaduan->nama_pelapor }}<br><span class="text-[0.71875rem] text-slate-500">&#64;{{ $pengaduan->user->username ?? '-' }}</span></span></div>
                 <div class="flex justify-between gap-3"><span class="text-slate-500">Diterima oleh</span><span class="font-semibold text-right">{{ $pengaduan->penerima->name ?? '-' }}</span></div>
                 <div class="flex justify-between gap-3"><span class="text-slate-500">Waktu diterima</span><span class="font-semibold text-right">{{ $pengaduan->diterima_at?->translatedFormat('d M Y, H:i') ?? '-' }}</span></div>
                 <div class="flex justify-between gap-3"><span class="text-slate-500">Terakhir diperbarui</span><span class="font-semibold text-right">{{ $pengaduan->updated_at?->translatedFormat('d M Y, H:i') }}</span></div>
