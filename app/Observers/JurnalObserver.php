@@ -34,7 +34,9 @@ class JurnalObserver
     }
 
     /**
-     * Turunkan status pengaduan dari status jurnal (Done/Success → Selesai, Rejected → Ditolak, lainnya → Diproses).
+     * Turunkan status pengaduan dari status jurnal (Done/Success → Selesai,
+     * Rejected → Ditolak, lainnya → Diproses). Status jurnal yang diketik manual
+     * di luar daftar baku ikut dipetakan ke "Diproses".
      */
     public static function sinkronkan(Pengaduan $pengaduan, Jurnal $jurnal): void
     {

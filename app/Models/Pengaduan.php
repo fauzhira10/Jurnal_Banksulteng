@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\PengaduanStatus;
+use App\Services\NomorTiketService;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -31,34 +32,15 @@ class Pengaduan extends Model
     protected static function booted(): void
     {
         static::creating(function (Pengaduan $pengaduan) {
-            if (empty($pengaduan->nomor_pengaduan)) {
-                $pengaduan->nomor_pengaduan = static::generateNomor($pengaduan->master_cabang_id);
+            // Nomor tiket lahir di sini, yaitu saat CS cabang mengirim keluhan,
+            // lalu dibawa terus ke Jurnal Keluhan tanpa dibuat ulang.
+            if (empty($pengaduan->nomor_tiket)) {
+                $pengaduan->nomor_tiket = NomorTiketService::buat();
             }
             if (empty($pengaduan->status)) {
                 $pengaduan->status = PengaduanStatus::Terkirim;
             }
         });
-    }
-
-    /**
-     * Membuat nomor pengaduan unik: PGD-{kode_cabang}-{Ymd}-{urut 4 digit}.
-     * Panggil di dalam transaksi DB agar penguncian baris efektif.
-     */
-    public static function generateNomor(?int $masterCabangId): string
-    {
-        $cabang = $masterCabangId ? MasterCabang::find($masterCabangId) : null;
-        $kode = ($cabang && ! empty($cabang->kode_cabang)) ? $cabang->kode_cabang : '000';
-        $prefix = 'PGD-'.$kode.'-'.now()->format('Ymd').'-';
-
-        $terakhir = static::query()
-            ->where('nomor_pengaduan', 'LIKE', $prefix.'%')
-            ->lockForUpdate()
-            ->orderByDesc('nomor_pengaduan')
-            ->value('nomor_pengaduan');
-
-        $urut = $terakhir ? ((int) substr($terakhir, strlen($prefix))) + 1 : 1;
-
-        return $prefix.str_pad((string) $urut, 4, '0', STR_PAD_LEFT);
     }
 
     // ==================== RELASI ====================
@@ -147,7 +129,7 @@ class Pengaduan extends Model
         }
 
         return $query->where(function (Builder $q) use ($keyword) {
-            $q->where('nomor_pengaduan', 'LIKE', "%{$keyword}%")
+            $q->where('nomor_tiket', 'LIKE', "%{$keyword}%")
                 ->orWhere('nama_nasabah', 'LIKE', "%{$keyword}%")
                 ->orWhere('no_rekening', 'LIKE', "%{$keyword}%")
                 ->orWhere('no_resi', 'LIKE', "%{$keyword}%")

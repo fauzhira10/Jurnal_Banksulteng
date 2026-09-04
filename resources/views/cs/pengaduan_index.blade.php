@@ -5,7 +5,7 @@
 @section('page_subtitle', 'Seluruh pengaduan dari ' . ($user->cabang->nama_cabang ?? 'cabang Anda') . ' beserta status penanganannya di pusat')
 
 @section('topbar_action')
-    <a href="{{ route('cs.pengaduan.create') }}" class="inline-flex items-center gap-2 h-[38px] px-3.5 rounded-lg bg-gradient-to-r from-brand-blue to-navy text-white hover:opacity-95 text-xs font-semibold shadow-sm transition-opacity">
+    <a href="{{ route('cs.pengaduan.create') }}" class="inline-flex items-center gap-2 h-[2.375rem] px-3.5 rounded-lg bg-gradient-to-r from-brand-blue to-navy text-white hover:opacity-95 text-xs font-semibold shadow-sm transition-opacity">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <line x1="12" y1="5" x2="12" y2="19"></line>
             <line x1="5" y1="12" x2="19" y2="12"></line>
@@ -15,7 +15,7 @@
 @endsection
 
 @section('content')
-<div class="max-w-[1200px] mx-auto">
+<div class="max-w-[75rem] mx-auto">
 
     @include('partials.pengaduan_stats', ['stats' => $stats, 'urlDasar' => route('cs.pengaduan.index'), 'nilaiSemua' => '', 'statusAktif' => request('status', '')])
 
@@ -45,7 +45,7 @@
     {{-- Tabel --}}
     <div class="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
         <div class="px-5 py-4 border-b border-slate-200 flex items-center justify-between flex-wrap gap-2">
-            <div class="text-[15px] font-bold text-navy">Daftar Pengaduan Cabang</div>
+            <div class="text-[0.9375rem] font-bold text-navy">Daftar Pengaduan Cabang</div>
             <div class="text-xs text-slate-500">Total <strong class="text-navy">{{ number_format($pengaduans->total(), 0, ',', '.') }}</strong> data</div>
         </div>
 
@@ -62,7 +62,7 @@
                         <thead>
                             <tr>
                                 <th style="width: 44px; text-align:center;">No</th>
-                                <th>Nomor / Tanggal Kirim</th>
+                                <th>Nomor Tiket / Tanggal Kirim</th>
                                 <th>Data Nasabah</th>
                                 <th>Transaksi</th>
                                 <th>Nominal</th>
@@ -75,33 +75,33 @@
                                 <tr>
                                     <td style="text-align:center; color:#64748b; font-weight:600;">{{ ($pengaduans->currentPage() - 1) * $pengaduans->perPage() + $loop->iteration }}</td>
                                     <td>
-                                        <div class="font-bold text-navy font-mono text-[12.5px]">{{ $p->nomor_pengaduan }}</div>
-                                        <div class="text-[11.5px] text-slate-500 mt-0.5">{{ $p->created_at->translatedFormat('d M Y, H:i') }}</div>
-                                        <div class="text-[11px] text-slate-400">Pelapor: {{ $p->nama_pelapor }}</div>
+                                        <div class="font-bold text-navy font-mono text-[0.78125rem]">{{ $p->nomor_tiket }}</div>
+                                        <div class="text-[0.71875rem] text-slate-500 mt-0.5">{{ $p->created_at->translatedFormat('d M Y, H:i') }}</div>
+                                        <div class="text-[0.71875rem] text-slate-500">Pelapor: {{ $p->nama_pelapor }}</div>
                                     </td>
                                     <td>
                                         <div class="font-semibold text-slate-800">{{ $p->nama_nasabah }}</div>
-                                        <div class="text-[11.5px] text-slate-500">Rek: <strong>{{ $p->no_rekening }}</strong> &bull; Resi: <strong>{{ $p->no_resi }}</strong></div>
-                                        <div class="text-[11px] text-slate-400">{{ $p->kategoriLengkap() }}</div>
+                                        <div class="text-[0.71875rem] text-slate-500">Rek: <strong>{{ $p->no_rekening }}</strong> &bull; Resi: <strong>{{ $p->no_resi }}</strong></div>
+                                        <div class="text-[0.71875rem] text-slate-500">{{ $p->kategoriLengkap() }}</div>
                                     </td>
                                     <td>
-                                        <div class="text-[12.5px] font-medium text-slate-700">{{ $p->transaksi->jenis_transaksi ?? '-' }}</div>
+                                        <div class="text-[0.78125rem] font-medium text-slate-700">{{ $p->transaksi->jenis_transaksi ?? '-' }}</div>
                                         <div class="mt-1 flex items-center gap-1.5 flex-wrap">
                                             <span class="badge badge-channel">{{ $p->channel }}</span>
-                                            <span class="text-[11px] text-slate-500">{{ $p->tgl_transaksi?->translatedFormat('d/m/Y') }}</span>
+                                            <span class="text-[0.71875rem] text-slate-500">{{ $p->tgl_transaksi?->translatedFormat('d/m/Y') }}</span>
                                         </div>
                                     </td>
                                     <td style="white-space:nowrap;" class="font-bold text-emerald-600">{{ $p->nominalRupiah() }}</td>
                                     <td>
                                         @include('partials.pengaduan_status_badge', ['status' => $p->status])
                                         @if($p->jurnal && $p->jurnal->no_tiket && $p->jurnal->no_tiket !== '-')
-                                            <div class="text-[11px] text-slate-500 mt-1">Tiket: {{ $p->jurnal->no_tiket }}</div>
+                                            <div class="text-[0.71875rem] text-slate-500 mt-1">Tiket: {{ $p->jurnal->no_tiket }}</div>
                                         @endif
                                     </td>
                                     <td style="text-align:center; white-space:nowrap;">
-                                        <a href="{{ route('cs.pengaduan.show', $p) }}" class="btn btn-secondary btn-sm" style="padding: 5px 11px; font-size: 12px;">Detail</a>
+                                        <a href="{{ route('cs.pengaduan.show', $p) }}" class="btn btn-secondary btn-sm" style="padding: 5px 11px; font-size: 0.75rem;">Detail</a>
                                         @if($p->bisaDiedit())
-                                            <a href="{{ route('cs.pengaduan.edit', $p) }}" class="btn btn-sm" style="padding: 5px 11px; font-size: 12px; background:#fef3c7; color:#b45309; border:1px solid #fde68a; margin-left:4px;">Edit</a>
+                                            <a href="{{ route('cs.pengaduan.edit', $p) }}" class="btn btn-sm" style="padding: 5px 11px; font-size: 0.75rem; background:#fef3c7; color:#b45309; border:1px solid #fde68a; margin-left:4px;">Edit</a>
                                         @endif
                                     </td>
                                 </tr>

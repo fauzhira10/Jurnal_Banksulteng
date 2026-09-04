@@ -18,7 +18,7 @@ test('admin melihat daftar pengaduan masuk dengan tab terkirim sebagai default',
     $response = $this->actingAs($admin)->get(route('admin.pengaduan.index'));
 
     $response->assertStatus(200);
-    $response->assertSee($pengaduan->nomor_pengaduan);
+    $response->assertSee($pengaduan->nomor_tiket);
     $response->assertSee('Verifikasi');
 });
 
@@ -71,7 +71,7 @@ test('form jurnal terisi otomatis dari pengaduan', function () {
     $response = $this->actingAs($admin)->get(route('jurnal.create', ['pengaduan' => $pengaduan->id]));
 
     $response->assertStatus(200);
-    $response->assertSee($pengaduan->nomor_pengaduan);
+    $response->assertSee($pengaduan->nomor_tiket);
     $response->assertSee('BUDI SANTOSO');
     $response->assertSee('name="pengaduan_id"', false);
     $response->assertSee('TRANSAKSI ATM / TARIK TUNAI / UANG TIDAK KELUAR');
@@ -90,7 +90,6 @@ test('menyimpan jurnal dari pengaduan menautkan keduanya dan status menjadi dipr
         'no_resi' => $pengaduan->no_resi,
         'no_rekening' => $pengaduan->no_rekening,
         'no_kartu' => $pengaduan->no_kartu,
-        'no_tiket' => $pengaduan->nomor_pengaduan,
         'master_cabang_id' => $cabang->id,
         'master_transaksi_id' => $transaksi->id,
         'channel' => 'ATM LOKAL',
@@ -115,7 +114,10 @@ test('menyimpan jurnal dari pengaduan menautkan keduanya dan status menjadi dipr
         ->and($pengaduan->status)->toBe(PengaduanStatus::Diproses)
         ->and($pengaduan->diproses_at)->not->toBeNull()
         ->and($pengaduan->diterima_oleh)->toBe($admin->id)
-        ->and($jurnal->no_tiket)->toBe($pengaduan->nomor_pengaduan);
+        // Jurnal membawa nomor tiket milik pengaduan, tidak membuat nomor baru,
+        // sehingga satu keluhan bernomor sama dari CS sampai selesai.
+        ->and($jurnal->no_tiket)->toBe($pengaduan->nomor_tiket)
+        ->and(Jurnal::formatTiketValid($jurnal->no_tiket))->toBeTrue();
 
     // Pengaduan yang sudah tertaut tidak bisa dijurnal ulang
     $this->actingAs($admin)->get(route('jurnal.create', ['pengaduan' => $pengaduan->id]))
@@ -130,7 +132,7 @@ test('perubahan status jurnal disinkronkan ke status pengaduan cs', function () 
 
     $jurnal = Jurnal::create([
         'nama_nasabah' => 'BUDI SANTOSO', 'no_resi' => '123456', 'no_rekening' => '00900001234', 'no_kartu' => '-',
-        'no_tiket' => $pengaduan->nomor_pengaduan, 'master_cabang_id' => $cabang->id, 'master_transaksi_id' => $transaksi->id,
+        'no_tiket' => $pengaduan->nomor_tiket, 'master_cabang_id' => $cabang->id, 'master_transaksi_id' => $transaksi->id,
         'terminal_transaksi' => '-', 'nominal_transaksi' => 500000, 'biaya_admin' => 0,
         'tgl_transaksi' => '2026-09-01', 'tgl_terima' => '2026-09-04', 'tgl_selesai' => null,
         'status' => 'Menunggu', 'permasalahan' => '-', 'keterangan_log' => '-',

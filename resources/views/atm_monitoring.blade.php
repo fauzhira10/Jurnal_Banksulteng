@@ -52,14 +52,14 @@
                     <span>Tahun</span>
                 </label>
                 <div class="relative flex items-center">
-                    <select name="tahun" id="filterTahun" onchange="this.form.submit()" class="w-full h-[42px] px-3.5 pr-8 text-xs font-semibold text-slate-800 bg-slate-50 border border-slate-200 rounded-xl appearance-none cursor-pointer focus:bg-white focus:border-brand-blue focus:ring-3 focus:ring-brand-blue/15 focus:outline-none transition-all">
+                    <select name="tahun" id="filterTahun" onchange="this.form.submit()" class="w-full h-[2.625rem] px-3.5 pr-8 text-xs font-semibold text-slate-800 bg-slate-50 border border-slate-200 rounded-xl appearance-none cursor-pointer focus:bg-white focus:border-brand-blue focus:ring-3 focus:ring-brand-blue/15 focus:outline-none transition-all">
                         @foreach($availableYears as $yr)
                             <option value="{{ $yr }}" {{ $selectedYear == $yr ? 'selected' : '' }}>
                                 Tahun {{ $yr }}
                             </option>
                         @endforeach
                     </select>
-                    <div class="absolute right-3 pointer-events-none text-slate-400">
+                    <div class="absolute right-3 pointer-events-none text-slate-500">
                         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
                     </div>
                 </div>
@@ -75,7 +75,7 @@
                     <span>Bulan</span>
                 </label>
                 <div class="relative flex items-center">
-                    <select name="bulan" id="filterBulan" onchange="this.form.submit()" class="w-full h-[42px] px-3.5 pr-8 text-xs font-semibold text-slate-800 bg-slate-50 border border-slate-200 rounded-xl appearance-none cursor-pointer focus:bg-white focus:border-brand-blue focus:ring-3 focus:ring-brand-blue/15 focus:outline-none transition-all">
+                    <select name="bulan" id="filterBulan" onchange="this.form.submit()" class="w-full h-[2.625rem] px-3.5 pr-8 text-xs font-semibold text-slate-800 bg-slate-50 border border-slate-200 rounded-xl appearance-none cursor-pointer focus:bg-white focus:border-brand-blue focus:ring-3 focus:ring-brand-blue/15 focus:outline-none transition-all">
                         <option value="">-- Semua Bulan --</option>
                         @for($m = 1; $m <= 12; $m++)
                             <option value="{{ $m }}" {{ $selectedMonth == $m ? 'selected' : '' }}>
@@ -83,7 +83,7 @@
                             </option>
                         @endfor
                     </select>
-                    <div class="absolute right-3 pointer-events-none text-slate-400">
+                    <div class="absolute right-3 pointer-events-none text-slate-500">
                         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
                     </div>
                 </div>
@@ -99,7 +99,7 @@
                     <span>Kantor Cabang</span>
                 </label>
                 <div class="relative flex items-center">
-                    <select name="master_cabang_id" id="filterCabang" class="w-full h-[42px] px-3.5 pr-8 text-xs font-semibold text-slate-800 bg-slate-50 border border-slate-200 rounded-xl appearance-none cursor-pointer focus:bg-white focus:border-brand-blue focus:ring-3 focus:ring-brand-blue/15 focus:outline-none transition-all">
+                    <select name="master_cabang_id" id="filterCabang" class="w-full h-[2.625rem] px-3.5 pr-8 text-xs font-semibold text-slate-800 bg-slate-50 border border-slate-200 rounded-xl appearance-none cursor-pointer focus:bg-white focus:border-brand-blue focus:ring-3 focus:ring-brand-blue/15 focus:outline-none transition-all">
                         <option value="" data-kode="">-- Seluruh Kantor Cabang --</option>
                         @foreach($cabangs as $c)
                             <option value="{{ $c->id }}" data-kode="{{ $c->kode_cabang ?? '' }}" {{ $selectedCabang == $c->id ? 'selected' : '' }}>
@@ -107,7 +107,7 @@
                             </option>
                         @endforeach
                     </select>
-                    <div class="absolute right-3 pointer-events-none text-slate-400">
+                    <div class="absolute right-3 pointer-events-none text-slate-500">
                         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
                     </div>
                 </div>
@@ -123,25 +123,25 @@
                     <span>Terminal / Mesin ATM</span>
                 </label>
                 <div class="relative flex items-center">
-                    <select name="q" id="filterTerminal" class="w-full h-[42px] px-3.5 pr-8 text-xs font-semibold text-slate-800 bg-slate-50 border border-slate-200 rounded-xl appearance-none cursor-pointer focus:bg-white focus:border-brand-blue focus:ring-3 focus:ring-brand-blue/15 focus:outline-none transition-all">
+                    <select name="q" id="filterTerminal" class="w-full h-[2.625rem] px-3.5 pr-8 text-xs font-semibold text-slate-800 bg-slate-50 border border-slate-200 rounded-xl appearance-none cursor-pointer focus:bg-white focus:border-brand-blue focus:ring-3 focus:ring-brand-blue/15 focus:outline-none transition-all">
                         <option value="">-- Seluruh Terminal / Mesin --</option>
                     </select>
-                    <div class="absolute right-3 pointer-events-none text-slate-400">
+                    <div class="absolute right-3 pointer-events-none text-slate-500">
                         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
                     </div>
                 </div>
             </div>
 
             <!-- Tombol Aksi -->
-            <div class="flex items-center gap-2.5 h-[42px]">
-                <button type="submit" class="h-[42px] px-5 rounded-xl bg-gradient-to-r from-navy to-blue-700 hover:from-navy-dark hover:to-blue-800 text-white font-bold text-xs inline-flex items-center gap-2 shadow-sm shadow-navy/20 transition-all cursor-pointer">
+            <div class="flex items-center gap-2.5 h-[2.625rem]">
+                <button type="submit" class="h-[2.625rem] px-5 rounded-xl bg-gradient-to-r from-navy to-blue-700 hover:from-navy-dark hover:to-blue-800 text-white font-bold text-xs inline-flex items-center gap-2 shadow-sm shadow-navy/20 transition-all cursor-pointer">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                         <circle cx="11" cy="11" r="8"></circle>
                         <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
                     </svg>
                     <span>Cari</span>
                 </button>
-                <a href="{{ route('atm.index', ['tahun' => $selectedYear]) }}" class="h-[42px] px-4 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 hover:text-slate-800 font-semibold text-xs border border-slate-200 inline-flex items-center gap-1.5 transition-colors" title="Reset Filter">
+                <a href="{{ route('atm.index', ['tahun' => $selectedYear]) }}" class="h-[2.625rem] px-4 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 hover:text-slate-800 font-semibold text-xs border border-slate-200 inline-flex items-center gap-1.5 transition-colors" title="Reset Filter">
                     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
                         <path d="M3 3v5h5"></path>
@@ -184,7 +184,7 @@
         <table class="w-full border-collapse text-xs text-left">
             <thead>
                 <tr>
-                    <th class="px-4.5 py-3.5 bg-slate-50 text-slate-600 font-bold text-xs uppercase tracking-wider border-b-2 border-slate-200 w-[60px] text-center">No</th>
+                    <th class="px-4.5 py-3.5 bg-slate-50 text-slate-600 font-bold text-xs uppercase tracking-wider border-b-2 border-slate-200 w-[3.75rem] text-center">No</th>
                     <th class="px-4.5 py-3.5 bg-slate-50 text-slate-600 font-bold text-xs uppercase tracking-wider border-b-2 border-slate-200">Kode / Nama Terminal ATM</th>
                     <th class="px-4.5 py-3.5 bg-slate-50 text-slate-600 font-bold text-xs uppercase tracking-wider border-b-2 border-slate-200">Kantor Cabang Pengelola</th>
                     <th class="px-4.5 py-3.5 bg-slate-50 text-slate-600 font-bold text-xs uppercase tracking-wider border-b-2 border-slate-200 text-center">Jumlah Keluhan</th>
@@ -202,21 +202,21 @@
 
                         <!-- Kode Terminal -->
                         <td class="px-4.5 py-3.5 border-b border-slate-100">
-                            <div class="font-bold text-navy text-[15px] sm:text-[15.5px]">{{ $atm['terminal'] }}</div>
+                            <div class="font-bold text-navy text-[0.9375rem] sm:text-[0.96875rem]">{{ $atm['terminal'] }}</div>
                             @if(!empty($atm['atm_info']['id_luno']))
-                                <div class="text-[13.5px] text-slate-600 mt-1.5 font-semibold flex items-center gap-2">
-                                    <span class="text-slate-500 font-medium text-[13px]">Kode Mesin:</span>
-                                    <span class="font-extrabold font-mono text-navy text-[14.5px] px-2.5 py-0.5 rounded-lg bg-sky-50 border border-sky-300 tracking-wide shadow-2xs">{{ $atm['atm_info']['id_luno'] }}</span>
+                                <div class="text-[0.84375rem] text-slate-600 mt-1.5 font-semibold flex items-center gap-2">
+                                    <span class="text-slate-500 font-medium text-[0.8125rem]">Kode Mesin:</span>
+                                    <span class="font-extrabold font-mono text-navy text-[0.90625rem] px-2.5 py-0.5 rounded-lg bg-sky-50 border border-sky-300 tracking-wide shadow-2xs">{{ $atm['atm_info']['id_luno'] }}</span>
                                 </div>
                             @elseif(str_contains(strtoupper($atm['terminal']), 'BANK LAIN'))
-                                <div class="text-[12px] text-slate-500 mt-1 font-semibold">Kanal Transaksi Off-Us (ATM Bank Lain)</div>
+                                <div class="text-[0.75rem] text-slate-500 mt-1 font-semibold">Kanal Transaksi Off-Us (ATM Bank Lain)</div>
                             @elseif(str_contains(strtoupper($atm['terminal']), 'MOBILE BANKING') || str_contains(strtoupper($atm['terminal']), 'SMS BANKING'))
-                                <div class="text-[12px] text-slate-500 mt-1 font-semibold">Kanal Layanan Perbankan Digital</div>
+                                <div class="text-[0.75rem] text-slate-500 mt-1 font-semibold">Kanal Layanan Perbankan Digital</div>
                             @endif
                         </td>
 
                         <!-- Kantor Cabang (Redesigned) -->
-                        <td class="px-4.5 py-3.5 border-b border-slate-100 min-w-[280px]">
+                        <td class="px-4.5 py-3.5 border-b border-slate-100 min-w-[17.5rem]">
                             @if(!empty($atm['is_multi_cabang']))
                                 @php
                                     $branchList = array_values($atm['cabang_list'] ?? []);
@@ -228,7 +228,7 @@
                                 <div class="space-y-2 py-0.5">
                                     <!-- Badge Ringkas Multi-Cabang -->
                                     <div class="flex items-center justify-between gap-2">
-                                        <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-50 border border-amber-200 text-amber-800 font-bold text-[11px]">
+                                        <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-50 border border-amber-200 text-amber-800 font-bold text-[0.71875rem]">
                                             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="text-amber-600">
                                                 <path d="M12 2L2 7l10 5 10-5-10-5z"></path>
                                                 <path d="M2 17l10 5 10-5"></path>
@@ -236,7 +236,7 @@
                                             </svg>
                                             <span>Multi-Cabang ({{ count($branchList) }} Cabang)</span>
                                         </div>
-                                        <span class="text-[10.5px] text-slate-400 font-medium">Top 3 Pelapor:</span>
+                                        <span class="text-[0.71875rem] text-slate-500 font-medium">Top 3 Pelapor:</span>
                                     </div>
 
                                     <!-- Mini Horizontal Distribution List (Top 3) -->
@@ -246,21 +246,21 @@
                                                 $barWidth = round(($tb['count'] / max($maxBranchCount, 1)) * 100);
                                                 $hasCode = !empty($tb['kode']) && strtoupper(trim($tb['nama'])) !== 'CALL CENTER';
                                             @endphp
-                                            <div class="flex items-center gap-2 text-[11px]">
-                                                <div class="flex items-center gap-1.5 min-w-0 max-w-[170px]" title="{{ $hasCode ? '[' . $tb['kode'] . '] ' . $tb['nama'] : $tb['nama'] }}">
+                                            <div class="flex items-center gap-2 text-[0.71875rem]">
+                                                <div class="flex items-center gap-1.5 min-w-0 max-w-[10.625rem]" title="{{ $hasCode ? '[' . $tb['kode'] . '] ' . $tb['nama'] : $tb['nama'] }}">
                                                     @if($hasCode)
-                                                        <span class="px-1.5 py-0.5 rounded bg-slate-200/90 text-slate-700 font-mono font-bold text-[9.5px] shrink-0">
+                                                        <span class="px-1.5 py-0.5 rounded bg-slate-200/90 text-slate-700 font-mono font-bold text-[0.71875rem] shrink-0">
                                                             {{ $tb['kode'] }}
                                                         </span>
                                                     @endif
-                                                    <span class="font-semibold text-slate-700 truncate text-[11px]">
+                                                    <span class="font-semibold text-slate-700 truncate text-[0.71875rem]">
                                                         {{ $tb['nama'] }}
                                                     </span>
                                                 </div>
                                                 <div class="flex-1 h-1.5 bg-slate-200 rounded-full overflow-hidden">
                                                     <div class="h-full rounded-full {{ $tbIdx == 0 ? 'bg-amber-500' : 'bg-brand-blue' }}" style="width: {{ max($barWidth, 8) }}%;"></div>
                                                 </div>
-                                                <span class="font-bold text-slate-800 text-[10.5px] shrink-0 min-w-[22px] text-right">
+                                                <span class="font-bold text-slate-800 text-[0.71875rem] shrink-0 min-w-[1.375rem] text-right">
                                                     {{ $tb['count'] }}
                                                 </span>
                                             </div>
@@ -269,7 +269,7 @@
 
                                     <!-- Progressive Disclosure Action -->
                                     <div class="pt-0.5">
-                                        <button type="button" onclick='openMultiBranchDetail(@json($atm['terminal']), @json($branchList), {{ $atm['total_keluhan'] }})' class="inline-flex items-center gap-1 text-[11px] font-bold text-brand-blue hover:text-navy hover:underline cursor-pointer group">
+                                        <button type="button" onclick='openMultiBranchDetail(@json($atm['terminal']), @json($branchList), {{ $atm['total_keluhan'] }})' class="inline-flex items-center gap-1 text-[0.71875rem] font-bold text-brand-blue hover:text-navy hover:underline cursor-pointer group">
                                             @if($remainingCount > 0)
                                                 <span>+{{ $remainingCount }} cabang lainnya (lihat semua)</span>
                                                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="group-hover:translate-y-0.5 transition-transform">
@@ -287,7 +287,7 @@
                             @else
                                 <div class="font-semibold text-slate-700">{{ $atm['cabang_nama'] }}</div>
                                 @if(!empty($atm['cabang_kode']) && strtoupper(trim($atm['cabang_nama'])) !== 'CALL CENTER')
-                                    <div class="text-[11.5px] text-slate-400 mt-0.5">Kode Cabang: {{ $atm['cabang_kode'] }}</div>
+                                    <div class="text-[0.71875rem] text-slate-500 mt-0.5">Kode Cabang: {{ $atm['cabang_kode'] }}</div>
                                 @endif
                             @endif
                         </td>
@@ -318,13 +318,13 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="6" class="text-center py-10 px-5 text-slate-400">
+                        <td colspan="6" class="text-center py-10 px-5 text-slate-500">
                             <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="mx-auto mb-2.5 opacity-50">
                                 <rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect>
                                 <rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect>
                             </svg>
                             <div class="font-semibold text-sm text-slate-700">Tidak Ada Data Keluhan Mesin ATM</div>
-                            <div class="text-xs text-slate-400 mt-1">Tidak ditemukan mesin ATM yang sesuai dengan filter pencarian yang Anda tentukan.</div>
+                            <div class="text-xs text-slate-500 mt-1">Tidak ditemukan mesin ATM yang sesuai dengan filter pencarian yang Anda tentukan.</div>
                         </td>
                     </tr>
                 @endforelse
@@ -356,45 +356,45 @@
 
                     {{-- Tombol Pertama & Sebelumnya --}}
                     @if ($atms->onFirstPage())
-                        <span class="inline-flex items-center justify-center min-w-[34px] h-[34px] px-2.5 rounded-lg text-xs font-semibold border border-slate-200 bg-slate-50 text-slate-300 cursor-not-allowed" title="Halaman Pertama">«</span>
-                        <span class="inline-flex items-center justify-center min-w-[34px] h-[34px] px-2.5 rounded-lg text-xs font-semibold border border-slate-200 bg-slate-50 text-slate-300 cursor-not-allowed" title="Halaman Sebelumnya">‹ Sebelumnya</span>
+                        <span class="inline-flex items-center justify-center min-w-[2.125rem] h-[2.125rem] px-2.5 rounded-lg text-xs font-semibold border border-slate-200 bg-slate-50 text-slate-300 cursor-not-allowed" title="Halaman Pertama">«</span>
+                        <span class="inline-flex items-center justify-center min-w-[2.125rem] h-[2.125rem] px-2.5 rounded-lg text-xs font-semibold border border-slate-200 bg-slate-50 text-slate-300 cursor-not-allowed" title="Halaman Sebelumnya">‹ Sebelumnya</span>
                     @else
-                        <a href="{{ $atms->url(1) }}" class="inline-flex items-center justify-center min-w-[34px] h-[34px] px-2.5 rounded-lg text-xs font-semibold border border-slate-200 bg-white text-slate-700 hover:bg-sky-50 hover:border-sky-300 hover:text-brand-blue transition-colors" title="Halaman Pertama">«</a>
-                        <a href="{{ $atms->previousPageUrl() }}" class="inline-flex items-center justify-center min-w-[34px] h-[34px] px-2.5 rounded-lg text-xs font-semibold border border-slate-200 bg-white text-slate-700 hover:bg-sky-50 hover:border-sky-300 hover:text-brand-blue transition-colors" title="Halaman Sebelumnya">‹ Sebelumnya</a>
+                        <a href="{{ $atms->url(1) }}" class="inline-flex items-center justify-center min-w-[2.125rem] h-[2.125rem] px-2.5 rounded-lg text-xs font-semibold border border-slate-200 bg-white text-slate-700 hover:bg-sky-50 hover:border-sky-300 hover:text-brand-blue transition-colors" title="Halaman Pertama">«</a>
+                        <a href="{{ $atms->previousPageUrl() }}" class="inline-flex items-center justify-center min-w-[2.125rem] h-[2.125rem] px-2.5 rounded-lg text-xs font-semibold border border-slate-200 bg-white text-slate-700 hover:bg-sky-50 hover:border-sky-300 hover:text-brand-blue transition-colors" title="Halaman Sebelumnya">‹ Sebelumnya</a>
                     @endif
 
                     {{-- Halaman 1 & Ellipsis jika jauh --}}
                     @if($start > 1)
-                        <a href="{{ $atms->url(1) }}" class="inline-flex items-center justify-center min-w-[34px] h-[34px] px-2.5 rounded-lg text-xs font-semibold border border-slate-200 bg-white text-slate-700 hover:bg-sky-50 hover:border-sky-300 hover:text-brand-blue transition-colors">1</a>
+                        <a href="{{ $atms->url(1) }}" class="inline-flex items-center justify-center min-w-[2.125rem] h-[2.125rem] px-2.5 rounded-lg text-xs font-semibold border border-slate-200 bg-white text-slate-700 hover:bg-sky-50 hover:border-sky-300 hover:text-brand-blue transition-colors">1</a>
                         @if($start > 2)
-                            <span class="inline-flex items-center justify-center min-w-[28px] h-[34px] text-slate-400 font-bold">...</span>
+                            <span class="inline-flex items-center justify-center min-w-[1.75rem] h-[2.125rem] text-slate-500 font-bold">...</span>
                         @endif
                     @endif
 
                     {{-- Nomor Halaman Numerik --}}
                     @for ($i = $start; $i <= $end; $i++)
                         @if ($i == $current)
-                            <span class="inline-flex items-center justify-center min-w-[34px] h-[34px] px-2.5 rounded-lg text-xs font-bold border border-navy bg-navy text-white shadow-xs">{{ $i }}</span>
+                            <span class="inline-flex items-center justify-center min-w-[2.125rem] h-[2.125rem] px-2.5 rounded-lg text-xs font-bold border border-navy bg-navy text-white shadow-xs">{{ $i }}</span>
                         @else
-                            <a href="{{ $atms->url($i) }}" class="inline-flex items-center justify-center min-w-[34px] h-[34px] px-2.5 rounded-lg text-xs font-semibold border border-slate-200 bg-white text-slate-700 hover:bg-sky-50 hover:border-sky-300 hover:text-brand-blue transition-colors">{{ $i }}</a>
+                            <a href="{{ $atms->url($i) }}" class="inline-flex items-center justify-center min-w-[2.125rem] h-[2.125rem] px-2.5 rounded-lg text-xs font-semibold border border-slate-200 bg-white text-slate-700 hover:bg-sky-50 hover:border-sky-300 hover:text-brand-blue transition-colors">{{ $i }}</a>
                         @endif
                     @endfor
 
                     {{-- Halaman Terakhir & Ellipsis jika jauh --}}
                     @if($end < $last)
                         @if($end < $last - 1)
-                            <span class="inline-flex items-center justify-center min-w-[28px] h-[34px] text-slate-400 font-bold">...</span>
+                            <span class="inline-flex items-center justify-center min-w-[1.75rem] h-[2.125rem] text-slate-500 font-bold">...</span>
                         @endif
-                        <a href="{{ $atms->url($last) }}" class="inline-flex items-center justify-center min-w-[34px] h-[34px] px-2.5 rounded-lg text-xs font-semibold border border-slate-200 bg-white text-slate-700 hover:bg-sky-50 hover:border-sky-300 hover:text-brand-blue transition-colors">{{ $last }}</a>
+                        <a href="{{ $atms->url($last) }}" class="inline-flex items-center justify-center min-w-[2.125rem] h-[2.125rem] px-2.5 rounded-lg text-xs font-semibold border border-slate-200 bg-white text-slate-700 hover:bg-sky-50 hover:border-sky-300 hover:text-brand-blue transition-colors">{{ $last }}</a>
                     @endif
 
                     {{-- Tombol Selanjutnya & Terakhir --}}
                     @if ($atms->hasMorePages())
-                        <a href="{{ $atms->nextPageUrl() }}" class="inline-flex items-center justify-center min-w-[34px] h-[34px] px-2.5 rounded-lg text-xs font-semibold border border-slate-200 bg-white text-slate-700 hover:bg-sky-50 hover:border-sky-300 hover:text-brand-blue transition-colors" title="Halaman Selanjutnya">Selanjutnya ›</a>
-                        <a href="{{ $atms->url($last) }}" class="inline-flex items-center justify-center min-w-[34px] h-[34px] px-2.5 rounded-lg text-xs font-semibold border border-slate-200 bg-white text-slate-700 hover:bg-sky-50 hover:border-sky-300 hover:text-brand-blue transition-colors" title="Halaman Terakhir (Loncat)">»</a>
+                        <a href="{{ $atms->nextPageUrl() }}" class="inline-flex items-center justify-center min-w-[2.125rem] h-[2.125rem] px-2.5 rounded-lg text-xs font-semibold border border-slate-200 bg-white text-slate-700 hover:bg-sky-50 hover:border-sky-300 hover:text-brand-blue transition-colors" title="Halaman Selanjutnya">Selanjutnya ›</a>
+                        <a href="{{ $atms->url($last) }}" class="inline-flex items-center justify-center min-w-[2.125rem] h-[2.125rem] px-2.5 rounded-lg text-xs font-semibold border border-slate-200 bg-white text-slate-700 hover:bg-sky-50 hover:border-sky-300 hover:text-brand-blue transition-colors" title="Halaman Terakhir (Loncat)">»</a>
                     @else
-                        <span class="inline-flex items-center justify-center min-w-[34px] h-[34px] px-2.5 rounded-lg text-xs font-semibold border border-slate-200 bg-slate-50 text-slate-300 cursor-not-allowed" title="Halaman Selanjutnya">Selanjutnya ›</span>
-                        <span class="inline-flex items-center justify-center min-w-[34px] h-[34px] px-2.5 rounded-lg text-xs font-semibold border border-slate-200 bg-slate-50 text-slate-300 cursor-not-allowed" title="Halaman Terakhir">»</span>
+                        <span class="inline-flex items-center justify-center min-w-[2.125rem] h-[2.125rem] px-2.5 rounded-lg text-xs font-semibold border border-slate-200 bg-slate-50 text-slate-300 cursor-not-allowed" title="Halaman Selanjutnya">Selanjutnya ›</span>
+                        <span class="inline-flex items-center justify-center min-w-[2.125rem] h-[2.125rem] px-2.5 rounded-lg text-xs font-semibold border border-slate-200 bg-slate-50 text-slate-300 cursor-not-allowed" title="Halaman Terakhir">»</span>
                     @endif
                 </nav>
             @endif
@@ -436,10 +436,10 @@
         <div class="p-4 bg-slate-50 border-b border-slate-200 space-y-2.5">
             <div class="flex items-center gap-3">
                 <div class="relative flex-1">
-                    <div class="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none">
+                    <div class="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500 pointer-events-none">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
                     </div>
-                    <input type="text" id="mbSearchInput" oninput="renderMultiBranchList()" placeholder="Cari nama atau kode cabang..." class="w-full h-9 pl-9 pr-3 text-xs font-medium bg-white border border-slate-300 rounded-xl focus:border-brand-blue focus:ring-2 focus:ring-brand-blue/15 focus:outline-none transition-all placeholder:text-slate-400">
+                    <input type="text" id="mbSearchInput" oninput="renderMultiBranchList()" placeholder="Cari nama atau kode cabang..." class="w-full h-9 pl-9 pr-3 text-xs font-medium bg-white border border-slate-300 rounded-xl focus:border-brand-blue focus:ring-2 focus:ring-brand-blue/15 focus:outline-none transition-all placeholder:text-slate-500">
                 </div>
                 <div class="flex items-center gap-1.5 shrink-0">
                     <select id="mbSortSelect" onchange="renderMultiBranchList()" class="h-9 px-2.5 text-xs font-semibold text-slate-700 bg-white border border-slate-300 rounded-xl focus:border-brand-blue focus:outline-none cursor-pointer">
@@ -450,7 +450,7 @@
                 </div>
             </div>
 
-            <div class="flex items-center justify-between text-[11px] text-slate-500">
+            <div class="flex items-center justify-between text-[0.71875rem] text-slate-500">
                 <span id="mbShowingText">Menampilkan 0 cabang pelapor</span>
                 <span id="mbTotalText">Total: 0 keluhan</span>
             </div>
@@ -463,7 +463,7 @@
 
         <!-- Modal Footer -->
         <div class="px-6 py-3.5 bg-slate-50 border-t border-slate-200 flex items-center justify-between">
-            <div class="text-[11px] text-slate-500 flex items-center gap-1.5">
+            <div class="text-[0.71875rem] text-slate-500 flex items-center gap-1.5">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#0284c7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
                 <span>Mini bar proporsional terhadap cabang pelapor tertinggi.</span>
             </div>
@@ -542,10 +542,10 @@
 
         if (filtered.length === 0) {
             container.innerHTML = `
-                <div class="py-10 text-center text-slate-400">
+                <div class="py-10 text-center text-slate-500">
                     <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="mx-auto mb-2 opacity-50"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
                     <div class="text-xs font-semibold text-slate-600">Tidak ada kantor cabang yang cocok</div>
-                    <div class="text-[11px] text-slate-400 mt-0.5">Coba kata kunci pencarian yang lain</div>
+                    <div class="text-[0.71875rem] text-slate-500 mt-0.5">Coba kata kunci pencarian yang lain</div>
                 </div>
             `;
             return;
@@ -562,18 +562,18 @@
 
             html += `
                 <div class="p-2.5 rounded-xl hover:bg-slate-50 border border-slate-100 hover:border-slate-200 transition-all flex items-center gap-3">
-                    <span class="w-6 h-6 rounded-lg flex items-center justify-center font-bold text-[10.5px] shrink-0 ${rankClass}">
+                    <span class="w-6 h-6 rounded-lg flex items-center justify-center font-bold text-[0.71875rem] shrink-0 ${rankClass}">
                         ${idx + 1}
                     </span>
                     <div class="flex-1 min-w-0">
                         <div class="flex items-center justify-between gap-2 mb-1.5">
                             <div class="flex items-center gap-1.5 truncate">
                                 <span class="font-bold text-xs text-slate-800 truncate">${branch.nama}</span>
-                                ${branch.kode && branch.nama.toUpperCase().trim() !== 'CALL CENTER' ? `<span class="text-[10.5px] px-2 py-0.5 rounded-md bg-slate-200/85 text-slate-700 font-mono font-bold">Kode: ${branch.kode}</span>` : ''}
+                                ${branch.kode && branch.nama.toUpperCase().trim() !== 'CALL CENTER' ? `<span class="text-[0.71875rem] px-2 py-0.5 rounded-md bg-slate-200/85 text-slate-700 font-mono font-bold">Kode: ${branch.kode}</span>` : ''}
                             </div>
                             <div class="flex items-center gap-2 shrink-0">
                                 <span class="font-extrabold text-xs text-navy px-2.5 py-0.5 rounded-md bg-sky-50 border border-sky-100">
-                                    ${branch.count} <span class="font-normal text-[10px] text-slate-500">kasus</span>
+                                    ${branch.count} <span class="font-normal text-[0.71875rem] text-slate-500">kasus</span>
                                 </span>
                             </div>
                         </div>

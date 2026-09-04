@@ -5,7 +5,7 @@
 @section('page_subtitle', 'Ringkasan performa penyelesaian keluhan, tren, cabang, & channel transaksi')
 
 @section('topbar_action')
-    <a href="{{ route('jurnal.create') }}" class="inline-flex items-center gap-2 h-[38px] px-4 rounded-xl bg-gradient-to-r from-brand-blue to-navy text-white text-xs font-bold shadow-sm shadow-brand-blue/20 hover:brightness-110 transition-all">
+    <a href="{{ route('jurnal.create') }}" class="inline-flex items-center gap-2 h-[2.375rem] px-4 rounded-xl bg-gradient-to-r from-brand-blue to-navy text-white text-xs font-bold shadow-sm shadow-brand-blue/20 hover:brightness-110 transition-all">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
             <line x1="12" y1="5" x2="12" y2="19"></line>
             <line x1="5" y1="12" x2="19" y2="12"></line>
@@ -32,7 +32,7 @@
 
     <div class="relative z-10 flex items-center gap-3">
         <div class="text-right hidden md:block">
-            <div class="text-[11px] uppercase tracking-wider text-blue-200 font-semibold">Total Kasus Aktif</div>
+            <div class="text-[0.71875rem] uppercase tracking-wider text-blue-200 font-semibold">Total Kasus Aktif</div>
             <div class="text-2xl font-black text-amber-300 leading-tight">{{ number_format($totalKasus, 0, ',', '.') }}</div>
         </div>
     </div>
@@ -56,12 +56,12 @@
             </div>
             @if($previousPeriodStats['delta_kasus'] !== null)
                 @php $d = $previousPeriodStats['delta_kasus']; @endphp
-                <span class="text-[10px] font-extrabold px-2 py-0.5 rounded-full {{ $d > 0 ? 'bg-rose-100 text-rose-700' : ($d < 0 ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-500') }}">
+                <span class="text-[0.71875rem] font-extrabold px-2 py-0.5 rounded-full {{ $d > 0 ? 'bg-rose-100 text-rose-700' : ($d < 0 ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-500') }}">
                     {{ $d > 0 ? '▲' : ($d < 0 ? '▼' : '') }} {{ number_format(abs($d), 1) }}%
                 </span>
             @endif
         </div>
-        <h4 class="text-[11px] text-slate-500 font-bold uppercase tracking-wider m-0 mb-0.5">Total Kasus</h4>
+        <h4 class="text-[0.71875rem] text-slate-500 font-bold uppercase tracking-wider m-0 mb-0.5">Total Kasus</h4>
         <div class="text-2xl font-black text-navy leading-tight">{{ number_format($totalKasus, 0, ',', '.') }}</div>
         <div id="sparkKasus" class="mt-1 h-10"></div>
     </div>
@@ -77,12 +77,12 @@
             </div>
             @if($previousPeriodStats['delta_nominal'] !== null)
                 @php $d = $previousPeriodStats['delta_nominal']; @endphp
-                <span class="text-[10px] font-extrabold px-2 py-0.5 rounded-full {{ $d > 0 ? 'bg-rose-100 text-rose-700' : ($d < 0 ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-500') }}">
+                <span class="text-[0.71875rem] font-extrabold px-2 py-0.5 rounded-full {{ $d > 0 ? 'bg-rose-100 text-rose-700' : ($d < 0 ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-500') }}">
                     {{ $d > 0 ? '▲' : ($d < 0 ? '▼' : '') }} {{ number_format(abs($d), 1) }}%
                 </span>
             @endif
         </div>
-        <h4 class="text-[11px] text-slate-500 font-bold uppercase tracking-wider m-0 mb-0.5">Total Nominal</h4>
+        <h4 class="text-[0.71875rem] text-slate-500 font-bold uppercase tracking-wider m-0 mb-0.5">Total Nominal</h4>
         <div class="text-lg font-black text-navy leading-tight" title="Rp {{ number_format($totalNominal, 0, ',', '.') }}">
             @if($totalNominal >= 1000000000)
                 Rp {{ number_format($totalNominal / 1000000000, 2, ',', '.') }} M
@@ -105,9 +105,9 @@
                 </svg>
             </div>
         </div>
-        <h4 class="text-[11px] text-slate-500 font-bold uppercase tracking-wider m-0 mb-0.5">Rata-rata Selesai</h4>
-        <div class="text-2xl font-black text-navy leading-tight">{{ number_format($avgResolutionDays, 1, ',', '.') }} <span class="text-sm font-bold text-slate-400">hari</span></div>
-        <div class="text-[10.5px] text-slate-400 mt-2">{{ $resolvedCount }} keluhan selesai</div>
+        <h4 class="text-[0.71875rem] text-slate-500 font-bold uppercase tracking-wider m-0 mb-0.5">Rata-rata Selesai</h4>
+        <div class="text-2xl font-black text-navy leading-tight">{{ number_format($avgResolutionDays, 1, ',', '.') }} <span class="text-sm font-bold text-slate-500">hari</span></div>
+        <div class="text-[0.71875rem] text-slate-500 mt-2">{{ $resolvedCount }} keluhan selesai</div>
     </div>
 
     {{-- Card 4: Resolution Rate --}}
@@ -121,13 +121,13 @@
             </div>
             @if($previousPeriodStats['delta_resolution'] !== null)
                 @php $d = $previousPeriodStats['delta_resolution']; @endphp
-                <span class="text-[10px] font-extrabold px-2 py-0.5 rounded-full {{ $d < 0 ? 'bg-rose-100 text-rose-700' : ($d > 0 ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-500') }}">
+                <span class="text-[0.71875rem] font-extrabold px-2 py-0.5 rounded-full {{ $d < 0 ? 'bg-rose-100 text-rose-700' : ($d > 0 ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-500') }}">
                     {{ $d > 0 ? '▲' : ($d < 0 ? '▼' : '') }} {{ number_format(abs($d), 1) }} pp
                 </span>
             @endif
         </div>
-        <h4 class="text-[11px] text-slate-500 font-bold uppercase tracking-wider m-0 mb-0.5">Resolution Rate</h4>
-        <div class="text-2xl font-black text-navy leading-tight">{{ number_format($resolutionRate, 1, ',', '.') }}<span class="text-sm font-bold text-slate-400">%</span></div>
+        <h4 class="text-[0.71875rem] text-slate-500 font-bold uppercase tracking-wider m-0 mb-0.5">Resolution Rate</h4>
+        <div class="text-2xl font-black text-navy leading-tight">{{ number_format($resolutionRate, 1, ',', '.') }}<span class="text-sm font-bold text-slate-500">%</span></div>
         <div class="mt-2 h-1.5 rounded-full bg-slate-100 overflow-hidden">
             <div class="h-full bg-gradient-to-r from-purple-500 to-emerald-500 rounded-full" style="width: {{ min($resolutionRate, 100) }}%"></div>
         </div>
@@ -144,9 +144,9 @@
                 </svg>
             </div>
         </div>
-        <h4 class="text-[11px] text-blue-100 font-bold uppercase tracking-wider m-0 mb-0.5">Cabang Aktif</h4>
+        <h4 class="text-[0.71875rem] text-blue-100 font-bold uppercase tracking-wider m-0 mb-0.5">Cabang Aktif</h4>
         <div class="text-2xl font-black text-white leading-tight">{{ number_format($totalCabang, 0, ',', '.') }} <span class="text-sm font-bold text-blue-200">unit</span></div>
-        <div class="text-[10.5px] text-blue-100 mt-2">Kantor cabang & KCP terdaftar</div>
+        <div class="text-[0.71875rem] text-blue-100 mt-2">Kantor cabang & KCP terdaftar</div>
     </div>
 </div>
 
@@ -162,7 +162,7 @@
                     </svg>
                     <span>Tren Keluhan 12 Bulan Terakhir</span>
                 </h3>
-                <p class="text-[11px] text-slate-500 mt-0.5">Bar biru: jumlah kasus &bull; Garis kuning: total nominal (juta Rp)</p>
+                <p class="text-[0.71875rem] text-slate-500 mt-0.5">Bar biru: jumlah kasus &bull; Garis kuning: total nominal (juta Rp)</p>
             </div>
         </div>
         <div id="monthlyTrendChart" style="min-height: 320px;"></div>
@@ -194,12 +194,12 @@
                 </svg>
                 <span>Breakdown Keluhan per Channel Transaksi</span>
             </h3>
-            <p class="text-[11px] text-slate-500 mt-0.5">Identifikasi channel dengan kontribusi keluhan tertinggi</p>
+            <p class="text-[0.71875rem] text-slate-500 mt-0.5">Identifikasi channel dengan kontribusi keluhan tertinggi</p>
         </div>
-        <div class="text-[11px] text-slate-500">Total: <strong class="text-navy">{{ $channelBreakdown->count() }}</strong> channel aktif</div>
+        <div class="text-[0.71875rem] text-slate-500">Total: <strong class="text-navy">{{ $channelBreakdown->count() }}</strong> channel aktif</div>
     </div>
     @if($channelBreakdown->isEmpty())
-        <div class="text-center py-8 text-xs text-slate-400">Belum ada data keluhan pada periode ini.</div>
+        <div class="text-center py-8 text-xs text-slate-500">Belum ada data keluhan pada periode ini.</div>
     @else
         <div id="channelBreakdownChart" style="min-height: 300px;"></div>
     @endif
@@ -217,7 +217,7 @@
                 </svg>
                 <span>Top 10 Cabang Bermasalah</span>
             </h3>
-            <a href="{{ route('jurnal.index') }}" class="text-[11.5px] font-bold text-brand-blue hover:underline">Detail &rsaquo;</a>
+            <a href="{{ route('jurnal.index') }}" class="text-[0.71875rem] font-bold text-brand-blue hover:underline">Detail &rsaquo;</a>
         </div>
         <div class="flex flex-col gap-1.5">
             @php $maxCabang = $branchRanking->max('total_kasus') ?: 1; @endphp
@@ -226,21 +226,21 @@
                 <a href="{{ route('jurnal.index') }}?master_cabang_id={{ $cab->id }}" class="group block p-2.5 rounded-xl hover:bg-slate-50 border border-transparent hover:border-slate-200 transition-all">
                     <div class="flex items-center justify-between mb-1.5">
                         <div class="flex items-center gap-2 overflow-hidden">
-                            <span class="w-5 h-5 rounded-md bg-navy text-white text-[10px] font-bold flex items-center justify-center shrink-0">{{ $idx + 1 }}</span>
-                            <span class="font-mono text-[10px] text-slate-400 shrink-0">{{ $cab->kode_cabang ?: '---' }}</span>
+                            <span class="w-5 h-5 rounded-md bg-navy text-white text-[0.71875rem] font-bold flex items-center justify-center shrink-0">{{ $idx + 1 }}</span>
+                            <span class="font-mono text-[0.71875rem] text-slate-500 shrink-0">{{ $cab->kode_cabang ?: '---' }}</span>
                             <span class="text-xs font-bold text-slate-800 truncate group-hover:text-brand-blue">{{ $cab->nama_cabang }}</span>
                         </div>
-                        <span class="text-[11px] font-extrabold text-navy shrink-0">{{ $cab->total_kasus }}</span>
+                        <span class="text-[0.71875rem] font-extrabold text-navy shrink-0">{{ $cab->total_kasus }}</span>
                     </div>
                     <div class="flex items-center gap-3">
                         <div class="flex-1 h-1.5 rounded-full bg-slate-100 overflow-hidden">
                             <div class="h-full bg-gradient-to-r from-sky-400 to-brand-blue rounded-full" style="width: {{ $pct }}%"></div>
                         </div>
-                        <span class="text-[10.5px] text-slate-500 font-semibold tabular-nums shrink-0">Rp {{ number_format($cab->total_nominal / 1000000, 1, ',', '.') }} Jt</span>
+                        <span class="text-[0.71875rem] text-slate-500 font-semibold tabular-nums shrink-0">Rp {{ number_format($cab->total_nominal / 1000000, 1, ',', '.') }} Jt</span>
                     </div>
                 </a>
             @empty
-                <div class="text-center py-8 text-xs text-slate-400">Belum ada data keluhan per cabang.</div>
+                <div class="text-center py-8 text-xs text-slate-500">Belum ada data keluhan per cabang.</div>
             @endforelse
         </div>
     </div>
@@ -255,7 +255,7 @@
                 </svg>
                 <span>Top 10 Mesin ATM Bermasalah</span>
             </h3>
-            <a href="{{ route('atm.index') }}" class="text-[11.5px] font-bold text-brand-blue hover:underline">Detail &rsaquo;</a>
+            <a href="{{ route('atm.index') }}" class="text-[0.71875rem] font-bold text-brand-blue hover:underline">Detail &rsaquo;</a>
         </div>
         <div class="flex flex-col gap-1.5">
             @php $maxAtm = $topAtms->max('total_keluhan') ?: 1; @endphp
@@ -267,23 +267,23 @@
                 <a href="{{ route('atm.index') }}?q={{ urlencode($atm->terminal_transaksi) }}" class="group block p-2.5 rounded-xl hover:bg-slate-50 border border-transparent hover:border-slate-200 transition-all">
                     <div class="flex items-center justify-between mb-1.5">
                         <div class="flex items-center gap-2 overflow-hidden">
-                            <span class="w-5 h-5 rounded-md bg-amber-500 text-white text-[10px] font-bold flex items-center justify-center shrink-0">{{ $idx + 1 }}</span>
+                            <span class="w-5 h-5 rounded-md bg-amber-500 text-white text-[0.71875rem] font-bold flex items-center justify-center shrink-0">{{ $idx + 1 }}</span>
                             <div class="overflow-hidden">
                                 <div class="text-xs font-bold text-slate-800 truncate group-hover:text-amber-700">{{ $atm->terminal_transaksi }}</div>
-                                <div class="text-[10px] text-slate-400 truncate">{{ $info['lokasi'] ?? '-' }} &bull; {{ $info['cabang'] ?? '-' }}</div>
+                                <div class="text-[0.71875rem] text-slate-500 truncate">{{ $info['lokasi'] ?? '-' }} &bull; {{ $info['cabang'] ?? '-' }}</div>
                             </div>
                         </div>
-                        <span class="text-[11px] font-extrabold text-amber-700 shrink-0">{{ $atm->total_keluhan }}</span>
+                        <span class="text-[0.71875rem] font-extrabold text-amber-700 shrink-0">{{ $atm->total_keluhan }}</span>
                     </div>
                     <div class="flex items-center gap-3">
                         <div class="flex-1 h-1.5 rounded-full bg-slate-100 overflow-hidden">
                             <div class="h-full bg-gradient-to-r from-amber-400 to-orange-500 rounded-full" style="width: {{ $pct }}%"></div>
                         </div>
-                        <span class="text-[10.5px] text-slate-500 font-semibold tabular-nums shrink-0">Rp {{ number_format($atm->total_nominal / 1000000, 1, ',', '.') }} Jt</span>
+                        <span class="text-[0.71875rem] text-slate-500 font-semibold tabular-nums shrink-0">Rp {{ number_format($atm->total_nominal / 1000000, 1, ',', '.') }} Jt</span>
                     </div>
                 </a>
             @empty
-                <div class="text-center py-8 text-xs text-slate-400">Belum ada data keluhan mesin ATM.</div>
+                <div class="text-center py-8 text-xs text-slate-500">Belum ada data keluhan mesin ATM.</div>
             @endforelse
         </div>
     </div>
@@ -301,16 +301,16 @@
                 </svg>
                 <span>Laporan Keluhan Terbaru</span>
             </h3>
-            <a href="{{ route('jurnal.index') }}" class="text-[11.5px] font-bold text-brand-blue hover:underline">Semua Data &rsaquo;</a>
+            <a href="{{ route('jurnal.index') }}" class="text-[0.71875rem] font-bold text-brand-blue hover:underline">Semua Data &rsaquo;</a>
         </div>
         <div class="overflow-x-auto">
             <table class="w-full border-collapse text-xs text-left">
                 <thead>
                     <tr>
-                        <th class="pb-2.5 text-slate-500 font-bold uppercase tracking-wider text-[11px]">Nasabah</th>
-                        <th class="pb-2.5 text-slate-500 font-bold uppercase tracking-wider text-[11px]">Jenis Transaksi</th>
-                        <th class="pb-2.5 text-slate-500 font-bold uppercase tracking-wider text-[11px] text-right">Nominal</th>
-                        <th class="pb-2.5 text-slate-500 font-bold uppercase tracking-wider text-[11px] text-center">Status</th>
+                        <th class="pb-2.5 text-slate-500 font-bold uppercase tracking-wider text-[0.71875rem]">Nasabah</th>
+                        <th class="pb-2.5 text-slate-500 font-bold uppercase tracking-wider text-[0.71875rem]">Jenis Transaksi</th>
+                        <th class="pb-2.5 text-slate-500 font-bold uppercase tracking-wider text-[0.71875rem] text-right">Nominal</th>
+                        <th class="pb-2.5 text-slate-500 font-bold uppercase tracking-wider text-[0.71875rem] text-center">Status</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-100">
@@ -318,11 +318,11 @@
                         <tr class="hover:bg-slate-50/80 transition-colors">
                             <td class="py-3 pr-3">
                                 <div class="font-bold text-navy text-xs">{{ $jurnal->nama_nasabah }}</div>
-                                <div class="text-[11px] text-slate-400">Resi: {{ $jurnal->no_resi }} &bull; {{ $jurnal->masterCabang->nama_cabang ?? '-' }}</div>
+                                <div class="text-[0.71875rem] text-slate-500">Resi: {{ $jurnal->no_resi }} &bull; {{ $jurnal->masterCabang->nama_cabang ?? '-' }}</div>
                             </td>
                             <td class="py-3 pr-3">
                                 <div class="font-semibold text-slate-700">{{ $jurnal->masterTransaksi->jenis_transaksi ?? '-' }}</div>
-                                <div class="text-[11px] text-slate-400">{{ $jurnal->terminal_transaksi ?: 'Non-ATM' }}</div>
+                                <div class="text-[0.71875rem] text-slate-500">{{ $jurnal->terminal_transaksi ?: 'Non-ATM' }}</div>
                             </td>
                             <td class="py-3 pr-3 text-right font-bold text-slate-800 tabular-nums">
                                 Rp {{ number_format($jurnal->nominal_transaksi, 0, ',', '.') }}
@@ -330,21 +330,21 @@
                             <td class="py-3 text-center">
                                 @php $st = strtolower($jurnal->status); @endphp
                                 @if($st == 'success')
-                                    <span class="inline-block px-2.5 py-0.5 rounded-full text-[11px] font-extrabold bg-emerald-100 text-emerald-700">Success</span>
+                                    <span class="inline-block px-2.5 py-0.5 rounded-full text-[0.71875rem] font-extrabold bg-emerald-100 text-emerald-700">Success</span>
                                 @elseif($st == 'menunggu')
-                                    <span class="inline-block px-2.5 py-0.5 rounded-full text-[11px] font-extrabold bg-amber-100 text-amber-700">Menunggu</span>
+                                    <span class="inline-block px-2.5 py-0.5 rounded-full text-[0.71875rem] font-extrabold bg-amber-100 text-amber-700">Menunggu</span>
                                 @elseif($st == 'done')
-                                    <span class="inline-block px-2.5 py-0.5 rounded-full text-[11px] font-extrabold bg-sky-100 text-sky-700">Done</span>
+                                    <span class="inline-block px-2.5 py-0.5 rounded-full text-[0.71875rem] font-extrabold bg-sky-100 text-sky-700">Done</span>
                                 @elseif($st == 'rejected')
-                                    <span class="inline-block px-2.5 py-0.5 rounded-full text-[11px] font-extrabold bg-rose-100 text-rose-700">Rejected</span>
+                                    <span class="inline-block px-2.5 py-0.5 rounded-full text-[0.71875rem] font-extrabold bg-rose-100 text-rose-700">Rejected</span>
                                 @else
-                                    <span class="inline-block px-2.5 py-0.5 rounded-full text-[11px] font-extrabold bg-slate-100 text-slate-700">{{ $jurnal->status }}</span>
+                                    <span class="inline-block px-2.5 py-0.5 rounded-full text-[0.71875rem] font-extrabold bg-slate-100 text-slate-700">{{ $jurnal->status }}</span>
                                 @endif
                             </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="4" class="text-center py-8 text-xs text-slate-400">
+                            <td colspan="4" class="text-center py-8 text-xs text-slate-500">
                                 Belum ada data keluhan nasabah.
                             </td>
                         </tr>
@@ -366,7 +366,7 @@
                 <span>Backlog &gt; 7 Hari</span>
             </h3>
             @if($pendingOverdue->isNotEmpty())
-                <span class="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-rose-100 text-rose-700">{{ $pendingOverdue->count() }} URGENT</span>
+                <span class="text-[0.71875rem] font-extrabold px-2 py-0.5 rounded-full bg-rose-100 text-rose-700">{{ $pendingOverdue->count() }} URGENT</span>
             @endif
         </div>
         <div class="flex flex-col gap-2">
@@ -374,10 +374,10 @@
                 <a href="{{ route('jurnal.index') }}?q={{ urlencode($backlog->no_resi) }}" class="group block p-2.5 rounded-xl bg-rose-50/50 border border-rose-100 hover:bg-rose-50 hover:border-rose-200 transition-all">
                     <div class="flex items-center justify-between mb-1">
                         <div class="text-xs font-bold text-slate-800 truncate group-hover:text-rose-700">{{ $backlog->nama_nasabah }}</div>
-                        <span class="text-[10px] font-extrabold text-rose-700 shrink-0 ml-2">{{ $backlog->days_pending }} hari</span>
+                        <span class="text-[0.71875rem] font-extrabold text-rose-700 shrink-0 ml-2">{{ $backlog->days_pending }} hari</span>
                     </div>
-                    <div class="text-[10.5px] text-slate-500 truncate">{{ $backlog->masterCabang->nama_cabang ?? '-' }} &bull; Rp {{ number_format($backlog->nominal_transaksi, 0, ',', '.') }}</div>
-                    <div class="text-[10px] text-slate-400 mt-0.5">Terima: {{ \Carbon\Carbon::parse($backlog->tgl_terima)->locale('id')->translatedFormat('d M Y') }}</div>
+                    <div class="text-[0.71875rem] text-slate-500 truncate">{{ $backlog->masterCabang->nama_cabang ?? '-' }} &bull; Rp {{ number_format($backlog->nominal_transaksi, 0, ',', '.') }}</div>
+                    <div class="text-[0.71875rem] text-slate-500 mt-0.5">Terima: {{ \Carbon\Carbon::parse($backlog->tgl_terima)->locale('id')->translatedFormat('d M Y') }}</div>
                 </a>
             @empty
                 <div class="text-center py-8">
@@ -387,7 +387,7 @@
                         </svg>
                     </div>
                     <div class="text-xs font-bold text-slate-700">Semua kasus tertangani!</div>
-                    <div class="text-[11px] text-slate-400 mt-0.5">Tidak ada backlog &gt; 7 hari.</div>
+                    <div class="text-[0.71875rem] text-slate-500 mt-0.5">Tidak ada backlog &gt; 7 hari.</div>
                 </div>
             @endforelse
         </div>
@@ -405,7 +405,7 @@
         </div>
         <div>
             <div class="text-xs font-extrabold text-navy">Input Keluhan Baru</div>
-            <div class="text-[11px] text-slate-500">Catat keluhan nasabah baru</div>
+            <div class="text-[0.71875rem] text-slate-500">Catat keluhan nasabah baru</div>
         </div>
     </a>
     <a href="{{ route('laporan.index') }}" class="bg-white border border-slate-200 rounded-2xl p-4 shadow-xs hover:shadow-md hover:-translate-y-0.5 transition-all flex items-center gap-3 group">
@@ -418,7 +418,7 @@
         </div>
         <div>
             <div class="text-xs font-extrabold text-navy">Laporan Rekap Bulanan</div>
-            <div class="text-[11px] text-slate-500">Matriks 12 bulan &amp; export Excel</div>
+            <div class="text-[0.71875rem] text-slate-500">Matriks 12 bulan &amp; export Excel</div>
         </div>
     </a>
     <a href="{{ route('atm.index') }}" class="bg-white border border-slate-200 rounded-2xl p-4 shadow-xs hover:shadow-md hover:-translate-y-0.5 transition-all flex items-center gap-3 group">
@@ -430,7 +430,7 @@
         </div>
         <div>
             <div class="text-xs font-extrabold text-navy">Monitoring ATM</div>
-            <div class="text-[11px] text-slate-500">Peringkat &amp; drill-down mesin</div>
+            <div class="text-[0.71875rem] text-slate-500">Peringkat &amp; drill-down mesin</div>
         </div>
     </a>
 </div>

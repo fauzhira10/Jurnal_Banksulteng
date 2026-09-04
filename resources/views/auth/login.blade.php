@@ -17,7 +17,7 @@
 <!-- Subtle Background Decorative Elements -->
 <div class="absolute inset-0 bg-pattern-dots pointer-events-none"></div>
 
-<div class="bg-white w-full max-w-[440px] rounded-2xl shadow-2xl overflow-hidden relative z-10 animate-modal-in">
+<div class="bg-white w-full max-w-[27.5rem] rounded-2xl shadow-2xl overflow-hidden relative z-10 animate-modal-in">
     <!-- Header -->
     <div class="bg-gradient-to-br from-navy to-navy-dark text-white pt-8 px-7 pb-6 text-center border-b-[3px] border-brand-gold relative">
         <div class="w-13 h-13 bg-white rounded-xl inline-flex items-center justify-center text-navy mb-3 shadow-lg">
@@ -28,7 +28,7 @@
                 <path d="M7 16h6"/>
             </svg>
         </div>
-        <h1 class="text-[19px] font-extrabold tracking-wide mb-1 text-white">PORTAL E-JURNAL</h1>
+        <h1 class="text-[1.1875rem] font-extrabold tracking-wide mb-1 text-white">PORTAL E-JURNAL</h1>
         <p class="text-xs text-blue-200 font-medium">PT Bank Pembangunan Daerah Sulawesi Tengah</p>
     </div>
 
@@ -36,7 +36,7 @@
     <div class="p-7 sm:p-8">
         <!-- Notifikasi Sukses Logout -->
         @if(session('success'))
-            <div class="bg-emerald-50 border border-emerald-200 text-emerald-900 rounded-xl p-3.5 text-[13px] mb-4.5 flex items-center gap-2.5 shadow-xs">
+            <div class="bg-emerald-50 border border-emerald-200 text-emerald-900 rounded-xl p-3.5 text-[0.8125rem] mb-4.5 flex items-center gap-2.5 shadow-xs">
                 <svg class="w-4.5 h-4.5 text-emerald-600 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
                     <polyline points="22 4 12 14.01 9 11.01"></polyline>
@@ -47,7 +47,7 @@
 
         <!-- Notifikasi Error Login -->
         @if (isset($errors) && $errors->any())
-            <div class="bg-rose-50 border border-rose-200 text-rose-900 rounded-xl p-3.5 text-[13px] mb-4.5 flex items-center gap-2.5 shadow-xs">
+            <div class="bg-rose-50 border border-rose-200 text-rose-900 rounded-xl p-3.5 text-[0.8125rem] mb-4.5 flex items-center gap-2.5 shadow-xs">
                 <svg class="w-4.5 h-4.5 text-rose-600 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <circle cx="12" cy="12" r="10"></circle>
                     <line x1="12" y1="8" x2="12" y2="12"></line>
@@ -62,9 +62,9 @@
 
             <!-- Username Input -->
             <div class="mb-5 flex flex-col gap-1.5">
-                <label for="username" class="text-[13px] font-semibold text-slate-700">Username Petugas</label>
+                <label for="username" class="text-[0.8125rem] font-semibold text-slate-700">Username Petugas</label>
                 <div class="relative flex items-center">
-                    <span class="absolute left-3.5 text-slate-400 pointer-events-none flex items-center">
+                    <span class="absolute left-3.5 text-slate-500 pointer-events-none flex items-center">
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
                             <circle cx="12" cy="7" r="4"></circle>
@@ -76,16 +76,16 @@
 
             <!-- Password Input -->
             <div class="mb-5 flex flex-col gap-1.5">
-                <label for="password" class="text-[13px] font-semibold text-slate-700">Kata Sandi</label>
+                <label for="password" class="text-[0.8125rem] font-semibold text-slate-700">Kata Sandi</label>
                 <div class="relative flex items-center">
-                    <span class="absolute left-3.5 text-slate-400 pointer-events-none flex items-center">
+                    <span class="absolute left-3.5 text-slate-500 pointer-events-none flex items-center">
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
                             <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
                         </svg>
                     </span>
                     <input type="password" name="password" id="password" class="w-full py-2.5 pl-11 pr-11 border border-slate-300 rounded-xl text-sm text-slate-800 placeholder-slate-400 transition-all duration-200 focus:border-brand-blue focus:ring-3 focus:ring-brand-blue/15 focus:outline-none" required placeholder="Masukkan kata sandi">
-                    <button type="button" class="absolute right-3 bg-transparent border-0 text-slate-400 hover:text-slate-600 cursor-pointer p-1 flex items-center" id="togglePwd" title="Tampilkan/Sembunyikan Sandi">
+                    <button type="button" class="absolute right-3 bg-transparent border-0 text-slate-500 hover:text-slate-600 cursor-pointer p-1 flex items-center" id="togglePwd" title="Tampilkan/Sembunyikan Sandi">
                         <svg id="eyeIcon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
                             <circle cx="12" cy="12" r="3"></circle>
@@ -95,7 +95,7 @@
             </div>
 
             <!-- Submit Button -->
-            <button type="submit" class="w-full py-3 px-5 bg-gradient-to-r from-brand-blue to-navy text-white rounded-xl text-[15px] font-bold cursor-pointer shadow-lg shadow-brand-blue/30 hover:opacity-95 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-brand-blue/40 transition-all duration-200 flex items-center justify-center gap-2 mt-6.5">
+            <button type="submit" class="w-full py-3 px-5 bg-gradient-to-r from-brand-blue to-navy text-white rounded-xl text-[0.9375rem] font-bold cursor-pointer shadow-lg shadow-brand-blue/30 hover:opacity-95 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-brand-blue/40 transition-all duration-200 flex items-center justify-center gap-2 mt-6.5">
                 <span>Masuk ke Sistem</span>
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path>
@@ -107,7 +107,7 @@
     </div>
 
     <!-- Footer -->
-    <div class="px-7 py-4 text-center text-[11.5px] text-slate-400 border-t border-slate-200 bg-slate-50/80">
+    <div class="px-7 py-4 text-center text-[0.71875rem] text-slate-500 border-t border-slate-200 bg-slate-50/80">
         &copy; {{ date('Y') }} PT Bank Sulteng &bull; Layanan Pengaduan & Jurnal Keluhan
     </div>
 </div>

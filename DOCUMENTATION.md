@@ -89,6 +89,23 @@ CS kirim pengaduan ──► Terkirim ──► Diterima ──► Diproses ─�
 
 Sinkronisasi status jurnal → pengaduan berjalan otomatis (observer). Menghapus jurnal mengembalikan pengaduan ke `Diterima`.
 
+### Skala Tampilan Adaptif
+Ukuran tampilan sistem **menyesuaikan lebar layar secara otomatis**. Pada laptop 14 inci ukurannya tetap seperti biasa, lalu membesar bertahap pada monitor yang lebih besar sehingga teks tidak terasa mengecil dan pengguna tidak perlu melakukan zoom.
+
+| Lebar layar | Contoh perangkat | Ukuran teks isi | Teks terkecil |
+|:---|:---|:---:|:---:|
+| 1366 px | Laptop 14 inci | 14,0 px | 11,5 px |
+| 1920 px | Monitor 22–24 inci | 15,0 px | 12,3 px |
+| 2560 px | Monitor 27 inci QHD | 16,2 px | 13,3 px |
+| 3840 px | Monitor 4K | 16,6 px | 13,7 px |
+
+Seluruh elemen ikut berskala: tinggi tombol, lebar sidebar, lebar kolom tabel, dan jarak antarelemen, sehingga proporsi tampilan tetap terjaga. Pengaturan ukuran huruf bawaan browser pengguna juga tetap dihormati, jadi pengguna yang memperbesar teks lewat pengaturan browser tetap terlayani. Dokumen cetak A4 pada menu Cetak sengaja dikecualikan agar hasil cetaknya tetap presisi.
+
+Ukuran teks terkecil dinaikkan menjadi 11,5 piksel dan warna teks keterangan dipertegas agar memenuhi standar keterbacaan WCAG AA.
+
+### Dialog Konfirmasi
+Tindakan penting seperti **Terima Pengaduan**, **Tolak Pengaduan**, menghapus lampiran, dan menonaktifkan akun pengguna memakai **modal konfirmasi bergaya sistem**, bukan dialog bawaan browser. Setiap dialog menampilkan ikon berwarna, judul, rincian data yang terdampak, serta tombol Batal dan tombol lanjut yang warnanya menyesuaikan tingkat risiko tindakan. Modal dapat ditutup dengan tombol Batal, tombol Escape, atau mengklik area di luar kotak.
+
 ### Field Formulir Pengaduan CS (`/cs/pengaduan/input`)
 
 | Bagian | Field | Keterangan |
@@ -158,7 +175,7 @@ Pengaturan ada di `config/pengaduan.php`: `lebar_maks_gambar`, `kualitas_gambar`
 | 2 | **No. Rekening** | `no_rekening` | Text | **Wajib (`*`)** | Nomor rekening nasabah yang didebet. |
 | 3 | **No. Resi / Trace Number** | `no_resi` | Text | **Wajib (`*`)** | Nomor resi/trace transaksi ATM/EDC/Mobile. |
 | 4 | **Nomor Kartu ATM/Debit** | `no_kartu` | Text | **Wajib (`*`)** | Nomor kartu ATM/Debit nasabah. |
-| 5 | **Nomor Tiket CS** | `no_tiket` | Text | **Wajib (`*`)** | Nomor tiket referensi customer service. |
+| 5 | **Nomor Tiket Keluhan** | `no_tiket` | Text | **Wajib (`*`)** | Diketik petugas sesuai berkas. Terkunci otomatis hanya bila jurnal berasal dari pengaduan CS. Lihat bagian penomoran tiket di bawah. |
 | 6 | **Cabang Transaksi / Pelapor** | `master_cabang_id` | Select | **Wajib (`*`)** | Dropdown 41 daftar kantor cabang Bank Sulteng. |
 | 7 | **Jenis Transaksi** | `master_transaksi_id` | Select | **Wajib (`*`)** | Dropdown 33 jenis transaksi (memicu auto-fill). |
 | 8 | **Channel Transaksi (Otomatis)** | `channel` | Text (Readonly) | Otomatis | Terisi otomatis sesuai channel jenis transaksi. |
@@ -168,8 +185,59 @@ Pengaturan ada di `config/pengaduan.php`: `lebar_maks_gambar`, `kualitas_gambar`
 | 12 | **Tanggal Transaksi Bermasalah** | `tgl_transaksi` | Date | **Wajib (`*`)** | Tanggal saat nasabah melakukan transaksi yang bermasalah. |
 | 13 | **Tanggal Terima Keluhan** | `tgl_terima` | Date | **Wajib (`*`)** | Tanggal saat cabang/petugas menerima pengaduan nasabah. |
 | 14 | **Tanggal Selesai Penanganan** | `tgl_selesai` | Date | Opsional | Tanggal saat keluhan selesai diproses (boleh kosong / `-` jika belum selesai). |
-| 15 | **Status Keluhan** | `status` | Select | **Wajib (`*`)** | Pilihan: **`-` (Belum Ditentukan)**, **Menunggu**, **Success**, **Done**, **Rejected** (otomatis `-` jika kosong di Excel). |
+| 15 | **Status Keluhan** | `status` | Teks + daftar pilihan | **Wajib (`*`)** | **Dapat diketik manual** atau dipilih dari daftar standar: **`-` (Belum Ditentukan)**, **Menunggu**, **Success**, **Done**, **Rejected** (otomatis `-` jika kosong di Excel). Lihat catatan status kustom di bawah. |
 | 16 | **Keterangan Log / Kronologi** | `keterangan_log` | Textarea | Opsional | Catatan kronologi keluhan atau detail tindak lanjut (default `-`). |
+
+### Penomoran Tiket Keluhan
+Setiap keluhan memiliki **satu nomor tiket** yang dipakai dari awal sampai selesai. Nomor dibuat otomatis oleh sistem dan tidak dapat diketik petugas.
+
+```text
+BS-2026090412345
+│   │        └── 5 angka acak yang belum terpakai pada tanggal tersebut
+│   └─────────── Tanggal (YYYYMMDD)
+└─────────────── Awalan tetap Bank Sulteng
+```
+
+Ada dua jalur masuk keluhan, dan penomorannya berbeda.
+
+**Jalur 1 — Keluhan dari CS cabang (nomor dibuat sistem).** Nomor lahir saat CS mengirim keluhan, lalu dibawa terus ke Jurnal Keluhan tanpa dibuat ulang, sehingga CS dan Admin Pusat selalu merujuk nomor yang sama.
+
+```text
+CS kirim keluhan ──► Nomor tiket dibuat ──► Admin verifikasi ──► Masuk jurnal
+                     BS-2026090412345         (nomor sama)        (nomor sama)
+```
+
+**Jalur 2 — Berkas fisik yang sampai ke Divisi IT (nomor diketik petugas).** Berkas menempuh beberapa tahap sebelum tiba di Divisi IT:
+
+```text
+CS cabang ──► Penyelia cabang ──► Divisi Literasi ──► Admin Divisi IT
+```
+
+Karena itu **Tanggal Terima Keluhan** pada form jurnal adalah tanggal berkas selesai diperiksa Divisi Literasi, **bukan** tanggal CS menerima keluhan dari nasabah. Nomor tiket tidak boleh dibuat dari tanggal tersebut, sehingga petugas mengetiknya sendiri sesuai berkas yang diterima.
+
+| Hal | Ketentuan |
+|:---|:---|
+| Jalur pengaduan CS | Nomor dibuat sistem saat pengaduan dikirim, memakai tanggal pengiriman. Pada form jurnal nomor tampil **terkunci** dan tidak dapat diubah, agar rujukan CS cabang tetap sama. |
+| Jalur jurnal langsung | Nomor **diketik petugas** sesuai berkas, wajib diisi, dan bebas format karena bisa saja mengikuti penomoran lama. |
+| Angka acak (jalur CS) | Diambil dengan pembangkit acak kriptografis, lalu dipastikan belum terpakai pada tanggal yang sama, dicek ke data pengaduan maupun jurnal. |
+| Kapasitas | 100.000 nomor untuk setiap tanggal. |
+| Bila bentrok | Sistem mencoba angka lain hingga 25 kali, lalu beralih mencari angka bebas secara berurutan sehingga pengiriman tidak pernah gagal. |
+| Bersamaan | Pembuatan nomor dikunci di tingkat database, jadi dua CS yang mengirim pada detik yang sama tidak mendapat nomor kembar. |
+| Saat diedit | Jurnal jalur langsung boleh dikoreksi nomornya. Jurnal jalur pengaduan CS nomornya tetap. |
+| Data lama | Nomor tiket lama hasil impor Excel dibiarkan apa adanya. |
+
+### Status Keluhan yang Diketik Manual
+Kolom **Status Keluhan** pada form Input Jurnal maupun Edit Jurnal berupa isian teks yang menyatu dengan daftar pilihan. Petugas dapat mengetik status apa pun sesuai kondisi penanganan, misalnya `Menunggu Konfirmasi Bank Lain` atau `Sedang Investigasi Vendor ATM`, atau memilih salah satu status standar dari daftar.
+
+| Perilaku | Keterangan |
+|:---|:---|
+| Penyeragaman penulisan | Ketikan yang sama dengan status standar diseragamkan otomatis, `done` menjadi `Done`, sehingga perhitungan statistik tidak terpecah. |
+| Perapian spasi | Spasi berlebih dirapikan, `Menunggu   Dokumen` menjadi `Menunggu Dokumen`. |
+| Batas panjang | Maksimal 50 karakter. |
+| Filter data | Status kustom otomatis muncul pada dropdown filter halaman Data Keluhan di grup **Status Kustom (diketik manual)**. |
+| Kartu statistik | Kartu ringkasan hanya menghitung status standar. Status kustom masuk hitungan **Total Keluhan** tetapi tidak pada kartu Menunggu / Success / Done / Rejected. |
+| Lencana tabel | Status kustom tampil dengan lencana abu-abu netral. |
+| Status pengaduan CS | Jurnal berstatus kustom membuat pengaduan cabang berstatus **Dalam Proses Jurnal**. Status **Selesai** hanya tercapai bila status jurnal `Done` atau `Success`, dan **Ditolak** bila `Rejected`. |
 
 ---
 

@@ -6,8 +6,8 @@
         return old($field, $edit ? ($pengaduan->{$field} ?? $default) : $default);
     };
     $inputCls = 'w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm bg-white text-slate-800 placeholder-slate-400 transition-all duration-200 focus:border-brand-blue focus:ring-3 focus:ring-brand-blue/15 focus:outline-none';
-    $labelCls = 'font-semibold text-[13px] text-slate-700 flex items-center gap-1';
-    $sectionCls = "md:col-span-2 flex items-center gap-2.5 my-2.5 text-brand-blue text-[13px] font-bold uppercase tracking-wider after:content-[''] after:grow after:h-px after:bg-slate-200";
+    $labelCls = 'font-semibold text-[0.8125rem] text-slate-700 flex items-center gap-1';
+    $sectionCls = "md:col-span-2 flex items-center gap-2.5 my-2.5 text-brand-blue text-[0.8125rem] font-bold uppercase tracking-wider after:content-[''] after:grow after:h-px after:bg-slate-200";
     $lampiranAda = $edit ? $pengaduan->lampirans->groupBy('jenis') : collect();
     $nominalAwal = (int) preg_replace('/[^\d]/', '', (string) old('nominal_transaksi', $edit ? (int) round((float) $pengaduan->nominal_transaksi) : ''));
     $tglTransaksiAwal = old('tgl_transaksi', $edit && $pengaduan->tgl_transaksi ? $pengaduan->tgl_transaksi->format('Y-m-d') : '');
@@ -18,7 +18,7 @@
 @section('page_subtitle', 'Formulir pengaduan keluhan transaksi nasabah untuk dikirim ke Admin Pusat (Divisi IT)')
 
 @section('topbar_action')
-    <a href="{{ $edit ? route('cs.pengaduan.show', $pengaduan) : route('cs.pengaduan.index') }}" class="inline-flex items-center gap-2 h-[38px] px-3.5 rounded-lg border border-slate-300 bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-slate-900 text-xs font-semibold transition-colors">
+    <a href="{{ $edit ? route('cs.pengaduan.show', $pengaduan) : route('cs.pengaduan.index') }}" class="inline-flex items-center gap-2 h-[2.375rem] px-3.5 rounded-lg border border-slate-300 bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-slate-900 text-xs font-semibold transition-colors">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <line x1="19" y1="12" x2="5" y2="12"></line>
             <polyline points="12 19 5 12 12 5"></polyline>
@@ -28,13 +28,13 @@
 @endsection
 
 @section('content')
-<div class="max-w-[1000px] mx-auto">
+<div class="max-w-[62.5rem] mx-auto">
 
     @if($edit)
-        <div class="bg-amber-50 border border-amber-200 text-amber-900 rounded-xl p-4 mb-5 text-[13px] flex items-start gap-3">
+        <div class="bg-amber-50 border border-amber-200 text-amber-900 rounded-xl p-4 mb-5 text-[0.8125rem] flex items-start gap-3">
             <span class="text-lg leading-none">✏️</span>
             <div>
-                Anda mengubah pengaduan <strong class="font-mono">{{ $pengaduan->nomor_pengaduan }}</strong>. Perubahan hanya dapat dilakukan selama status masih <strong>Menunggu Verifikasi Pusat</strong>. Lampiran baru akan <strong>ditambahkan</strong>; lampiran lama bisa dihapus lewat tombol di sampingnya.
+                Anda mengubah pengaduan <strong class="font-mono">{{ $pengaduan->nomor_tiket }}</strong>. Perubahan hanya dapat dilakukan selama status masih <strong>Menunggu Verifikasi Pusat</strong>. Lampiran baru akan <strong>ditambahkan</strong>; lampiran lama bisa dihapus lewat tombol di sampingnya.
             </div>
         </div>
     @endif
@@ -82,7 +82,7 @@
                                 </option>
                             @endforeach
                         </select>
-                        <span class="text-[11px] text-slate-500">Pilih kantor cabang asal pengaduan{{ $cabang ? ' (default: cabang penempatan akun Anda)' : '' }}.</span>
+                        <span class="text-[0.71875rem] text-slate-500">Pilih kantor cabang asal pengaduan{{ $cabang ? ' (default: cabang penempatan akun Anda)' : '' }}.</span>
                     </div>
 
                     <div class="flex flex-col gap-1.5">
@@ -145,7 +145,7 @@
                                 <option value="{{ $t->id }}" {{ (string) $nilai('master_transaksi_id') === (string) $t->id ? 'selected' : '' }}>{{ $t->jenis_transaksi }}</option>
                             @endforeach
                         </select>
-                        <span class="text-[11px] text-slate-500">Channel akan terisi otomatis setelah jenis transaksi dipilih.</span>
+                        <span class="text-[0.71875rem] text-slate-500">Channel akan terisi otomatis setelah jenis transaksi dipilih.</span>
                     </div>
 
                     <div class="flex flex-col gap-1.5">
@@ -168,7 +168,7 @@
                         <select name="terminal_transaksi" id="terminal_transaksi" class="{{ $inputCls }}">
                             <option value="">-- Pilih Mesin ATM / Terminal --</option>
                         </select>
-                        <span class="text-[11px] text-slate-500" id="terminalHelperText">Mesin ATM dari cabang asal yang dipilih ditampilkan paling atas.</span>
+                        <span class="text-[0.71875rem] text-slate-500" id="terminalHelperText">Mesin ATM dari cabang asal yang dipilih ditampilkan paling atas.</span>
                     </div>
 
                     <div class="flex flex-col gap-1.5">
@@ -191,7 +191,7 @@
                         <span>4. Lampiran Dokumen</span>
                     </div>
 
-                    <div class="md:col-span-2 bg-sky-50 border border-sky-200 text-sky-900 rounded-xl p-3.5 text-[12.5px] flex items-start gap-2.5">
+                    <div class="md:col-span-2 bg-sky-50 border border-sky-200 text-sky-900 rounded-xl p-3.5 text-[0.78125rem] flex items-start gap-2.5">
                         <span class="text-base leading-none">📎</span>
                         <div>
                             Unggah <strong>foto (JPG/PNG/WEBP)</strong> atau <strong>PDF</strong>, maksimal <strong>{{ $maxFile }} berkas</strong> per jenis dan <strong>{{ round($maxKb / 1024) }} MB</strong> per berkas.
@@ -213,20 +213,20 @@
                             @if($sudahAda->isNotEmpty())
                                 <div class="flex flex-col gap-1.5 mb-1">
                                     @foreach($sudahAda as $l)
-                                        <div class="flex items-center gap-2.5 px-3 py-2 rounded-lg border border-emerald-200 bg-emerald-50/60 text-[12px]">
-                                            <span class="w-8 h-8 rounded-md flex items-center justify-center font-extrabold text-[8.5px] shrink-0 {{ $l->adalahGambar() ? 'bg-sky-100 text-sky-700' : 'bg-rose-100 text-rose-600' }}">{{ $l->labelFormat() }}</span>
+                                        <div class="flex items-center gap-2.5 px-3 py-2 rounded-lg border border-emerald-200 bg-emerald-50/60 text-[0.75rem]">
+                                            <span class="w-8 h-8 rounded-md flex items-center justify-center font-extrabold text-[0.71875rem] shrink-0 {{ $l->adalahGambar() ? 'bg-sky-100 text-sky-700' : 'bg-rose-100 text-rose-600' }}">{{ $l->labelFormat() }}</span>
                                             <a href="{{ route('pengaduan.lampiran.show', [$pengaduan, $l]) }}" target="_blank" class="grow min-w-0 truncate font-semibold text-navy hover:text-brand-blue" title="Buka {{ $l->nama_asli }}">{{ $l->nama_asli }} <span class="font-normal text-slate-500">&bull; {{ $l->ukuranTerbaca() }}</span></a>
-                                            <button type="submit" form="hapusLampiran{{ $l->id }}" class="text-rose-600 hover:text-rose-800 font-bold text-[11px] cursor-pointer shrink-0" onclick="return confirm('Hapus lampiran ini?')">Hapus</button>
+                                            <button type="submit" form="hapusLampiran{{ $l->id }}" class="text-rose-600 hover:text-rose-800 font-bold text-[0.71875rem] cursor-pointer shrink-0">Hapus</button>
                                         </div>
                                     @endforeach
                                 </div>
                             @endif
 
                             <input type="file" name="lampiran[{{ $jenis }}][]" id="lampiran_{{ $jenis }}" data-lampiran="{{ $jenis }}" multiple accept=".jpg,.jpeg,.png,.webp,.pdf,image/jpeg,image/png,image/webp,application/pdf" {{ $wajib ? 'required' : '' }}
-                                class="block w-full text-[12.5px] text-slate-600 border border-dashed border-slate-300 rounded-xl bg-slate-50/60 cursor-pointer file:mr-3 file:py-2.5 file:px-4 file:rounded-l-xl file:border-0 file:text-[12px] file:font-bold file:bg-navy file:text-white hover:file:bg-brand-blue hover:border-brand-blue/50 transition-colors">
-                            <span class="text-[11px] text-slate-500">{{ $cfg['keterangan'] ?? '' }}</span>
+                                class="block w-full text-[0.78125rem] text-slate-600 border border-dashed border-slate-300 rounded-xl bg-slate-50/60 cursor-pointer file:mr-3 file:py-2.5 file:px-4 file:rounded-l-xl file:border-0 file:text-[0.75rem] file:font-bold file:bg-navy file:text-white hover:file:bg-brand-blue hover:border-brand-blue/50 transition-colors">
+                            <span class="text-[0.71875rem] text-slate-500">{{ $cfg['keterangan'] ?? '' }}</span>
                             <div id="preview_{{ $jenis }}" class="grid grid-cols-2 sm:grid-cols-3 gap-2 empty:hidden"></div>
-                            <span id="err_{{ $jenis }}" class="hidden text-[11.5px] text-rose-600 font-medium"></span>
+                            <span id="err_{{ $jenis }}" class="hidden text-[0.71875rem] text-rose-600 font-medium"></span>
                         </div>
                     @endforeach
 
@@ -239,17 +239,17 @@
                     <div class="md:col-span-2 flex flex-col gap-1.5">
                         <div class="flex items-center justify-between">
                             <label class="{{ $labelCls }}">Kronologi Kejadian <span class="text-rose-600 font-bold">*</span></label>
-                            <span class="text-[11px] text-slate-400"><span id="kronologiCount">0</span> karakter (min. 20)</span>
+                            <span class="text-[0.71875rem] text-slate-500"><span id="kronologiCount">0</span> karakter (min. 20)</span>
                         </div>
-                        <textarea name="kronologi" id="kronologi" required minlength="20" rows="7" placeholder="Tuliskan kronologi selengkap mungkin: waktu kejadian, lokasi/mesin, langkah yang dilakukan nasabah, pesan error yang muncul, apakah struk keluar, saldo terdebet atau tidak, dan tindakan yang sudah dilakukan CS." class="{{ $inputCls }} resize-y min-h-[140px] leading-relaxed">{{ $nilai('kronologi') }}</textarea>
+                        <textarea name="kronologi" id="kronologi" required minlength="20" rows="7" placeholder="Tuliskan kronologi selengkap mungkin: waktu kejadian, lokasi/mesin, langkah yang dilakukan nasabah, pesan error yang muncul, apakah struk keluar, saldo terdebet atau tidak, dan tindakan yang sudah dilakukan CS." class="{{ $inputCls }} resize-y min-h-[8.75rem] leading-relaxed">{{ $nilai('kronologi') }}</textarea>
                     </div>
                 </div>
 
                 <div class="mt-6 pt-5 border-t border-slate-200 flex items-center justify-between gap-3 flex-wrap">
-                    <span class="text-[11.5px] text-slate-500">Dengan mengirim, Anda menyatakan data & lampiran sudah diverifikasi bersama nasabah.</span>
+                    <span class="text-[0.71875rem] text-slate-500">Dengan mengirim, Anda menyatakan data & lampiran sudah diverifikasi bersama nasabah.</span>
                     <div class="flex items-center gap-3">
-                        <a href="{{ $edit ? route('cs.pengaduan.show', $pengaduan) : route('cs.pengaduan.index') }}" class="inline-flex items-center justify-center px-4 py-2.5 rounded-xl text-[13.5px] font-semibold bg-slate-100 text-slate-700 border border-slate-300 hover:bg-slate-200 transition-colors">Batal</a>
-                        <button type="submit" id="btnSubmit" class="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-[13.5px] font-semibold bg-gradient-to-r from-brand-blue to-navy text-white hover:opacity-95 hover:shadow-lg shadow-brand-blue/25 transition-all cursor-pointer">
+                        <a href="{{ $edit ? route('cs.pengaduan.show', $pengaduan) : route('cs.pengaduan.index') }}" class="inline-flex items-center justify-center px-4 py-2.5 rounded-xl text-[0.84375rem] font-semibold bg-slate-100 text-slate-700 border border-slate-300 hover:bg-slate-200 transition-colors">Batal</a>
+                        <button type="submit" id="btnSubmit" class="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-[0.84375rem] font-semibold bg-gradient-to-r from-brand-blue to-navy text-white hover:opacity-95 hover:shadow-lg shadow-brand-blue/25 transition-all cursor-pointer">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
                             <span>{{ $edit ? 'Simpan Perubahan' : 'Kirim Pengaduan ke Pusat' }}</span>
                         </button>
@@ -262,7 +262,12 @@
     {{-- Form hapus lampiran (di luar form utama agar valid HTML) --}}
     @if($edit)
         @foreach($pengaduan->lampirans as $l)
-            <form id="hapusLampiran{{ $l->id }}" action="{{ route('cs.pengaduan.lampiran.destroy', [$pengaduan, $l]) }}" method="POST" class="hidden">
+            <form id="hapusLampiran{{ $l->id }}" action="{{ route('cs.pengaduan.lampiran.destroy', [$pengaduan, $l]) }}" method="POST" class="hidden"
+                  data-konfirmasi="Hapus Lampiran Ini?"
+                  data-ikon="🗑️"
+                  data-warna="rose"
+                  data-aksi="Ya, Hapus"
+                  data-pesan="Berkas {{ $l->nama_asli }} pada {{ $l->label() }} akan dihapus permanen dari pengaduan ini.">
                 @csrf
                 @method('DELETE')
             </form>
@@ -403,7 +408,7 @@
                 }
 
                 const item = document.createElement('div');
-                item.className = 'flex items-center gap-2 p-2 rounded-lg border border-slate-200 bg-white text-[11px] min-w-0';
+                item.className = 'flex items-center gap-2 p-2 rounded-lg border border-slate-200 bg-white text-[0.71875rem] min-w-0';
 
                 if (f.type.startsWith('image/')) {
                     const img = document.createElement('img');
@@ -413,7 +418,7 @@
                     item.appendChild(img);
                 } else {
                     const ic = document.createElement('span');
-                    ic.className = 'w-10 h-10 rounded bg-rose-100 text-rose-600 flex items-center justify-center font-extrabold text-[9px] shrink-0';
+                    ic.className = 'w-10 h-10 rounded bg-rose-100 text-rose-600 flex items-center justify-center font-extrabold text-[0.71875rem] shrink-0';
                     ic.textContent = 'PDF';
                     item.appendChild(ic);
                 }

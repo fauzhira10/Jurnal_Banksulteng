@@ -17,9 +17,9 @@
                 </svg>
             </div>
             <div>
-                <h3 class="text-[15px] font-bold text-navy leading-tight flex items-center gap-2">
+                <h3 class="text-[0.9375rem] font-bold text-navy leading-tight flex items-center gap-2">
                     <span>Pencarian & Filter Data Keluhan</span>
-                    <span id="activeFilterBadgeCount" class="hidden text-[11px] font-bold px-2 py-0.5 rounded-full bg-brand-blue/10 text-brand-blue border border-brand-blue/20">0 filter aktif</span>
+                    <span id="activeFilterBadgeCount" class="hidden text-[0.71875rem] font-bold px-2 py-0.5 rounded-full bg-brand-blue/10 text-brand-blue border border-brand-blue/20">0 filter aktif</span>
                 </h3>
                 <p class="text-xs text-slate-500 mt-0.5">Filter cepat berdasarkan kata kunci, kantor cabang, terminal mesin, status, atau periode transaksi</p>
             </div>
@@ -42,7 +42,7 @@
         <form id="filterForm" method="GET" action="{{ route('jurnal.index') }}" onsubmit="return false;">
             <!-- Tier 1: Hero Search Input -->
             <div class="relative">
-                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400">
+                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-500">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="text-brand-blue">
                         <circle cx="11" cy="11" r="8"></circle>
                         <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
@@ -53,7 +53,7 @@
                     id="searchInput" 
                     name="q" 
                     value="{{ request('q') }}" 
-                    class="w-full h-12 pl-11 pr-24 text-[13.5px] font-medium text-slate-800 bg-slate-50/70 border border-slate-200 rounded-xl placeholder:text-slate-400 placeholder:text-xs sm:placeholder:text-[13px] focus:bg-white focus:border-brand-blue focus:ring-4 focus:ring-brand-blue/10 focus:outline-none transition-all shadow-2xs" 
+                    class="w-full h-12 pl-11 pr-24 text-[0.84375rem] font-medium text-slate-800 bg-slate-50/70 border border-slate-200 rounded-xl placeholder:text-slate-500 placeholder:text-xs sm:placeholder:text-[0.8125rem] focus:bg-white focus:border-brand-blue focus:ring-4 focus:ring-brand-blue/10 focus:outline-none transition-all shadow-2xs" 
                     placeholder="Ketik nama nasabah, nomor resi/trace, nomor rekening, nomor kartu debit, atau nomor tiket CS..." 
                     autocomplete="off"
                 >
@@ -70,7 +70,7 @@
                             <line x1="6" y1="6" x2="18" y2="18"></line>
                         </svg>
                     </button>
-                    <span class="hidden sm:inline-flex items-center text-[10.5px] font-bold text-slate-400 bg-slate-200/60 px-2 py-0.5 rounded-md border border-slate-300/50">
+                    <span class="hidden sm:inline-flex items-center text-[0.71875rem] font-bold text-slate-500 bg-slate-200/60 px-2 py-0.5 rounded-md border border-slate-300/50">
                         Live Search
                     </span>
                 </div>
@@ -102,7 +102,7 @@
                                 </option>
                             @endforeach
                         </select>
-                        <div class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
+                        <div class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-500">
                             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                                 <polyline points="6 9 12 15 18 9"></polyline>
                             </svg>
@@ -125,7 +125,7 @@
                         <select id="filterTerminal" name="terminal_transaksi" class="w-full h-10 px-3 pr-8 text-xs font-semibold text-slate-800 bg-slate-50 border border-slate-200 rounded-xl appearance-none cursor-pointer focus:bg-white focus:border-brand-blue focus:ring-3 focus:ring-brand-blue/15 focus:outline-none transition-all">
                             <option value="">-- Semua Terminal / Mesin --</option>
                         </select>
-                        <div class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
+                        <div class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-500">
                             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                                 <polyline points="6 9 12 15 18 9"></polyline>
                             </svg>
@@ -150,8 +150,15 @@
                             <option value="Success" {{ request('status') == 'Success' ? 'selected' : '' }}>🔵 Success</option>
                             <option value="Done" {{ request('status') == 'Done' ? 'selected' : '' }}>🟢 Done</option>
                             <option value="Rejected" {{ request('status') == 'Rejected' ? 'selected' : '' }}>🔴 Rejected</option>
+                            @if(!empty($statusKustom) && count($statusKustom))
+                                <optgroup label="Status Kustom (diketik manual)">
+                                    @foreach($statusKustom as $sk)
+                                        <option value="{{ $sk }}" {{ request('status') === (string) $sk ? 'selected' : '' }}>🟣 {{ $sk }}</option>
+                                    @endforeach
+                                </optgroup>
+                            @endif
                         </select>
-                        <div class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
+                        <div class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-500">
                             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                                 <polyline points="6 9 12 15 18 9"></polyline>
                             </svg>
@@ -193,7 +200,7 @@
 
             <!-- Tier 3: Active Filter Chips Bar (Dynamic Pills) -->
             <div id="activeFilterChipsContainer" class="hidden pt-3 border-t border-slate-100 flex flex-wrap items-center gap-2">
-                <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Filter Aktif:</span>
+                <span class="text-[0.71875rem] font-bold text-slate-500 uppercase tracking-wider">Filter Aktif:</span>
                 <div id="activeFilterChipsList" class="flex flex-wrap items-center gap-1.5">
                     <!-- Populated dynamically via JS -->
                 </div>
@@ -214,7 +221,7 @@
             <span>Daftar Jurnal Keluhan Tersimpan</span>
         </div>
         <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
-            <div id="totalCountBadge" style="font-size: 13px; color: var(--bs-gray-500); margin-right: 4px;">
+            <div id="totalCountBadge" style="font-size: 0.8125rem; color: var(--bs-gray-500); margin-right: 4px;">
                 Menampilkan <strong id="totalCountNum">{{ $jurnals->total() }}</strong> total data keluhan
             </div>
             <button type="button" class="btn btn-import-excel" onclick="openImportModal()" title="Unggah / Import File Excel Master (.xlsx / .xls)">
@@ -247,7 +254,7 @@
         @if($jurnals->count() > 0)
             <!-- Toolbar Pilihan Baris Data (10, 50, 100) & Info Range -->
             <div class="table-toolbar">
-                <div style="display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--bs-gray-700);">
+                <div style="display: flex; align-items: center; gap: 8px; font-size: 0.8125rem; color: var(--bs-gray-700);">
                     <span>Tampilkan</span>
                     <select id="perPageSelect" class="per-page-select" onchange="handlePerPageChange(this.value)" title="Pilih jumlah baris data yang ditampilkan per halaman">
                         <option value="10" {{ $jurnals->perPage() == 10 ? 'selected' : '' }}>10</option>
@@ -256,7 +263,7 @@
                     </select>
                     <span>data per halaman</span>
                 </div>
-                <div style="font-size: 12.5px; color: var(--bs-gray-500); font-weight: 500;">
+                <div style="font-size: 0.78125rem; color: var(--bs-gray-500); font-weight: 500;">
                     Menampilkan <strong>{{ $jurnals->firstItem() ?? 0 }} - {{ $jurnals->lastItem() ?? 0 }}</strong> dari total <strong style="color: var(--bs-navy);">{{ number_format($jurnals->total(), 0, ',', '.') }}</strong> data
                 </div>
             </div>
@@ -286,7 +293,7 @@
                                     <div style="font-weight: 600; color: var(--bs-navy);">
                                         Transaksi: {{ \Carbon\Carbon::parse($jurnal->tgl_transaksi)->translatedFormat('d M Y') }}
                                     </div>
-                                    <div style="font-size: 11.5px; color: var(--bs-gray-500); margin-top: 5px;">
+                                    <div style="font-size: 0.71875rem; color: var(--bs-gray-500); margin-top: 5px;">
                                         Terima: {{ \Carbon\Carbon::parse($jurnal->tgl_terima)->translatedFormat('d/m/Y') }}
                                     </div>
                                 </td>
@@ -298,7 +305,7 @@
                                         <span>Resi: <strong class="highlightable">{{ $jurnal->no_resi }}</strong></span>
                                     </div>
                                     @if($jurnal->no_tiket)
-                                        <div style="font-size: 11px; color: var(--bs-blue); margin-top: 2px;">
+                                        <div style="font-size: 0.71875rem; color: var(--bs-blue); margin-top: 2px;">
                                             Tiket: <strong class="highlightable">{{ $jurnal->no_tiket }}</strong>
                                         </div>
                                     @endif
@@ -308,7 +315,7 @@
                                         {{ $jurnal->masterCabang->nama_cabang ?? '-' }}
                                     </div>
                                     @if(!empty($jurnal->masterCabang->kode_cabang) && strtoupper(trim($jurnal->masterCabang->nama_cabang ?? '')) !== 'CALL CENTER')
-                                        <div class="highlightable" style="font-size: 11.5px; color: var(--bs-gray-500); margin-top: 2px;">
+                                        <div class="highlightable" style="font-size: 0.71875rem; color: var(--bs-gray-500); margin-top: 2px;">
                                             Kode: {{ $jurnal->masterCabang->kode_cabang }}
                                         </div>
                                     @endif
@@ -328,10 +335,10 @@
                                                 $idMesin = $matches[1];
                                             }
                                         @endphp
-                                        <div style="font-size: 12.5px; color: var(--bs-blue); margin-top: 4px; font-weight: 500; display: flex; flex-direction: column; align-items: flex-start; gap: 3px;">
-                                            <span>Mesin: <strong class="highlightable font-semibold" style="color: var(--bs-navy); font-size: 13px;">{{ $displayNamaMesin }}</strong></span>
+                                        <div style="font-size: 0.78125rem; color: var(--bs-blue); margin-top: 4px; font-weight: 500; display: flex; flex-direction: column; align-items: flex-start; gap: 3px;">
+                                            <span>Mesin: <strong class="highlightable font-semibold" style="color: var(--bs-navy); font-size: 0.8125rem;">{{ $displayNamaMesin }}</strong></span>
                                             @if(!empty($idMesin))
-                                                <span class="highlightable" style="padding: 2px 7px; background: #e0f2fe; color: #0369a1; border-radius: 5px; font-size: 11.5px; font-family: monospace; font-weight: 800; border: 1.5px solid #bae6fd; letter-spacing: 0.2px;">
+                                                <span class="highlightable" style="padding: 2px 7px; background: #e0f2fe; color: #0369a1; border-radius: 5px; font-size: 0.71875rem; font-family: monospace; font-weight: 800; border: 1.5px solid #bae6fd; letter-spacing: 0.2px;">
                                                     ID Mesin: {{ $idMesin }}
                                                 </span>
                                             @endif
@@ -344,10 +351,10 @@
                                     </span>
                                 </td>
                                 <td style="white-space: nowrap;">
-                                    <div class="nominal-badge highlightable" style="font-size: 14.5px;">
+                                    <div class="nominal-badge highlightable" style="font-size: 0.90625rem;">
                                         Rp {{ number_format($jurnal->nominal_transaksi, 0, ',', '.') }}
                                     </div>
-                                    <div style="font-size: 11.5px; color: var(--bs-gray-500); margin-top: 2px;">
+                                    <div style="font-size: 0.71875rem; color: var(--bs-gray-500); margin-top: 2px;">
                                         Admin: Rp {{ number_format($jurnal->biaya_admin ?? $jurnal->masterTransaksi->biaya_admin ?? 0, 0, ',', '.') }}
                                     </div>
                                 </td>
@@ -370,7 +377,7 @@
                                     @php
                                         $hasLog = !empty($jurnal->keterangan_log) && trim($jurnal->keterangan_log) !== '-' && trim($jurnal->keterangan_log) !== '' && trim(strtolower($jurnal->keterangan_log)) !== 'tidak ada keterangan tambahan.';
                                     @endphp
-                                    <button type="button" class="btn btn-secondary btn-sm" onclick="showDetailModal({{ json_encode($jurnal) }})" title="Lihat Rincian & Aksi" style="padding: 6px 12px; font-size: 12.5px; font-weight: 600; display: inline-flex; align-items: center; gap: 5px;">
+                                    <button type="button" class="btn btn-secondary btn-sm" onclick="showDetailModal({{ json_encode($jurnal) }})" title="Lihat Rincian & Aksi" style="padding: 6px 12px; font-size: 0.78125rem; font-weight: 600; display: inline-flex; align-items: center; gap: 5px;">
                                         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                             <circle cx="12" cy="12" r="10"></circle>
                                             <line x1="12" y1="16" x2="12" y2="12"></line>
@@ -379,7 +386,7 @@
                                         <span>Detail</span>
                                     </button>
                                     @if($hasLog)
-                                        <button type="button" onclick="openPrintChoiceModal({{ json_encode($jurnal) }})" class="btn btn-sm btn-cetak-action" data-jurnal-id="{{ $jurnal->id }}" style="background-color: #0284c7; color: white; padding: 6px 12px; font-size: 12.5px; font-weight: 600; display: inline-flex; align-items: center; gap: 5px; text-decoration: none; border-radius: 4px; margin-left: 5px; border: 1px solid #0369a1; cursor: pointer;" title="Pilih Format Cetak Dokumen">
+                                        <button type="button" onclick="openPrintChoiceModal({{ json_encode($jurnal) }})" class="btn btn-sm btn-cetak-action" data-jurnal-id="{{ $jurnal->id }}" style="background-color: #0284c7; color: white; padding: 6px 12px; font-size: 0.78125rem; font-weight: 600; display: inline-flex; align-items: center; gap: 5px; text-decoration: none; border-radius: 4px; margin-left: 5px; border: 1px solid #0369a1; cursor: pointer;" title="Pilih Format Cetak Dokumen">
                                             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                                 <polyline points="6 9 6 2 18 2 18 9"></polyline>
                                                 <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
@@ -388,7 +395,7 @@
                                             <span>Cetak ▾</span>
                                         </button>
                                     @else
-                                        <button type="button" onclick="openQuickLogModal({{ json_encode($jurnal) }}, true)" class="btn btn-sm btn-cetak-action" data-jurnal-id="{{ $jurnal->id }}" style="background-color: #fff7ed; color: #c2410c; padding: 6px 11px; font-size: 12px; font-weight: 600; display: inline-flex; align-items: center; gap: 4px; border-radius: 4px; margin-left: 5px; border: 1px dashed #ea580c; cursor: pointer;" title="Keterangan log masih kosong. Klik untuk mengisi log & mencetak.">
+                                        <button type="button" onclick="openQuickLogModal({{ json_encode($jurnal) }}, true)" class="btn btn-sm btn-cetak-action" data-jurnal-id="{{ $jurnal->id }}" style="background-color: #fff7ed; color: #c2410c; padding: 6px 11px; font-size: 0.75rem; font-weight: 600; display: inline-flex; align-items: center; gap: 4px; border-radius: 4px; margin-left: 5px; border: 1px dashed #ea580c; cursor: pointer;" title="Keterangan log masih kosong. Klik untuk mengisi log & mencetak.">
                                             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                                                 <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
                                                 <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
@@ -571,7 +578,7 @@
                     </div>
                     <div class="detail-item">
                         <div class="detail-label">Nominal Transaksi (Rp)</div>
-                        <div class="detail-value" id="modal_nominal_transaksi" style="color: #047857; font-size: 16px;">-</div>
+                        <div class="detail-value" id="modal_nominal_transaksi" style="color: #047857; font-size: 1rem;">-</div>
                     </div>
                     <div class="detail-item">
                         <div class="detail-label">Biaya Admin</div>
@@ -671,7 +678,7 @@
 <div class="modal-backdrop" id="printChoiceModal" style="z-index: 1250;">
     <div class="modal-content" style="max-width: 580px; border-top: 4px solid #0284c7; animation: modalFadeIn 0.2s ease-out;">
         <div class="modal-header" style="background-color: #f0f9ff; border-bottom: 1px solid #e0f2fe;">
-            <h3 style="color: #0369a1; display: flex; align-items: center; gap: 8px; font-size: 16px; font-weight: 700;">
+            <h3 style="color: #0369a1; display: flex; align-items: center; gap: 8px; font-size: 1rem; font-weight: 700;">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0284c7" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                     <polyline points="6 9 6 2 18 2 18 9"></polyline>
                     <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
@@ -689,7 +696,7 @@
 
         <div class="modal-body" style="padding: 20px 24px;">
             <!-- Context Box -->
-            <div style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 12px 16px; margin-bottom: 16px; font-size: 12px;">
+            <div style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 12px 16px; margin-bottom: 16px; font-size: 0.75rem;">
                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 8px;">
                     <div><span style="color: #64748b;">Nasabah:</span> <strong id="printChoiceNasabah" style="color: #0f172a;">-</strong></div>
                     <div><span style="color: #64748b;">No. Resi/Trace:</span> <strong id="printChoiceNoResi" style="color: #0284c7;">-</strong></div>
@@ -698,7 +705,7 @@
                 </div>
             </div>
 
-            <p style="font-size: 12.5px; color: #475569; margin: 0 0 14px 0; font-weight: 500;">
+            <p style="font-size: 0.78125rem; color: #475569; margin: 0 0 14px 0; font-weight: 500;">
                 Silakan tentukan jenis formulir yang ingin Anda cetak:
             </p>
 
@@ -706,19 +713,19 @@
                 <!-- Opsi 1: Form Normal / Penyelesaian -->
                 <a id="linkPrintNormal" href="#" target="_blank" onclick="closePrintChoiceModal()" style="display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 14px 18px; background: #ffffff; border: 1.5px solid #10b981; border-radius: 12px; text-decoration: none; transition: all 0.2s; box-shadow: 0 1px 3px rgba(16, 185, 129, 0.08);" onmouseover="this.style.backgroundColor='#ecfdf5'; this.style.transform='translateY(-1px)';" onmouseout="this.style.backgroundColor='#ffffff'; this.style.transform='translateY(0)';">
                     <div style="display: flex; align-items: center; gap: 14px;">
-                        <div style="width: 42px; height: 42px; border-radius: 10px; background: #d1fae5; color: #059669; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 20px;">
+                        <div style="width: 42px; height: 42px; border-radius: 10px; background: #d1fae5; color: #059669; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 1.25rem;">
                             📄
                         </div>
                         <div>
-                            <div style="font-size: 13.5px; font-weight: 700; color: #065f46; margin-bottom: 2px;">
+                            <div style="font-size: 0.84375rem; font-weight: 700; color: #065f46; margin-bottom: 2px;">
                                 Form Penyelesaian Keluhan (Klaim Diterima)
                             </div>
-                            <div style="font-size: 11.5px; color: #047857; line-height: 1.35;">
+                            <div style="font-size: 0.71875rem; color: #047857; line-height: 1.35;">
                                 Formulir penyelesaian keluhan standar sesuai kanal transaksi.
                             </div>
                         </div>
                     </div>
-                    <span style="background: #059669; color: #ffffff; font-weight: 700; font-size: 11.5px; padding: 7px 13px; border-radius: 8px; white-space: nowrap;">
+                    <span style="background: #059669; color: #ffffff; font-weight: 700; font-size: 0.71875rem; padding: 7px 13px; border-radius: 8px; white-space: nowrap;">
                         Cetak →
                     </span>
                 </a>
@@ -726,19 +733,19 @@
                 <!-- Opsi 2: Form Penolakan Klaim -->
                 <a id="linkPrintPenolakan" href="#" target="_blank" onclick="closePrintChoiceModal()" style="display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 14px 18px; background: #ffffff; border: 1.5px solid #ef4444; border-radius: 12px; text-decoration: none; transition: all 0.2s; box-shadow: 0 1px 3px rgba(239, 68, 68, 0.08);" onmouseover="this.style.backgroundColor='#fff1f2'; this.style.transform='translateY(-1px)';" onmouseout="this.style.backgroundColor='#ffffff'; this.style.transform='translateY(0)';">
                     <div style="display: flex; align-items: center; gap: 14px;">
-                        <div style="width: 42px; height: 42px; border-radius: 10px; background: #fee2e2; color: #dc2626; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 20px;">
+                        <div style="width: 42px; height: 42px; border-radius: 10px; background: #fee2e2; color: #dc2626; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 1.25rem;">
                             🚫
                         </div>
                         <div>
-                            <div style="font-size: 13.5px; font-weight: 700; color: #991b1b; margin-bottom: 2px;">
+                            <div style="font-size: 0.84375rem; font-weight: 700; color: #991b1b; margin-bottom: 2px;">
                                 Form Penolakan Klaim (Klaim Ditolak)
                             </div>
-                            <div style="font-size: 11.5px; color: #b91c1c; line-height: 1.35;">
+                            <div style="font-size: 0.71875rem; color: #b91c1c; line-height: 1.35;">
                                 Format penolakan (Tindak Lanjut: <strong>KLAIM DITOLAK</strong>, tanpa slip & tabel kredit).
                             </div>
                         </div>
                     </div>
-                    <span style="background: #dc2626; color: #ffffff; font-weight: 700; font-size: 11.5px; padding: 7px 13px; border-radius: 8px; white-space: nowrap;">
+                    <span style="background: #dc2626; color: #ffffff; font-weight: 700; font-size: 0.71875rem; padding: 7px 13px; border-radius: 8px; white-space: nowrap;">
                         Cetak →
                     </span>
                 </a>
@@ -757,7 +764,7 @@
 <div class="modal-backdrop" id="quickLogModal" style="z-index: 1200;">
     <div class="modal-content" style="max-width: 580px; border-top: 4px solid #ea580c; animation: modalFadeIn 0.2s ease-out;">
         <div class="modal-header" style="background-color: #fff7ed; border-bottom: 1px solid #ffedd5;">
-            <h3 style="color: #c2410c; display: flex; align-items: center; gap: 8px; font-size: 15.5px; font-weight: 700;">
+            <h3 style="color: #c2410c; display: flex; align-items: center; gap: 8px; font-size: 0.96875rem; font-weight: 700;">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ea580c" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
                     <polyline points="14 2 14 8 20 8"></polyline>
@@ -777,7 +784,7 @@
 
         <div class="modal-body" style="padding: 20px 24px;">
             <!-- Brief Context Box -->
-            <div style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px 14px; margin-bottom: 14px; font-size: 12px;">
+            <div style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px 14px; margin-bottom: 14px; font-size: 0.75rem;">
                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 8px;">
                     <div><span style="color: #64748b;">Nasabah:</span> <strong id="quickLogNasabah" style="color: #0f172a;">-</strong></div>
                     <div><span style="color: #64748b;">No. Resi/Trace:</span> <strong id="quickLogNoResi" style="color: #0284c7;">-</strong></div>
@@ -786,7 +793,7 @@
                 </div>
             </div>
 
-            <div style="background: #fffbeb; border: 1px solid #fde68a; border-radius: 8px; padding: 10px 12px; margin-bottom: 14px; font-size: 11.5px; color: #92400e; display: flex; align-items: flex-start; gap: 8px; line-height: 1.45;">
+            <div style="background: #fffbeb; border: 1px solid #fde68a; border-radius: 8px; padding: 10px 12px; margin-bottom: 14px; font-size: 0.71875rem; color: #92400e; display: flex; align-items: flex-start; gap: 8px; line-height: 1.45;">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0; margin-top: 1px;">
                     <circle cx="12" cy="12" r="10"></circle>
                     <line x1="12" y1="8" x2="12" y2="12"></line>
@@ -798,15 +805,15 @@
             <!-- Form Control: Textarea Edit Log -->
             <div style="margin-bottom: 4px;">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-                    <label for="quickLogTextarea" style="font-size: 12px; font-weight: 700; color: #334155;">
+                    <label for="quickLogTextarea" style="font-size: 0.75rem; font-weight: 700; color: #334155;">
                         ✏️ Keterangan Log Hasil Pemeriksaan:
                     </label>
-                    <span id="quickLogCharCount" style="font-size: 11px; color: #94a3b8; font-weight: 600;">0 karakter</span>
+                    <span id="quickLogCharCount" style="font-size: 0.71875rem; color: #94a3b8; font-weight: 600;">0 karakter</span>
                 </div>
-                <textarea id="quickLogTextarea" rows="4" oninput="updateQuickLogCharCount()" style="width: 100%; padding: 10px 12px; border-radius: 8px; border: 1.5px solid #cbd5e1; font-size: 12.5px; color: #1e293b; outline: none; resize: vertical; box-sizing: border-box; line-height: 1.5;" placeholder="Ketik keterangan hasil pemeriksaan log transaksi di sini..."></textarea>
+                <textarea id="quickLogTextarea" rows="4" oninput="updateQuickLogCharCount()" style="width: 100%; padding: 10px 12px; border-radius: 8px; border: 1.5px solid #cbd5e1; font-size: 0.78125rem; color: #1e293b; outline: none; resize: vertical; box-sizing: border-box; line-height: 1.5;" placeholder="Ketik keterangan hasil pemeriksaan log transaksi di sini..."></textarea>
             </div>
 
-            <div id="quickLogFeedback" style="display: none; font-size: 12px; font-weight: 600; padding: 8px 12px; border-radius: 6px; margin-top: 10px;"></div>
+            <div id="quickLogFeedback" style="display: none; font-size: 0.75rem; font-weight: 600; padding: 8px 12px; border-radius: 6px; margin-top: 10px;"></div>
         </div>
 
         <div class="modal-footer" style="background-color: #fafafa; border-top: 1px solid var(--bs-gray-200); padding: 14px 24px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
@@ -856,17 +863,17 @@
         </div>
 
         <div class="modal-body" style="padding: 24px;">
-            <p style="font-size: 14.5px; color: var(--bs-gray-800); line-height: 1.5; margin-bottom: 16px;">
+            <p style="font-size: 0.90625rem; color: var(--bs-gray-800); line-height: 1.5; margin-bottom: 16px;">
                 Apakah Anda <strong>benar-benar yakin</strong> ingin menghapus data jurnal keluhan nasabah ini?
             </p>
 
-            <div style="background-color: var(--bs-gray-50); border: 1px solid var(--bs-gray-200); border-radius: var(--radius-md); padding: 14px 16px; margin-bottom: 16px; font-size: 13.5px;">
+            <div style="background-color: var(--bs-gray-50); border: 1px solid var(--bs-gray-200); border-radius: var(--radius-md); padding: 14px 16px; margin-bottom: 16px; font-size: 0.84375rem;">
                 <div style="margin-bottom: 6px;">Nama Nasabah: <strong id="deleteNasabahName" style="color: var(--bs-navy);">-</strong></div>
                 <div style="margin-bottom: 6px;">No. Resi / Trace: <strong id="deleteNoResi" style="color: var(--bs-blue);">-</strong></div>
                 <div>Nominal Transaksi: <strong id="deleteNominal" style="color: #047857;">-</strong></div>
             </div>
 
-            <div style="background-color: #fef2f2; border: 1px dashed #fca5a5; border-radius: var(--radius-md); padding: 10px 12px; font-size: 12.5px; color: #991b1b; display: flex; align-items: flex-start; gap: 8px;">
+            <div style="background-color: #fef2f2; border: 1px dashed #fca5a5; border-radius: var(--radius-md); padding: 10px 12px; font-size: 0.78125rem; color: #991b1b; display: flex; align-items: flex-start; gap: 8px;">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0; margin-top: 1px;">
                     <circle cx="12" cy="12" r="10"></circle>
                     <line x1="12" y1="8" x2="12" y2="12"></line>
@@ -918,7 +925,7 @@
         <form id="importForm" action="{{ route('jurnal.import_excel') }}" method="POST" enctype="multipart/form-data" onsubmit="handleImportSubmit(event)">
             @csrf
             <div class="modal-body" style="padding: 24px;">
-                <p style="font-size: 13.5px; color: var(--bs-gray-700); margin-bottom: 16px; line-height: 1.5;">
+                <p style="font-size: 0.84375rem; color: var(--bs-gray-700); margin-bottom: 16px; line-height: 1.5;">
                     Unggah file <strong>Excel Master (.xlsx / .xls)</strong> Anda yang sudah terisi ribuan data transaksi. Sistem akan memetakan dan memasukkan seluruh baris data ke database secara otomatis.
                 </p>
 
@@ -930,23 +937,23 @@
                         <line x1="12" y1="18" x2="12" y2="12"></line>
                         <line x1="9" y1="15" x2="15" y2="15"></line>
                     </svg>
-                    <div id="dropzoneText" style="font-weight: 700; color: #0369a1; font-size: 14px;">Klik untuk memilih file Excel atau seret file ke sini</div>
-                    <div style="font-size: 12px; color: var(--bs-gray-500); margin-top: 4px;">Mendukung format: .xlsx, .xls, .csv (Maks. 50MB)</div>
-                    <div id="selectedFileName" style="display: none; margin-top: 10px; font-weight: 700; color: #047857; background: #ecfdf5; padding: 6px 12px; border-radius: var(--radius-sm); border: 1px solid #a7f3d0; font-size: 13px;"></div>
+                    <div id="dropzoneText" style="font-weight: 700; color: #0369a1; font-size: 0.875rem;">Klik untuk memilih file Excel atau seret file ke sini</div>
+                    <div style="font-size: 0.75rem; color: var(--bs-gray-500); margin-top: 4px;">Mendukung format: .xlsx, .xls, .csv (Maks. 50MB)</div>
+                    <div id="selectedFileName" style="display: none; margin-top: 10px; font-weight: 700; color: #047857; background: #ecfdf5; padding: 6px 12px; border-radius: var(--radius-sm); border: 1px solid #a7f3d0; font-size: 0.8125rem;"></div>
                 </div>
                 <input type="file" id="fileExcelInput" name="file_excel" accept=".xlsx,.xls,.csv" style="display: none;" onchange="handleFileSelected(this)" required>
 
                 <!-- Option Checkbox -->
                 <div id="templateOptionBox" style="margin-top: 18px; display: flex; align-items: flex-start; gap: 10px; background: #f8fafc; padding: 12px 14px; border-radius: var(--radius-md); border: 1px solid var(--bs-gray-200);">
                     <input type="checkbox" id="chkSetAsTemplate" name="set_as_template" value="1" checked style="margin-top: 3px; cursor: pointer; width: 16px; height: 16px;">
-                    <label for="chkSetAsTemplate" style="font-size: 12.5px; color: var(--bs-gray-700); cursor: pointer; margin: 0; line-height: 1.4;">
+                    <label for="chkSetAsTemplate" style="font-size: 0.78125rem; color: var(--bs-gray-700); cursor: pointer; margin: 0; line-height: 1.4;">
                         <strong>Jadikan sebagai Master Template aktif</strong><br>
                         <span style="color: var(--bs-gray-500);">Format cetak slip, rekapitulasi cabang, dan seluruh rumus bawaan dari file ini akan disimpan dan digunakan saat ekspor berikutnya.</span>
                     </label>
                 </div>
 
                 <!-- Info Box -->
-                <div id="tipsInfoBox" style="margin-top: 14px; font-size: 12px; color: #0369a1; background-color: #f0f9ff; border-left: 3px solid #0284c7; padding: 10px 12px; border-radius: 0 var(--radius-sm) var(--radius-sm) 0;">
+                <div id="tipsInfoBox" style="margin-top: 14px; font-size: 0.75rem; color: #0369a1; background-color: #f0f9ff; border-left: 3px solid #0284c7; padding: 10px 12px; border-radius: 0 var(--radius-sm) var(--radius-sm) 0;">
                     💡 <strong>Tips Cerdas:</strong> Awalan angka nol pada Nomor Rekening, Nomor Kartu, dan Kode Cabang akan tetap dipertahankan. Data yang sudah pernah dimasukkan akan diperbarui secara otomatis tanpa menimbulkan duplikat.
                 </div>
 
@@ -954,8 +961,8 @@
                 <div id="importProgressBarWrapper" style="display: none; margin-top: 18px;">
                     <!-- Status & Percentage -->
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                        <span id="importProgressText" style="font-size: 13px; font-weight: 700; color: #0369a1;">Mengunggah berkas Excel ke server...</span>
-                        <span id="importProgressPercent" style="font-size: 14px; font-weight: 800; color: #0284c7;">0%</span>
+                        <span id="importProgressText" style="font-size: 0.8125rem; font-weight: 700; color: #0369a1;">Mengunggah berkas Excel ke server...</span>
+                        <span id="importProgressPercent" style="font-size: 0.875rem; font-weight: 800; color: #0284c7;">0%</span>
                     </div>
 
                     <!-- Progress Bar Track -->
@@ -1012,8 +1019,8 @@
                 </svg>
             </div>
             
-            <h3 style="font-size: 20px; font-weight: 800; color: var(--bs-navy); margin-bottom: 6px;">Import Data Berhasil!</h3>
-            <p style="font-size: 13.5px; color: var(--bs-gray-600); margin-bottom: 0; line-height: 1.5;">
+            <h3 style="font-size: 1.25rem; font-weight: 800; color: var(--bs-navy); margin-bottom: 6px;">Import Data Berhasil!</h3>
+            <p style="font-size: 0.84375rem; color: var(--bs-gray-600); margin-bottom: 0; line-height: 1.5;">
                 Seluruh data dari berkas Excel Master telah berhasil diproses dan tersimpan ke dalam sistem.
             </p>
 
@@ -1034,7 +1041,7 @@
             </div>
 
             <!-- Details Note -->
-            <div style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: var(--radius-md); padding: 12px 14px; text-align: left; font-size: 12.5px; color: var(--bs-gray-700);">
+            <div style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: var(--radius-md); padding: 12px 14px; text-align: left; font-size: 0.78125rem; color: var(--bs-gray-700);">
                 <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
                     <span style="color: var(--bs-gray-500);">Berkas:</span>
                     <strong id="resFileName" style="color: var(--bs-navy);">-</strong>
@@ -1066,8 +1073,8 @@
                 </svg>
             </div>
             
-            <h3 id="resErrorTitle" style="font-size: 19px; font-weight: 800; color: #991b1b; margin-bottom: 6px;">Proses Gagal</h3>
-            <p id="resErrorMessage" style="font-size: 13.5px; color: var(--bs-gray-700); margin-bottom: 0; line-height: 1.5;">
+            <h3 id="resErrorTitle" style="font-size: 1.1875rem; font-weight: 800; color: #991b1b; margin-bottom: 6px;">Proses Gagal</h3>
+            <p id="resErrorMessage" style="font-size: 0.84375rem; color: var(--bs-gray-700); margin-bottom: 0; line-height: 1.5;">
                 Terjadi kesalahan saat memproses berkas Excel.
             </p>
         </div>
@@ -1107,11 +1114,11 @@
             @csrf
             @method('DELETE')
             <div class="modal-body" style="padding: 24px;">
-                <p style="font-size: 14px; color: var(--bs-gray-800); line-height: 1.5; margin-bottom: 16px;">
+                <p style="font-size: 0.875rem; color: var(--bs-gray-800); line-height: 1.5; margin-bottom: 16px;">
                     Apakah Anda <strong>benar-benar yakin</strong> ingin mengosongkan seluruh data jurnal keluhan dari sistem?
                 </p>
 
-                <div style="background-color: #fef2f2; border: 1px dashed #fca5a5; border-radius: var(--radius-md); padding: 12px 14px; font-size: 13px; color: #991b1b; display: flex; align-items: flex-start; gap: 10px; margin-bottom: 16px;">
+                <div style="background-color: #fef2f2; border: 1px dashed #fca5a5; border-radius: var(--radius-md); padding: 12px 14px; font-size: 0.8125rem; color: #991b1b; display: flex; align-items: flex-start; gap: 10px; margin-bottom: 16px;">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0; margin-top: 2px;">
                         <circle cx="12" cy="12" r="10"></circle>
                         <line x1="12" y1="8" x2="12" y2="12"></line>
@@ -1141,7 +1148,7 @@
 <div class="modal-backdrop" id="exportProgressModal">
     <div class="modal-content" style="max-width: 520px; border-top: 4px solid #059669; animation: modalFadeIn 0.25s ease-out;">
         <div class="modal-header" style="background-color: #f0fdf4; border-bottom: 1px solid #bbf7d0;">
-            <h3 style="color: #065f46; display: flex; align-items: center; gap: 8px; font-size: 17px; font-weight: 700;">
+            <h3 style="color: #065f46; display: flex; align-items: center; gap: 8px; font-size: 1.0625rem; font-weight: 700;">
                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
                     <polyline points="7 10 12 15 17 10"></polyline>
@@ -1169,14 +1176,14 @@
                         <polyline points="20 6 9 17 4 12"></polyline>
                     </svg>
                 </div>
-                <h4 id="exportStatusTitle" style="font-size: 16px; font-weight: 700; color: var(--bs-navy); margin-bottom: 4px;">Menyiapkan Data Transaksi</h4>
-                <p id="exportStatusSub" style="font-size: 13px; color: var(--bs-gray-600); margin: 0;">Mengagregasikan ribuan baris data jurnal dengan relasi master...</p>
+                <h4 id="exportStatusTitle" style="font-size: 1rem; font-weight: 700; color: var(--bs-navy); margin-bottom: 4px;">Menyiapkan Data Transaksi</h4>
+                <p id="exportStatusSub" style="font-size: 0.8125rem; color: var(--bs-gray-600); margin: 0;">Mengagregasikan ribuan baris data jurnal dengan relasi master...</p>
             </div>
 
             <!-- Status & Percentage -->
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                <span id="exportProgressText" style="font-size: 13px; font-weight: 700; color: #065f46;">Proses ekspor sedang berjalan...</span>
-                <span id="exportProgressPercent" style="font-size: 14px; font-weight: 800; color: #059669;">25%</span>
+                <span id="exportProgressText" style="font-size: 0.8125rem; font-weight: 700; color: #065f46;">Proses ekspor sedang berjalan...</span>
+                <span id="exportProgressPercent" style="font-size: 0.875rem; font-weight: 800; color: #059669;">25%</span>
             </div>
 
             <!-- Progress Bar Track -->
@@ -1321,8 +1328,8 @@
                         <circle cx="11" cy="11" r="8"></circle>
                         <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
                     </svg>
-                    <div style="font-weight: 700; color: var(--bs-gray-700); font-size: 14px;">Tidak Ada Data yang Cocok</div>
-                    <div style="font-size: 12.5px; margin-top: 2px;">Tidak ditemukan transaksi dengan kata kunci: <mark class="highlight-yellow">${query}</mark></div>
+                    <div style="font-weight: 700; color: var(--bs-gray-700); font-size: 0.875rem;">Tidak Ada Data yang Cocok</div>
+                    <div style="font-size: 0.78125rem; margin-top: 2px;">Tidak ditemukan transaksi dengan kata kunci: <mark class="highlight-yellow">${query}</mark></div>
                 </td>`;
                 tbody.appendChild(emptyRow);
             }
@@ -1520,8 +1527,8 @@
     function createChipElement(label, value, onRemove) {
         const chip = document.createElement('div');
         chip.className = 'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold bg-brand-blue/10 text-navy border border-brand-blue/20 shadow-2xs transition-all hover:bg-brand-blue/15';
-        chip.innerHTML = `<span class="text-slate-500 font-normal text-[11px]">${label}:</span> <strong class="text-navy font-bold truncate max-w-[220px] text-[11.5px]">${value}</strong>
-            <button type="button" class="w-4 h-4 rounded-full bg-slate-200/80 hover:bg-rose-100 hover:text-rose-600 flex items-center justify-center ml-0.5 transition-colors cursor-pointer text-[10px]" title="Hapus filter ini">✕</button>`;
+        chip.innerHTML = `<span class="text-slate-500 font-normal text-[0.71875rem]">${label}:</span> <strong class="text-navy font-bold truncate max-w-[13.75rem] text-[0.71875rem]">${value}</strong>
+            <button type="button" class="w-4 h-4 rounded-full bg-slate-200/80 hover:bg-rose-100 hover:text-rose-600 flex items-center justify-center ml-0.5 transition-colors cursor-pointer text-[0.71875rem]" title="Hapus filter ini">✕</button>`;
         chip.querySelector('button').addEventListener('click', onRemove);
         return chip;
     }
@@ -1669,8 +1676,8 @@
         const pengaduanWrap = document.getElementById('modal_pengaduan_wrap');
         const pengaduanEl = document.getElementById('modal_pengaduan');
         if (jurnal.pengaduan && jurnal.pengaduan.id) {
-            const nomor = escapeHtml(jurnal.pengaduan.nomor_pengaduan || ('#' + jurnal.pengaduan.id));
-            pengaduanEl.innerHTML = `<a href="{{ url('/pengaduan-masuk') }}/${jurnal.pengaduan.id}" target="_blank" style="color: var(--bs-blue); font-weight: 700; font-family: monospace; text-decoration: underline;">${nomor}</a> <span style="font-size: 11px; color: #64748b;">(${escapeHtml(jurnal.pengaduan.status || '-')})</span>`;
+            const nomor = escapeHtml(jurnal.pengaduan.nomor_tiket || ('#' + jurnal.pengaduan.id));
+            pengaduanEl.innerHTML = `<a href="{{ url('/pengaduan-masuk') }}/${jurnal.pengaduan.id}" target="_blank" style="color: var(--bs-blue); font-weight: 700; font-family: monospace; text-decoration: underline;">${nomor}</a> <span style="font-size: 0.71875rem; color: #64748b;">(${escapeHtml(jurnal.pengaduan.status || '-')})</span>`;
             pengaduanWrap.style.display = '';
         } else {
             pengaduanEl.textContent = '-';
@@ -1700,15 +1707,15 @@
             if (idMesin) {
                 document.getElementById('modal_terminal_transaksi').innerHTML = `
                     <div style="display: flex; flex-direction: column; align-items: flex-start; gap: 4px;">
-                        <span style="font-weight: 700; color: var(--bs-navy); font-size: 15px;">${escapeHtml(displayNama)}</span>
-                        <span style="display: inline-flex; align-items: center; padding: 2.5px 8px; background: #e0f2fe; color: #0369a1; border-radius: 5px; font-weight: 800; font-size: 12px; font-family: monospace; border: 1.5px solid #bae6fd; letter-spacing: 0.2px;">
+                        <span style="font-weight: 700; color: var(--bs-navy); font-size: 0.9375rem;">${escapeHtml(displayNama)}</span>
+                        <span style="display: inline-flex; align-items: center; padding: 2.5px 8px; background: #e0f2fe; color: #0369a1; border-radius: 5px; font-weight: 800; font-size: 0.75rem; font-family: monospace; border: 1.5px solid #bae6fd; letter-spacing: 0.2px;">
                             ID Mesin: ${escapeHtml(idMesin)}
                         </span>
                     </div>
                 `;
             } else {
                 document.getElementById('modal_terminal_transaksi').innerHTML = `
-                    <span style="font-weight: 700; color: var(--bs-navy); font-size: 15px;">${escapeHtml(displayNama)}</span>
+                    <span style="font-weight: 700; color: var(--bs-navy); font-size: 0.9375rem;">${escapeHtml(displayNama)}</span>
                 `;
             }
         } else {
@@ -1744,13 +1751,13 @@
                             </svg>
                         </div>
                         <div>
-                            <div style="font-size: 11px; font-weight: 700; color: #059669; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 3px;">
+                            <div style="font-size: 0.71875rem; font-weight: 700; color: #059669; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 3px;">
                                 Catatan Hasil Pemeriksaan Log Transaksi:
                             </div>
-                            <div style="color: #1e293b; line-height: 1.55; font-size: 13px; font-weight: 500; white-space: pre-wrap;">${escapeHtml(jurnal.keterangan_log)}</div>
+                            <div style="color: #1e293b; line-height: 1.55; font-size: 0.8125rem; font-weight: 500; white-space: pre-wrap;">${escapeHtml(jurnal.keterangan_log)}</div>
                         </div>
                     </div>
-                    <button type="button" onclick="openQuickLogFromDetail(false)" style="background: #ffffff; color: #0284c7; border: 1px solid #cbd5e1; border-radius: 8px; padding: 6px 12px; font-size: 11.5px; font-weight: 600; cursor: pointer; white-space: nowrap; transition: all 0.2s; display: inline-flex; align-items: center; gap: 5px; box-shadow: 0 1px 2px rgba(0,0,0,0.04);" onmouseover="this.style.backgroundColor='#f0f9ff'; this.style.borderColor='#0284c7';" onmouseout="this.style.backgroundColor='#ffffff'; this.style.borderColor='#cbd5e1';">
+                    <button type="button" onclick="openQuickLogFromDetail(false)" style="background: #ffffff; color: #0284c7; border: 1px solid #cbd5e1; border-radius: 8px; padding: 6px 12px; font-size: 0.71875rem; font-weight: 600; cursor: pointer; white-space: nowrap; transition: all 0.2s; display: inline-flex; align-items: center; gap: 5px; box-shadow: 0 1px 2px rgba(0,0,0,0.04);" onmouseover="this.style.backgroundColor='#f0f9ff'; this.style.borderColor='#0284c7';" onmouseout="this.style.backgroundColor='#ffffff'; this.style.borderColor='#cbd5e1';">
                         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
                             <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
@@ -1773,15 +1780,15 @@
                                 </svg>
                             </div>
                             <div>
-                                <div style="font-weight: 700; color: #1e293b; font-size: 14px; line-height: 1.2;">
+                                <div style="font-weight: 700; color: #1e293b; font-size: 0.875rem; line-height: 1.2;">
                                     Keterangan Log Belum Diisi
                                 </div>
-                                <div style="font-size: 11.5px; color: #64748b; margin-top: 2px;">
+                                <div style="font-size: 0.71875rem; color: #64748b; margin-top: 2px;">
                                     Catatan hasil pemeriksaan switching / mesin ATM wajib dilengkapi
                                 </div>
                             </div>
                         </div>
-                        <span style="display: inline-flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 700; color: #b45309; background: #fef3c7; border: 1px solid #fde68a; padding: 4px 10px; border-radius: 20px;">
+                        <span style="display: inline-flex; align-items: center; gap: 4px; font-size: 0.71875rem; font-weight: 700; color: #b45309; background: #fef3c7; border: 1px solid #fde68a; padding: 4px 10px; border-radius: 20px;">
                             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                                 <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
                                 <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
@@ -1795,10 +1802,10 @@
 
                     <!-- Bottom Action Row -->
                     <div style="display: flex; align-items: center; justify-content: space-between; gap: 14px; flex-wrap: wrap;">
-                        <p style="font-size: 12px; color: #475569; margin: 0; line-height: 1.45; flex: 1; min-width: 220px;">
+                        <p style="font-size: 0.75rem; color: #475569; margin: 0; line-height: 1.45; flex: 1; min-width: 220px;">
                             Formulir keluhan resmi nasabah belum dapat dicetak sebelum hasil pemeriksaan log dimasukkan.
                         </p>
-                        <button type="button" onclick="openQuickLogFromDetail(false)" style="background: linear-gradient(135deg, #ea580c 0%, #c2410c 100%); color: #ffffff; border: none; border-radius: 8px; padding: 8px 18px; font-size: 12px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 2px 5px rgba(234, 88, 12, 0.25); white-space: nowrap; transition: all 0.15s ease;" onmouseover="this.style.transform='translateY(-1px)'; this.style.boxShadow='0 4px 10px rgba(234, 88, 12, 0.35)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 5px rgba(234, 88, 12, 0.25)';">
+                        <button type="button" onclick="openQuickLogFromDetail(false)" style="background: linear-gradient(135deg, #ea580c 0%, #c2410c 100%); color: #ffffff; border: none; border-radius: 8px; padding: 8px 18px; font-size: 0.75rem; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 2px 5px rgba(234, 88, 12, 0.25); white-space: nowrap; transition: all 0.15s ease;" onmouseover="this.style.transform='translateY(-1px)'; this.style.boxShadow='0 4px 10px rgba(234, 88, 12, 0.35)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 5px rgba(234, 88, 12, 0.25)';">
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                                 <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
                                 <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
@@ -1960,7 +1967,7 @@
                 const tableRowBtn = document.querySelector(`.btn-cetak-action[data-jurnal-id="${currentQuickLogJurnal.id}"]`);
                 if (tableRowBtn) {
                     tableRowBtn.outerHTML = `
-                        <button type="button" onclick='openPrintChoiceModal(${JSON.stringify(currentQuickLogJurnal)})' class="btn btn-sm btn-cetak-action" data-jurnal-id="${currentQuickLogJurnal.id}" style="background-color: #0284c7; color: white; padding: 6px 12px; font-size: 12.5px; font-weight: 600; display: inline-flex; align-items: center; gap: 5px; text-decoration: none; border-radius: 4px; margin-left: 5px; border: 1px solid #0369a1; cursor: pointer;" title="Pilih Format Cetak Dokumen">
+                        <button type="button" onclick='openPrintChoiceModal(${JSON.stringify(currentQuickLogJurnal)})' class="btn btn-sm btn-cetak-action" data-jurnal-id="${currentQuickLogJurnal.id}" style="background-color: #0284c7; color: white; padding: 6px 12px; font-size: 0.78125rem; font-weight: 600; display: inline-flex; align-items: center; gap: 5px; text-decoration: none; border-radius: 4px; margin-left: 5px; border: 1px solid #0369a1; cursor: pointer;" title="Pilih Format Cetak Dokumen">
                             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <polyline points="6 9 6 2 18 2 18 9"></polyline>
                                 <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>

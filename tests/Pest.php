@@ -161,6 +161,56 @@ function buatLampiran(Pengaduan $pengaduan, string $jenis = 'foto_ktp', string $
     ]);
 }
 
+/**
+ * Data POST minimal untuk menyimpan jurnal keluhan lewat form.
+ */
+function dataJurnal(MasterCabang $cabang, MasterTransaksi $transaksi, array $override = []): array
+{
+    return array_merge([
+        'nama_nasabah' => 'Ahmad Rifai',
+        'no_resi' => '12345678',
+        'no_rekening' => '001099887766',
+        'no_kartu' => '6019001234567890',
+        'master_cabang_id' => $cabang->id,
+        'master_transaksi_id' => $transaksi->id,
+        'channel' => 'ATM LOKAL',
+        'terminal_transaksi' => '-',
+        'nominal_transaksi' => 500000,
+        'biaya_admin' => 0,
+        'tgl_transaksi' => '2026-09-01',
+        'tgl_terima' => '2026-09-04',
+        'tgl_selesai' => '2026-09-05',
+        'status' => 'Menunggu',
+        'permasalahan' => '-',
+        'keterangan_log' => '-',
+    ], $override);
+}
+
+/**
+ * Atribut lengkap untuk membuat baris jurnal langsung lewat model.
+ */
+function dataJurnalDb(MasterCabang $cabang, MasterTransaksi $transaksi, array $override = []): array
+{
+    return array_merge([
+        'nama_nasabah' => 'BUDI SANTOSO',
+        'no_resi' => '123456',
+        'no_rekening' => '00900001234',
+        'no_kartu' => '-',
+        'no_tiket' => '-',
+        'master_cabang_id' => $cabang->id,
+        'master_transaksi_id' => $transaksi->id,
+        'terminal_transaksi' => '-',
+        'nominal_transaksi' => 500000,
+        'biaya_admin' => 0,
+        'tgl_transaksi' => '2026-09-01',
+        'tgl_terima' => '2026-09-04',
+        'tgl_selesai' => null,
+        'status' => 'Menunggu',
+        'permasalahan' => '-',
+        'keterangan_log' => '-',
+    ], $override);
+}
+
 function dataFormPengaduan(MasterTransaksi $transaksi, ?MasterCabang $cabang = null, array $override = []): array
 {
     return array_merge([

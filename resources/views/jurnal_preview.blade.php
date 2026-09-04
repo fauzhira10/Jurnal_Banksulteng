@@ -5,7 +5,7 @@
 @section('page_subtitle', 'Data jurnal keluhan baru saja ditambahkan dan siap untuk dicetak')
 
 @section('topbar_action')
-    <a href="{{ route('jurnal.index') }}" class="inline-flex items-center gap-2 h-[38px] px-3.5 rounded-lg border border-slate-300 bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-slate-900 text-xs font-semibold transition-colors">
+    <a href="{{ route('jurnal.index') }}" class="inline-flex items-center gap-2 h-[2.375rem] px-3.5 rounded-lg border border-slate-300 bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-slate-900 text-xs font-semibold transition-colors">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
             <line x1="3" y1="9" x2="21" y2="9"></line>
@@ -13,7 +13,7 @@
         </svg>
         <span>Ke Tabel Data Jurnal</span>
     </a>
-    <a href="{{ route('jurnal.create') }}" class="inline-flex items-center gap-2 h-[38px] px-3.5 rounded-lg bg-gradient-to-r from-brand-blue to-navy text-white hover:opacity-95 text-xs font-semibold shadow-sm transition-opacity">
+    <a href="{{ route('jurnal.create') }}" class="inline-flex items-center gap-2 h-[2.375rem] px-3.5 rounded-lg bg-gradient-to-r from-brand-blue to-navy text-white hover:opacity-95 text-xs font-semibold shadow-sm transition-opacity">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <line x1="12" y1="5" x2="12" y2="19"></line>
             <line x1="5" y1="12" x2="19" y2="12"></line>
@@ -23,7 +23,7 @@
 @endsection
 
 @section('content')
-<div class="max-w-[850px] mx-auto">
+<div class="max-w-[53.125rem] mx-auto">
     
     @if(session('success'))
     <div class="bg-emerald-50 border-l-4 border-emerald-500 p-4 rounded-r-lg mb-6 shadow-sm flex items-start gap-3">
@@ -39,26 +39,26 @@
     @endif
 
     @if($jurnal->pengaduan)
-        <div class="bg-sky-50 border border-sky-200 text-sky-900 rounded-xl p-4 mb-5 text-[13px] flex items-start gap-3 shadow-xs">
+        <div class="bg-sky-50 border border-sky-200 text-sky-900 rounded-xl p-4 mb-5 text-[0.8125rem] flex items-start gap-3 shadow-xs">
             <span class="text-lg leading-none">📨</span>
             <div class="grow min-w-0">
-                <div class="font-bold">Sumber: Pengaduan CS <span class="font-mono">{{ $jurnal->pengaduan->nomor_pengaduan }}</span> — {{ $jurnal->pengaduan->labelCabang() }}</div>
-                <div class="text-[12px] text-sky-800 mt-0.5">Status di sisi CS saat ini: <strong>{{ $jurnal->pengaduan->status->label() }}</strong>.</div>
+                <div class="font-bold">Sumber: Pengaduan CS <span class="font-mono">{{ $jurnal->pengaduan->nomor_tiket }}</span> — {{ $jurnal->pengaduan->labelCabang() }}</div>
+                <div class="text-[0.75rem] text-sky-800 mt-0.5">Status di sisi CS saat ini: <strong>{{ $jurnal->pengaduan->status->label() }}</strong>.</div>
                 @if($jurnal->pengaduan->lampirans->isNotEmpty())
                     <div class="flex flex-wrap gap-1.5 mt-2">
                         @foreach($jurnal->pengaduan->lampirans as $l)
-                            <a href="{{ route('pengaduan.lampiran.show', [$jurnal->pengaduan, $l]) }}" target="_blank" class="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-white border border-sky-200 text-[11px] font-semibold text-navy hover:border-brand-blue" title="{{ $l->nama_asli }}">{{ $l->ikon() }} {{ $l->label() }} <span class="text-slate-400 font-normal">{{ $l->labelFormat() }}</span></a>
+                            <a href="{{ route('pengaduan.lampiran.show', [$jurnal->pengaduan, $l]) }}" target="_blank" class="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-white border border-sky-200 text-[0.71875rem] font-semibold text-navy hover:border-brand-blue" title="{{ $l->nama_asli }}">{{ $l->ikon() }} {{ $l->label() }} <span class="text-slate-500 font-normal">{{ $l->labelFormat() }}</span></a>
                         @endforeach
                     </div>
                 @endif
-                <a href="{{ route('admin.pengaduan.show', $jurnal->pengaduan) }}" class="inline-block mt-2 text-[12px] font-bold text-brand-blue hover:underline">Lihat detail pengaduan & kronologi →</a>
+                <a href="{{ route('admin.pengaduan.show', $jurnal->pengaduan) }}" class="inline-block mt-2 text-[0.75rem] font-bold text-brand-blue hover:underline">Lihat detail pengaduan & kronologi →</a>
             </div>
         </div>
     @endif
 
     <div class="bg-white rounded-2xl border border-slate-200 shadow-xs mb-6 overflow-hidden">
         <div class="px-6 py-4.5 border-b border-slate-200 flex items-center justify-between bg-slate-50 flex-wrap gap-2">
-            <div class="text-[15px] font-bold text-navy flex items-center gap-2.5">
+            <div class="text-[0.9375rem] font-bold text-navy flex items-center gap-2.5">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-brand-blue">
                     <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
                     <polyline points="14 2 14 8 20 8"></polyline>
@@ -86,7 +86,7 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
                 <!-- Data Nasabah -->
                 <div>
-                    <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Informasi Nasabah</h3>
+                    <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">Informasi Nasabah</h3>
                     <div class="space-y-3.5">
                         <div class="flex flex-col">
                             <span class="text-xs text-slate-500 mb-0.5">Nama Nasabah</span>
@@ -113,13 +113,13 @@
 
                 <!-- Data Transaksi -->
                 <div>
-                    <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Data Transaksi</h3>
+                    <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">Data Transaksi</h3>
                     <div class="space-y-3.5">
                         <div class="flex flex-col">
                             <span class="text-xs text-slate-500 mb-0.5">Jenis Transaksi (Channel)</span>
                             <span class="text-sm font-semibold text-slate-800">
                                 {{ $jurnal->masterTransaksi->jenis_transaksi ?? '-' }} 
-                                <span class="text-slate-400 font-normal">({{ $jurnal->masterTransaksi->channel ?? '-' }})</span>
+                                <span class="text-slate-500 font-normal">({{ $jurnal->masterTransaksi->channel ?? '-' }})</span>
                             </span>
                         </div>
                         <div class="flex flex-col">
@@ -137,13 +137,13 @@
                             <div class="flex flex-col">
                                 <span class="text-sm font-bold text-slate-800">{{ $atmInfo['profil'] ?? $jurnal->terminal_transaksi }}</span>
                                 @if(isset($atmInfo['id_luno']))
-                                    <span class="text-[11px] font-mono text-slate-500 mt-0.5">ID: {{ $atmInfo['id_luno'] }}</span>
+                                    <span class="text-[0.71875rem] font-mono text-slate-500 mt-0.5">ID: {{ $atmInfo['id_luno'] }}</span>
                                 @endif
                             </div>
                         </div>
                         <div class="flex flex-col">
                             <span class="text-xs text-slate-500 mb-0.5">Nominal Transaksi</span>
-                            <span class="text-[15px] font-bold text-emerald-600">Rp {{ number_format($jurnal->nominal_transaksi, 0, ',', '.') }}</span>
+                            <span class="text-[0.9375rem] font-bold text-emerald-600">Rp {{ number_format($jurnal->nominal_transaksi, 0, ',', '.') }}</span>
                         </div>
                         <div class="flex flex-col">
                             <span class="text-xs text-slate-500 mb-0.5">Biaya Admin</span>
@@ -158,7 +158,7 @@
             <div class="mt-8 border-t border-slate-100 pt-6">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
                     <div>
-                        <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Timeline</h3>
+                        <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">Timeline</h3>
                         <div class="space-y-3.5">
                             <div class="flex flex-col">
                                 <span class="text-xs text-slate-500 mb-0.5">Tanggal Transaksi</span>
@@ -176,11 +176,11 @@
                     </div>
                     
                     <div>
-                        <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Catatan Petugas</h3>
+                        <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">Catatan Petugas</h3>
                         <div class="space-y-4">
                             <div class="flex flex-col">
                                 <span class="text-xs text-slate-500 mb-1">Keterangan Keluhan</span>
-                                <div class="bg-slate-50 border border-slate-200 rounded-lg p-3 text-sm text-slate-700 min-h-[40px]">
+                                <div class="bg-slate-50 border border-slate-200 rounded-lg p-3 text-sm text-slate-700 min-h-[2.5rem]">
                                     {{ $jurnal->permasalahan !== '-' && $jurnal->permasalahan ? $jurnal->permasalahan : 'Tidak ada keterangan permasalahan.' }}
                                 </div>
                             </div>
@@ -192,11 +192,11 @@
                                 <div class="flex items-center justify-between mb-1">
                                     <span class="text-xs text-slate-500">Keterangan Log / Kronologi</span>
                                     @if(!$hasLog)
-                                        <span class="text-[11px] font-bold text-amber-700 bg-amber-100 px-2 py-0.5 rounded border border-amber-300">Log Belum Diisi</span>
+                                        <span class="text-[0.71875rem] font-bold text-amber-700 bg-amber-100 px-2 py-0.5 rounded border border-amber-300">Log Belum Diisi</span>
                                     @endif
                                 </div>
                                 @if($hasLog)
-                                    <div class="bg-slate-50 border border-slate-200 rounded-lg p-3 text-sm text-slate-700 min-h-[60px] leading-relaxed">
+                                    <div class="bg-slate-50 border border-slate-200 rounded-lg p-3 text-sm text-slate-700 min-h-[3.75rem] leading-relaxed">
                                         {{ $jurnal->keterangan_log }}
                                     </div>
                                 @else

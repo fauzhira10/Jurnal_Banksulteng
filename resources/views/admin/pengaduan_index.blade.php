@@ -12,15 +12,15 @@
     }
     $filterLain = request()->only(['q', 'master_cabang_id', 'tgl_dari', 'tgl_sampai']);
 @endphp
-<div class="max-w-[1250px] mx-auto">
+<div class="max-w-[78.125rem] mx-auto">
 
     {{-- Tab status --}}
     <div class="bg-white rounded-2xl border border-slate-200 shadow-xs mb-5 p-2 flex items-center gap-1.5 overflow-x-auto">
         @foreach($tabs as $t)
             @php $aktif = $statusAktif === $t['nilai']; @endphp
-            <a href="{{ route('admin.pengaduan.index', array_merge($filterLain, ['status' => $t['nilai']])) }}" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-[12.5px] font-semibold whitespace-nowrap transition-colors {{ $aktif ? 'bg-navy text-white shadow-md' : 'text-slate-600 hover:bg-slate-100' }}">
+            <a href="{{ route('admin.pengaduan.index', array_merge($filterLain, ['status' => $t['nilai']])) }}" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-[0.78125rem] font-semibold whitespace-nowrap transition-colors {{ $aktif ? 'bg-navy text-white shadow-md' : 'text-slate-600 hover:bg-slate-100' }}">
                 <span>{{ $t['label'] }}</span>
-                <span class="px-1.5 py-0.5 rounded-full text-[10.5px] font-extrabold {{ $aktif ? 'bg-white/20 text-white' : 'badge ' . $t['cls'] }}" style="padding: 1px 7px;">{{ number_format($counts[$t['nilai']] ?? 0, 0, ',', '.') }}</span>
+                <span class="px-1.5 py-0.5 rounded-full text-[0.71875rem] font-extrabold {{ $aktif ? 'bg-white/20 text-white' : 'badge ' . $t['cls'] }}" style="padding: 1px 7px;">{{ number_format($counts[$t['nilai']] ?? 0, 0, ',', '.') }}</span>
             </a>
         @endforeach
     </div>
@@ -60,7 +60,7 @@
     {{-- Tabel --}}
     <div class="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
         <div class="px-5 py-4 border-b border-slate-200 flex items-center justify-between flex-wrap gap-2">
-            <div class="text-[15px] font-bold text-navy">
+            <div class="text-[0.9375rem] font-bold text-navy">
                 @if($statusAktif === 'semua') Seluruh Pengaduan @else Pengaduan: {{ \App\Enums\PengaduanStatus::from($statusAktif)->label() }} @endif
             </div>
             <div class="text-xs text-slate-500">Total <strong class="text-navy">{{ number_format($pengaduans->total(), 0, ',', '.') }}</strong> data</div>
@@ -78,7 +78,7 @@
                         <thead>
                             <tr>
                                 <th style="width: 44px; text-align:center;">No</th>
-                                <th>Nomor / Tanggal Kirim</th>
+                                <th>Nomor Tiket / Tanggal Kirim</th>
                                 <th>Cabang & Pelapor</th>
                                 <th>Data Nasabah</th>
                                 <th>Transaksi</th>
@@ -92,34 +92,34 @@
                                 <tr>
                                     <td style="text-align:center; color:#64748b; font-weight:600;">{{ ($pengaduans->currentPage() - 1) * $pengaduans->perPage() + $loop->iteration }}</td>
                                     <td>
-                                        <div class="font-bold text-navy font-mono text-[12.5px]">{{ $p->nomor_pengaduan }}</div>
-                                        <div class="text-[11.5px] text-slate-500 mt-0.5">{{ $p->created_at->translatedFormat('d M Y, H:i') }}</div>
-                                        <div class="text-[11px] text-slate-400">{{ $p->created_at->diffForHumans() }}</div>
+                                        <div class="font-bold text-navy font-mono text-[0.78125rem]">{{ $p->nomor_tiket }}</div>
+                                        <div class="text-[0.71875rem] text-slate-500 mt-0.5">{{ $p->created_at->translatedFormat('d M Y, H:i') }}</div>
+                                        <div class="text-[0.71875rem] text-slate-500">{{ $p->created_at->diffForHumans() }}</div>
                                     </td>
                                     <td>
                                         <div class="font-bold text-slate-800">{{ $p->cabang->nama_cabang ?? '-' }}</div>
-                                        @if(!empty($p->cabang->kode_cabang))<div class="text-[11.5px] text-slate-500">Kode: {{ $p->cabang->kode_cabang }}</div>@endif
-                                        <div class="text-[11px] text-slate-400 mt-0.5">CS: {{ $p->nama_pelapor }}</div>
+                                        @if(!empty($p->cabang->kode_cabang))<div class="text-[0.71875rem] text-slate-500">Kode: {{ $p->cabang->kode_cabang }}</div>@endif
+                                        <div class="text-[0.71875rem] text-slate-500 mt-0.5">CS: {{ $p->nama_pelapor }}</div>
                                     </td>
                                     <td>
                                         <div class="font-semibold text-slate-800">{{ $p->nama_nasabah }}</div>
-                                        <div class="text-[11.5px] text-slate-500">Rek: <strong>{{ $p->no_rekening }}</strong> &bull; Resi: <strong>{{ $p->no_resi }}</strong></div>
-                                        <div class="text-[11px] text-slate-400">{{ $p->kategoriLengkap() }}</div>
+                                        <div class="text-[0.71875rem] text-slate-500">Rek: <strong>{{ $p->no_rekening }}</strong> &bull; Resi: <strong>{{ $p->no_resi }}</strong></div>
+                                        <div class="text-[0.71875rem] text-slate-500">{{ $p->kategoriLengkap() }}</div>
                                     </td>
                                     <td>
-                                        <div class="text-[12.5px] font-medium text-slate-700">{{ $p->transaksi->jenis_transaksi ?? '-' }}</div>
+                                        <div class="text-[0.78125rem] font-medium text-slate-700">{{ $p->transaksi->jenis_transaksi ?? '-' }}</div>
                                         <div class="mt-1 flex items-center gap-1.5 flex-wrap">
                                             <span class="badge badge-channel">{{ $p->channel }}</span>
-                                            <span class="text-[11px] text-slate-500">{{ $p->tgl_transaksi?->translatedFormat('d/m/Y') }}</span>
+                                            <span class="text-[0.71875rem] text-slate-500">{{ $p->tgl_transaksi?->translatedFormat('d/m/Y') }}</span>
                                         </div>
                                     </td>
                                     <td style="white-space:nowrap;" class="font-bold text-emerald-600">{{ $p->nominalRupiah() }}</td>
                                     <td>
                                         @include('partials.pengaduan_status_badge', ['status' => $p->status, 'singkat' => true])
-                                        @if($p->jurnal)<div class="text-[11px] text-slate-500 mt-1">Jurnal #{{ $p->jurnal->id }} &bull; {{ $p->jurnal->status }}</div>@endif
+                                        @if($p->jurnal)<div class="text-[0.71875rem] text-slate-500 mt-1">Jurnal #{{ $p->jurnal->id }} &bull; {{ $p->jurnal->status }}</div>@endif
                                     </td>
                                     <td style="text-align:center; white-space:nowrap;">
-                                        <a href="{{ route('admin.pengaduan.show', $p) }}" class="btn btn-sm" style="padding: 6px 12px; font-size: 12px; background:#0b2f54; color:#fff; border:1px solid #0b2f54;">
+                                        <a href="{{ route('admin.pengaduan.show', $p) }}" class="btn btn-sm" style="padding: 6px 12px; font-size: 0.75rem; background:#0b2f54; color:#fff; border:1px solid #0b2f54;">
                                             {{ $p->status === \App\Enums\PengaduanStatus::Terkirim ? 'Verifikasi' : 'Detail' }}
                                         </a>
                                     </td>

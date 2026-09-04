@@ -5,7 +5,7 @@
 @section('page_subtitle', 'Pencatatan, validasi anti-duplikat, dan penanganan keluhan transaksi nasabah Bank Sulteng')
 
 @section('topbar_action')
-    <a href="{{ route('jurnal.index') }}" class="inline-flex items-center gap-2 h-[38px] px-3.5 rounded-lg border border-slate-300 bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-slate-900 text-xs font-semibold transition-colors">
+    <a href="{{ route('jurnal.index') }}" class="inline-flex items-center gap-2 h-[2.375rem] px-3.5 rounded-lg border border-slate-300 bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-slate-900 text-xs font-semibold transition-colors">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
             <line x1="3" y1="9" x2="21" y2="9"></line>
@@ -20,21 +20,21 @@
     $prefill = $prefill ?? [];
     $pengaduan = $pengaduan ?? null;
 @endphp
-<div class="max-w-[950px] mx-auto">
+<div class="max-w-[59.375rem] mx-auto">
     @if($pengaduan)
-        <div class="bg-sky-50 border border-sky-200 text-sky-900 rounded-xl p-4 mb-5 text-[13px] flex items-start gap-3 shadow-xs">
+        <div class="bg-sky-50 border border-sky-200 text-sky-900 rounded-xl p-4 mb-5 text-[0.8125rem] flex items-start gap-3 shadow-xs">
             <span class="text-lg leading-none">📨</span>
             <div class="grow min-w-0">
-                <div class="font-bold">Diisi otomatis dari pengaduan <span class="font-mono">{{ $pengaduan->nomor_pengaduan }}</span> — {{ $pengaduan->labelCabang() }}</div>
-                <div class="text-[12px] text-sky-800 mt-0.5">Pelapor: {{ $pengaduan->nama_pelapor }} &bull; Kategori: {{ $pengaduan->kategoriLengkap() }}. Periksa kembali seluruh isian, lengkapi No. Tiket / biaya admin, lalu simpan. Status pengaduan di sisi CS otomatis menjadi <strong>Dalam Proses</strong>.</div>
+                <div class="font-bold">Diisi otomatis dari pengaduan <span class="font-mono">{{ $pengaduan->nomor_tiket }}</span> — {{ $pengaduan->labelCabang() }}</div>
+                <div class="text-[0.75rem] text-sky-800 mt-0.5">Pelapor: {{ $pengaduan->nama_pelapor }} &bull; Kategori: {{ $pengaduan->kategoriLengkap() }}. Periksa kembali seluruh isian dan lengkapi biaya admin, lalu simpan. Nomor tiket keluhan dibawa dari pengaduan ini, dan status di sisi CS otomatis menjadi <strong>Dalam Proses</strong>.</div>
                 @if($pengaduan->lampirans->isNotEmpty())
                     <div class="flex flex-wrap gap-1.5 mt-2">
                         @foreach($pengaduan->lampirans as $l)
-                            <a href="{{ route('pengaduan.lampiran.show', [$pengaduan, $l]) }}" target="_blank" class="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-white border border-sky-200 text-[11px] font-semibold text-navy hover:border-brand-blue" title="{{ $l->nama_asli }}">{{ $l->ikon() }} {{ $l->label() }} <span class="text-slate-400 font-normal">{{ $l->labelFormat() }}</span></a>
+                            <a href="{{ route('pengaduan.lampiran.show', [$pengaduan, $l]) }}" target="_blank" class="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-white border border-sky-200 text-[0.71875rem] font-semibold text-navy hover:border-brand-blue" title="{{ $l->nama_asli }}">{{ $l->ikon() }} {{ $l->label() }} <span class="text-slate-500 font-normal">{{ $l->labelFormat() }}</span></a>
                         @endforeach
                     </div>
                 @endif
-                <a href="{{ route('admin.pengaduan.show', $pengaduan) }}" class="inline-block mt-2 text-[12px] font-bold text-brand-blue hover:underline">Lihat detail pengaduan & kronologi →</a>
+                <a href="{{ route('admin.pengaduan.show', $pengaduan) }}" class="inline-block mt-2 text-[0.75rem] font-bold text-brand-blue hover:underline">Lihat detail pengaduan & kronologi →</a>
             </div>
         </div>
     @endif
@@ -63,7 +63,7 @@
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                     <!-- SECTION 1: IDENTITAS NASABAH -->
-                    <div class="md:col-span-2 flex items-center gap-2.5 my-2.5 text-brand-blue text-[13px] font-bold uppercase tracking-wider after:content-[''] after:grow after:h-px after:bg-slate-200">
+                    <div class="md:col-span-2 flex items-center gap-2.5 my-2.5 text-brand-blue text-[0.8125rem] font-bold uppercase tracking-wider after:content-[''] after:grow after:h-px after:bg-slate-200">
                         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
                             <circle cx="12" cy="7" r="4"></circle>
@@ -73,36 +73,61 @@
 
                     <!-- Nama Nasabah -->
                     <div class="flex flex-col gap-1.5">
-                        <label class="font-semibold text-[13px] text-slate-700 flex items-center gap-1">Nama Nasabah <span class="text-rose-600 font-bold">*</span></label>
+                        <label class="font-semibold text-[0.8125rem] text-slate-700 flex items-center gap-1">Nama Nasabah <span class="text-rose-600 font-bold">*</span></label>
                         <input type="text" name="nama_nasabah" value="{{ old('nama_nasabah', $prefill['nama_nasabah'] ?? '') }}" required placeholder="Contoh: BUDI SANTOSO" class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm bg-white text-slate-800 placeholder-slate-400 uppercase transition-all duration-200 focus:border-brand-blue focus:ring-3 focus:ring-brand-blue/15 focus:outline-none" oninput="this.value = this.value.toUpperCase()">
                     </div>
 
                     <!-- No. Rekening -->
                     <div class="flex flex-col gap-1.5">
-                        <label class="font-semibold text-[13px] text-slate-700 flex items-center gap-1">No. Rekening <span class="text-rose-600 font-bold">*</span></label>
+                        <label class="font-semibold text-[0.8125rem] text-slate-700 flex items-center gap-1">No. Rekening <span class="text-rose-600 font-bold">*</span></label>
                         <input type="text" name="no_rekening" value="{{ old('no_rekening', $prefill['no_rekening'] ?? '') }}" required placeholder="Contoh: 00900000" class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm bg-white text-slate-800 placeholder-slate-400 transition-all duration-200 focus:border-brand-blue focus:ring-3 focus:ring-brand-blue/15 focus:outline-none">
                     </div>
 
                     <!-- No. Resi / Trace Number -->
                     <div class="flex flex-col gap-1.5">
-                        <label class="font-semibold text-[13px] text-slate-700 flex items-center gap-1">No. Resi / Trace Number <span class="text-rose-600 font-bold">*</span></label>
+                        <label class="font-semibold text-[0.8125rem] text-slate-700 flex items-center gap-1">No. Resi / Trace Number <span class="text-rose-600 font-bold">*</span></label>
                         <input type="text" name="no_resi" value="{{ old('no_resi', $prefill['no_resi'] ?? '') }}" required placeholder="Contoh: 00000000" class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm bg-white text-slate-800 placeholder-slate-400 transition-all duration-200 focus:border-brand-blue focus:ring-3 focus:ring-brand-blue/15 focus:outline-none">
                     </div>
 
                     <!-- Nomor Kartu -->
                     <div class="flex flex-col gap-1.5">
-                        <label class="font-semibold text-[13px] text-slate-700 flex items-center gap-1">Nomor Kartu ATM/Debit <span class="text-rose-600 font-bold">*</span></label>
+                        <label class="font-semibold text-[0.8125rem] text-slate-700 flex items-center gap-1">Nomor Kartu ATM/Debit <span class="text-rose-600 font-bold">*</span></label>
                         <input type="text" name="no_kartu" value="{{ old('no_kartu', $prefill['no_kartu'] ?? '') }}" required placeholder="Contoh: 6019xxxxxxxxxxxx" class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm bg-white text-slate-800 placeholder-slate-400 transition-all duration-200 focus:border-brand-blue focus:ring-3 focus:ring-brand-blue/15 focus:outline-none">
                     </div>
 
-                    <!-- Nomor Tiket -->
+                    <!-- Nomor Tiket: terkunci bila dari pengaduan CS, diketik manual bila jurnal langsung -->
+                    @php $tiketDariPengaduan = $prefill['no_tiket'] ?? null; @endphp
                     <div class="md:col-span-2 flex flex-col gap-1.5">
-                        <label class="font-semibold text-[13px] text-slate-700 flex items-center gap-1">Nomor Tiket CS <span class="text-rose-600 font-bold">*</span></label>
-                        <input type="text" name="no_tiket" value="{{ old('no_tiket', $prefill['no_tiket'] ?? '') }}" required placeholder="Contoh: BS-20260001" class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm bg-white text-slate-800 placeholder-slate-400 transition-all duration-200 focus:border-brand-blue focus:ring-3 focus:ring-brand-blue/15 focus:outline-none">
+                        <label for="no_tiket" class="font-semibold text-[0.8125rem] text-slate-700 flex items-center gap-1">
+                            Nomor Tiket Keluhan
+                            @if($tiketDariPengaduan)
+                                <span class="inline-flex items-center gap-1 ml-1 px-1.5 py-0.5 rounded bg-slate-100 border border-slate-200 text-[0.6875rem] font-semibold text-slate-600">
+                                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                                    Dari pengaduan CS
+                                </span>
+                            @else
+                                <span class="text-rose-600 font-bold">*</span>
+                            @endif
+                        </label>
+
+                        @if($tiketDariPengaduan)
+                            <div class="flex items-center rounded-xl border border-slate-300 bg-slate-50 overflow-hidden">
+                                <span class="inline-flex items-center px-3.5 py-2.5 bg-slate-100 text-slate-500 font-semibold text-[0.75rem] border-r border-slate-200 select-none">Nomor</span>
+                                <output class="block w-full px-3.5 py-2.5 text-sm font-mono font-bold text-navy tracking-wide">{{ $tiketDariPengaduan }}</output>
+                            </div>
+                            <span class="text-[0.71875rem] text-slate-500 leading-snug">
+                                Nomor ini dibuat saat CS cabang mengirim keluhan dan tetap dipakai pada jurnal, sehingga satu keluhan bernomor sama dari awal sampai selesai.
+                            </span>
+                        @else
+                            <input type="text" name="no_tiket" id="no_tiket" value="{{ old('no_tiket') }}" required maxlength="255" placeholder="Contoh: BS-2026090412345" class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm bg-white text-slate-800 placeholder-slate-400 font-mono transition-all duration-200 focus:border-brand-blue focus:ring-3 focus:ring-brand-blue/15 focus:outline-none">
+                            <span class="text-[0.71875rem] text-slate-500 leading-snug">
+                                Ketik nomor tiket sesuai berkas yang diterima. Nomor ini berasal dari proses sebelumnya (cabang, penyelia, lalu Divisi Literasi), jadi tidak dibuat dari Tanggal Terima Keluhan pada form ini.
+                            </span>
+                        @endif
                     </div>
 
                     <!-- SECTION 2: DETAIL TRANSAKSI & KANTOR CABANG -->
-                    <div class="md:col-span-2 flex items-center gap-2.5 my-2.5 text-brand-blue text-[13px] font-bold uppercase tracking-wider after:content-[''] after:grow after:h-px after:bg-slate-200">
+                    <div class="md:col-span-2 flex items-center gap-2.5 my-2.5 text-brand-blue text-[0.8125rem] font-bold uppercase tracking-wider after:content-[''] after:grow after:h-px after:bg-slate-200">
                         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <line x1="12" y1="1" x2="12" y2="23"></line>
                             <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
@@ -112,7 +137,7 @@
 
                     <!-- Cabang Transaksi / Pelapor -->
                     <div class="flex flex-col gap-1.5">
-                        <label class="font-semibold text-[13px] text-slate-700 flex items-center gap-1">Cabang Transaksi / Pelapor <span class="text-rose-600 font-bold">*</span></label>
+                        <label class="font-semibold text-[0.8125rem] text-slate-700 flex items-center gap-1">Cabang Transaksi / Pelapor <span class="text-rose-600 font-bold">*</span></label>
                         <select name="master_cabang_id" id="cabang_id" required class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm bg-white text-slate-800 transition-all duration-200 focus:border-brand-blue focus:ring-3 focus:ring-brand-blue/15 focus:outline-none">
                             <option value="">-- Pilih Kantor Cabang --</option>
                             @foreach($cabangs as $c)
@@ -125,7 +150,7 @@
 
                     <!-- Jenis Transaksi -->
                     <div class="flex flex-col gap-1.5">
-                        <label class="font-semibold text-[13px] text-slate-700 flex items-center gap-1">Jenis Transaksi <span class="text-rose-600 font-bold">*</span></label>
+                        <label class="font-semibold text-[0.8125rem] text-slate-700 flex items-center gap-1">Jenis Transaksi <span class="text-rose-600 font-bold">*</span></label>
                         <select name="master_transaksi_id" id="transaksi_id" required class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm bg-white text-slate-800 transition-all duration-200 focus:border-brand-blue focus:ring-3 focus:ring-brand-blue/15 focus:outline-none">
                             <option value="">-- Pilih Jenis Transaksi --</option>
                             @foreach($transaksis as $t)
@@ -138,7 +163,7 @@
 
                     <!-- Channel Transaksi (Dropdown) -->
                     <div class="flex flex-col gap-1.5">
-                        <label class="font-semibold text-[13px] text-slate-700 flex items-center gap-1">Channel Transaksi <span class="text-rose-600 font-bold">*</span></label>
+                        <label class="font-semibold text-[0.8125rem] text-slate-700 flex items-center gap-1">Channel Transaksi <span class="text-rose-600 font-bold">*</span></label>
                         <select name="channel" id="channel" required class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm bg-white text-slate-800 transition-all duration-200 focus:border-brand-blue focus:ring-3 focus:ring-brand-blue/15 focus:outline-none">
                             <option value="">-- Pilih Channel Transaksi --</option>
                             @php
@@ -167,10 +192,10 @@
                     <!-- Biaya Admin (Combobox Lengkap 7-Fase: Input Bebas + Auto-Format Rupiah + Suggestion + Keyboard Nav + Auto-Flip) -->
                     <div class="flex flex-col gap-1.5 relative" id="admin_fee_combobox_container">
                         <div class="flex items-center justify-between">
-                            <label class="font-semibold text-[13px] text-slate-700 flex items-center gap-1">
+                            <label class="font-semibold text-[0.8125rem] text-slate-700 flex items-center gap-1">
                                 Biaya Admin (Rp) <span class="text-rose-600 font-bold">*</span>
                             </label>
-                            <span id="admin_fee_hint" class="text-[11px] text-slate-400 font-normal">Ketik bebas / pilih preset</span>
+                            <span id="admin_fee_hint" class="text-[0.71875rem] text-slate-500 font-normal">Ketik bebas / pilih preset</span>
                         </div>
                         
                         <div id="admin_fee_input_wrapper" class="flex items-center rounded-xl border border-slate-300 bg-white overflow-hidden focus-within:border-brand-blue focus-within:ring-3 focus-within:ring-brand-blue/15 transition-all duration-200">
@@ -210,7 +235,7 @@
                             <button 
                                 type="button" 
                                 id="btn_toggle_admin_dropdown" 
-                                class="inline-flex items-center px-3 py-2.5 text-slate-400 hover:text-brand-blue transition-colors focus:outline-none cursor-pointer"
+                                class="inline-flex items-center px-3 py-2.5 text-slate-500 hover:text-brand-blue transition-colors focus:outline-none cursor-pointer"
                                 title="Buka pilihan preset biaya admin"
                                 aria-label="Buka pilihan preset biaya admin"
                                 tabindex="-1"
@@ -222,7 +247,7 @@
                         </div>
 
                         <!-- Pesan Error Validasi -->
-                        <span id="admin_fee_error" class="hidden text-[11.5px] text-rose-600 font-medium mt-0.5">
+                        <span id="admin_fee_error" class="hidden text-[0.71875rem] text-rose-600 font-medium mt-0.5">
                             * Biaya admin wajib diisi (minimal Rp 0).
                         </span>
 
@@ -232,9 +257,9 @@
                             role="listbox"
                             class="hidden absolute left-0 right-0 bg-white border border-slate-200 rounded-xl shadow-xl shadow-slate-200/60 z-50 overflow-hidden py-1 divide-y divide-slate-100 transition-all"
                         >
-                            <div class="px-3.5 py-1.5 text-[10.5px] font-bold tracking-wider text-slate-400 uppercase bg-slate-50/80 flex items-center justify-between">
+                            <div class="px-3.5 py-1.5 text-[0.71875rem] font-bold tracking-wider text-slate-500 uppercase bg-slate-50/80 flex items-center justify-between">
                                 <span>Nilai Umum / Preset Standar</span>
-                                <span class="text-[10px] text-slate-400 font-normal lowercase">Gunakan ↑↓ Enter</span>
+                                <span class="text-[0.71875rem] text-slate-500 font-normal lowercase">Gunakan ↑↓ Enter</span>
                             </div>
                             <div class="max-h-56 overflow-y-auto py-1" id="admin_suggestion_list">
                                 @php
@@ -256,11 +281,11 @@
                                         role="option"
                                         id="admin_opt_{{ $val }}"
                                         aria-selected="false"
-                                        class="admin-suggestion-item min-h-[44px] px-3.5 py-2.5 text-sm text-slate-700 hover:bg-sky-50 hover:text-brand-blue flex items-center justify-between cursor-pointer transition-colors"
+                                        class="admin-suggestion-item min-h-[2.75rem] px-3.5 py-2.5 text-sm text-slate-700 hover:bg-sky-50 hover:text-brand-blue flex items-center justify-between cursor-pointer transition-colors"
                                         data-value="{{ $val }}"
                                         data-label="{{ $lbl }}"
                                     >
-                                        <span class="font-medium text-[13.5px]">{{ $lbl }}</span>
+                                        <span class="font-medium text-[0.84375rem]">{{ $lbl }}</span>
                                         <span class="admin-check hidden text-brand-blue font-bold text-sm">✓</span>
                                     </div>
                                 @endforeach
@@ -273,7 +298,7 @@
 
                     <!-- Nominal Transaksi -->
                     <div class="flex flex-col gap-1.5">
-                        <label class="font-semibold text-[13px] text-slate-700 flex items-center gap-1">Biaya / Nominal Transaksi (Rp) <span class="text-rose-600 font-bold">*</span></label>
+                        <label class="font-semibold text-[0.8125rem] text-slate-700 flex items-center gap-1">Biaya / Nominal Transaksi (Rp) <span class="text-rose-600 font-bold">*</span></label>
                         <div class="flex items-center rounded-xl border border-slate-300 bg-white overflow-hidden focus-within:border-brand-blue focus-within:ring-3 focus-within:ring-brand-blue/15 transition-all duration-200">
                             <span class="inline-flex items-center px-3.5 py-2.5 bg-slate-50 text-slate-500 font-semibold text-xs border-r border-slate-200 select-none">
                                 Rp
@@ -284,19 +309,19 @@
 
                     <!-- Terminal Transaksi / Mesin ATM -->
                     <div class="flex flex-col gap-1.5">
-                        <label class="font-semibold text-[13px] text-slate-700 flex items-center gap-1">
+                        <label class="font-semibold text-[0.8125rem] text-slate-700 flex items-center gap-1">
                             Terminal Transaksi / Mesin ATM <span class="text-rose-600 font-bold">*</span>
                         </label>
                         <select name="terminal_transaksi" id="terminal_transaksi" required class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm bg-white text-slate-800 transition-all duration-200 focus:border-brand-blue focus:ring-3 focus:ring-brand-blue/15 focus:outline-none">
                             <option value="">-- Pilih Mesin ATM / Terminal --</option>
                         </select>
-                        <span id="terminalHelperText" class="text-[11.5px] text-slate-500">
+                        <span id="terminalHelperText" class="text-[0.71875rem] text-slate-500">
                             Pilih mesin ATM langsung atau pilih kantor cabang terlebih dahulu.
                         </span>
                     </div>
 
                     <!-- SECTION 3: WAKTU, STATUS & KRONOLOGI -->
-                    <div class="md:col-span-2 flex items-center gap-2.5 my-2.5 text-brand-blue text-[13px] font-bold uppercase tracking-wider after:content-[''] after:grow after:h-px after:bg-slate-200">
+                    <div class="md:col-span-2 flex items-center gap-2.5 my-2.5 text-brand-blue text-[0.8125rem] font-bold uppercase tracking-wider after:content-[''] after:grow after:h-px after:bg-slate-200">
                         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <circle cx="12" cy="12" r="10"></circle>
                             <polyline points="12 6 12 12 16 14"></polyline>
@@ -306,59 +331,50 @@
 
                     <!-- Tanggal Transaksi -->
                     <div class="flex flex-col gap-1.5">
-                        <label class="font-semibold text-[13px] text-slate-700 flex items-center gap-1">Tanggal Transaksi Bermasalah <span class="text-rose-600 font-bold">*</span></label>
+                        <label class="font-semibold text-[0.8125rem] text-slate-700 flex items-center gap-1">Tanggal Transaksi Bermasalah <span class="text-rose-600 font-bold">*</span></label>
                         <input type="date" name="tgl_transaksi" value="{{ old('tgl_transaksi', $prefill['tgl_transaksi'] ?? '') }}" required class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm bg-white text-slate-800 transition-all duration-200 focus:border-brand-blue focus:ring-3 focus:ring-brand-blue/15 focus:outline-none">
                     </div>
 
                     <!-- Tanggal Terima -->
                     <div class="flex flex-col gap-1.5">
-                        <label class="font-semibold text-[13px] text-slate-700 flex items-center gap-1">Tanggal Terima Keluhan <span class="text-rose-600 font-bold">*</span></label>
-                        <input type="date" name="tgl_terima" value="{{ old('tgl_terima', $prefill['tgl_terima'] ?? date('Y-m-d')) }}" required class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm bg-white text-slate-800 transition-all duration-200 focus:border-brand-blue focus:ring-3 focus:ring-brand-blue/15 focus:outline-none">
+                        <label class="font-semibold text-[0.8125rem] text-slate-700 flex items-center gap-1">Tanggal Terima Keluhan <span class="text-rose-600 font-bold">*</span></label>
+                        <input type="date" name="tgl_terima" id="tgl_terima" value="{{ old('tgl_terima', $prefill['tgl_terima'] ?? date('Y-m-d')) }}" required class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm bg-white text-slate-800 transition-all duration-200 focus:border-brand-blue focus:ring-3 focus:ring-brand-blue/15 focus:outline-none">
                     </div>
 
                     <!-- Tanggal Selesai -->
                     <div class="flex flex-col gap-1.5">
-                        <label class="font-semibold text-[13px] text-slate-700 flex items-center gap-1">
+                        <label class="font-semibold text-[0.8125rem] text-slate-700 flex items-center gap-1">
                             Tanggal Selesai Penanganan 
                              <span class ="text-rose-600 font-bold">*</span>
                         </label>
                         <input type="date" name="tgl_selesai" value="{{ old('tgl_selesai') }}" required class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm bg-white text-slate-800 transition-all duration-200 focus:border-brand-blue focus:ring-3 focus:ring-brand-blue/15 focus:outline-none">
                     </div>
 
-                    <!-- Status -->
-                    <div class="flex flex-col gap-1.5">
-                        <label class="font-semibold text-[13px] text-slate-700 flex items-center gap-1">Status Keluhan <span class="text-rose-600 font-bold">*</span></label>
-                        <select name="status" required class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm bg-white text-slate-800 transition-all duration-200 focus:border-brand-blue focus:ring-3 focus:ring-brand-blue/15 focus:outline-none">
-                            <option value="-" {{ old('status') == '-' ? 'selected' : '' }}>- (Belum Ditentukan)</option>
-                            <option value="Menunggu" {{ old('status', 'Menunggu') == 'Menunggu' ? 'selected' : '' }}>Menunggu</option>
-                            <option value="Success" {{ old('status') == 'Success' ? 'selected' : '' }}>Success</option>
-                            <option value="Done" {{ old('status') == 'Done' ? 'selected' : '' }}>Done</option>
-                            <option value="Rejected" {{ old('status') == 'Rejected' ? 'selected' : '' }}>Rejected</option>
-                        </select>
-                    </div>
+                    <!-- Status (bisa diketik manual atau pilih dari daftar standar) -->
+                    @include('partials.status_combobox', ['nilai' => old('status', 'Menunggu')])
 
                     <!-- Keterangan Keluhan -->
                     <div class="md:col-span-2 flex flex-col gap-1.5">
-                        <label class="font-semibold text-[13px] text-slate-700">Keterangan Keluhan</label>
+                        <label class="font-semibold text-[0.8125rem] text-slate-700">Keterangan Keluhan</label>
                         <input type="text" name="permasalahan" value="{{ old('permasalahan', $prefill['permasalahan'] ?? '') }}" placeholder="Contoh: TARIK TUNAI ATM LOKAL GAGAL, SALDO TERDEBET" class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm bg-white text-slate-800 placeholder-slate-400 uppercase transition-all duration-200 focus:border-brand-blue focus:ring-3 focus:ring-brand-blue/15 focus:outline-none" oninput="this.value = this.value.toUpperCase()">
                     </div>
 
                     <!-- Keterangan Log -->
                     <div class="md:col-span-2 flex flex-col gap-1.5">
-                        <label class="font-semibold text-[13px] text-slate-700">Keterangan Log / Catatan Kronologi Keluhan</label>
-                        <textarea name="keterangan_log" placeholder="Tuliskan catatan, hasil pemeriksaan log, atau tindak lanjut petugas di sini..." class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm bg-white text-slate-800 placeholder-slate-400 transition-all duration-200 focus:border-brand-blue focus:ring-3 focus:ring-brand-blue/15 focus:outline-none resize-y min-h-[90px]">{{ old('keterangan_log') }}</textarea>
+                        <label class="font-semibold text-[0.8125rem] text-slate-700">Keterangan Log / Catatan Kronologi Keluhan</label>
+                        <textarea name="keterangan_log" placeholder="Tuliskan catatan, hasil pemeriksaan log, atau tindak lanjut petugas di sini..." class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm bg-white text-slate-800 placeholder-slate-400 transition-all duration-200 focus:border-brand-blue focus:ring-3 focus:ring-brand-blue/15 focus:outline-none resize-y min-h-[5.625rem]">{{ old('keterangan_log') }}</textarea>
                     </div>
                 </div>
 
                 <div class="mt-6 pt-5 border-t border-slate-200 flex items-center justify-end gap-3">
-                    <button type="reset" class="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-[13.5px] font-semibold bg-slate-100 text-slate-700 border border-slate-300 hover:bg-slate-200 hover:text-slate-900 transition-colors cursor-pointer">
+                    <button type="reset" class="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-[0.84375rem] font-semibold bg-slate-100 text-slate-700 border border-slate-300 hover:bg-slate-200 hover:text-slate-900 transition-colors cursor-pointer">
                         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
                             <path d="M3 3v5h5"></path>
                         </svg>
                         <span>Reset Form</span>
                     </button>
-                    <button type="submit" class="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-[13.5px] font-semibold bg-gradient-to-r from-brand-blue to-navy text-white hover:opacity-95 hover:shadow-lg shadow-brand-blue/25 transition-all cursor-pointer">
+                    <button type="submit" class="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-[0.84375rem] font-semibold bg-gradient-to-r from-brand-blue to-navy text-white hover:opacity-95 hover:shadow-lg shadow-brand-blue/25 transition-all cursor-pointer">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
                             <polyline points="17 21 17 13 7 13 7 21"></polyline>

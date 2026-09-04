@@ -49,7 +49,7 @@
                 $lingkaran = 'bg-white border-brand-blue text-brand-blue animate-pulse-soft';
                 $kotak = 'border-brand-blue/40 bg-sky-50/60';
             } else {
-                $lingkaran = 'bg-slate-100 border-slate-300 text-slate-400';
+                $lingkaran = 'bg-slate-100 border-slate-300 text-slate-500';
                 $kotak = 'border-dashed border-slate-200 bg-slate-50/60';
             }
         @endphp
@@ -62,8 +62,8 @@
                 @endif
             </div>
             <div class="min-w-0">
-                <div class="text-[12.5px] font-bold {{ $sudah || $aktif ? 'text-navy' : 'text-slate-400' }}">{{ $l['label'] }}</div>
-                <div class="text-[11px] text-slate-500 mt-0.5 leading-snug">
+                <div class="text-[0.78125rem] font-bold {{ $sudah || $aktif ? 'text-navy' : 'text-slate-500' }}">{{ $l['label'] }}</div>
+                <div class="text-[0.71875rem] text-slate-500 mt-0.5 leading-snug">
                     @if($l['waktu'])
                         <span class="font-semibold text-slate-600">{{ $l['waktu']->translatedFormat('d M Y, H:i') }}</span><br>
                     @endif

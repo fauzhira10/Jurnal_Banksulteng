@@ -54,10 +54,10 @@
                     <span class="text-xs text-slate-500 mb-0.5">Terminal Transaksi</span>
                     <span class="text-sm font-semibold text-slate-800">{{ $atmInfo['profil'] ?? ($p->terminal_transaksi ?: '-') }}</span>
                     @if(!empty($atmInfo['id_luno']))
-                        <span class="text-[11px] font-mono text-slate-500 mt-0.5">ID Mesin: {{ $atmInfo['id_luno'] }} &bull; {{ $atmInfo['lokasi'] ?? '' }}</span>
+                        <span class="text-[0.71875rem] font-mono text-slate-500 mt-0.5">ID Mesin: {{ $atmInfo['id_luno'] }} &bull; {{ $atmInfo['lokasi'] ?? '' }}</span>
                     @endif
                 </div>
-                <div class="flex flex-col"><span class="text-xs text-slate-500 mb-0.5">Nominal Transaksi</span><span class="text-[15px] font-bold text-emerald-600">{{ $p->nominalRupiah() }}</span></div>
+                <div class="flex flex-col"><span class="text-xs text-slate-500 mb-0.5">Nominal Transaksi</span><span class="text-[0.9375rem] font-bold text-emerald-600">{{ $p->nominalRupiah() }}</span></div>
                 <div class="flex flex-col"><span class="text-xs text-slate-500 mb-0.5">Tanggal Transaksi</span><span class="text-sm font-semibold text-slate-800">{{ $p->tgl_transaksi?->translatedFormat('d F Y') }}</span></div>
             </div>
         </div>
@@ -67,7 +67,7 @@
             <h3 class="text-xs font-bold text-brand-blue uppercase tracking-wider mb-3 flex items-center gap-2">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path></svg>
                 4. Lampiran Dokumen
-                <span class="text-[10.5px] font-semibold text-slate-400 normal-case tracking-normal">({{ $p->lampirans->count() }} berkas, format asli dari cabang)</span>
+                <span class="text-[0.71875rem] font-semibold text-slate-500 normal-case tracking-normal">({{ $p->lampirans->count() }} berkas, format asli dari cabang)</span>
             </h3>
             @if($p->lampirans->isEmpty())
                 <div class="text-sm text-slate-500 italic bg-slate-50 border border-dashed border-slate-200 rounded-xl p-4">Tidak ada lampiran.</div>
@@ -77,18 +77,18 @@
                         @php $berkas = $lampiranPerJenis->get($jenis, collect()); @endphp
                         @continue($berkas->isEmpty())
                         <div>
-                            <div class="text-[12px] font-bold text-slate-700 mb-1.5">{{ $cfg['label'] ?? $jenis }} <span class="text-slate-400 font-semibold">({{ $berkas->count() }} berkas)</span></div>
+                            <div class="text-[0.75rem] font-bold text-slate-700 mb-1.5">{{ $cfg['label'] ?? $jenis }} <span class="text-slate-500 font-semibold">({{ $berkas->count() }} berkas)</span></div>
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-2.5">
                                 @foreach($berkas as $l)
                                     <a href="{{ route('pengaduan.lampiran.show', [$p, $l]) }}" target="_blank" class="flex items-center gap-3 p-3 rounded-xl border border-slate-200 bg-slate-50/60 hover:bg-sky-50 hover:border-brand-blue/40 transition-colors group">
-                                        <div class="w-10 h-10 rounded-lg flex items-center justify-center shrink-0 font-extrabold text-[9.5px] tracking-wide {{ $l->adalahGambar() ? 'bg-sky-100 text-sky-700' : 'bg-rose-100 text-rose-600' }}">{{ $l->labelFormat() }}</div>
+                                        <div class="w-10 h-10 rounded-lg flex items-center justify-center shrink-0 font-extrabold text-[0.71875rem] tracking-wide {{ $l->adalahGambar() ? 'bg-sky-100 text-sky-700' : 'bg-rose-100 text-rose-600' }}">{{ $l->labelFormat() }}</div>
                                         <div class="min-w-0 grow">
-                                            <div class="text-[12.5px] font-bold text-navy group-hover:text-brand-blue truncate" title="{{ $l->nama_asli }}">{{ $l->nama_asli }}</div>
-                                            <div class="text-[11px] text-slate-500 truncate">
+                                            <div class="text-[0.78125rem] font-bold text-navy group-hover:text-brand-blue truncate" title="{{ $l->nama_asli }}">{{ $l->nama_asli }}</div>
+                                            <div class="text-[0.71875rem] text-slate-500 truncate">
                                                 {{ $l->adalahGambar() ? 'Gambar' : 'Dokumen PDF' }} &bull; {{ $l->ukuranTerbaca() }} &bull; diunggah {{ $l->created_at?->translatedFormat('d M Y') }}
                                             </div>
                                         </div>
-                                        <svg class="w-4 h-4 text-slate-400 group-hover:text-brand-blue shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+                                        <svg class="w-4 h-4 text-slate-500 group-hover:text-brand-blue shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
                                     </a>
                                 @endforeach
                             </div>

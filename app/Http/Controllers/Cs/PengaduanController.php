@@ -87,7 +87,7 @@ class PengaduanController extends Controller
 
         return redirect()
             ->route('cs.pengaduan.show', $pengaduan)
-            ->with('success', "Pengaduan {$pengaduan->nomor_pengaduan} berhasil dikirim ke Admin Pusat. Silakan pantau statusnya di halaman ini.");
+            ->with('success', "Pengaduan {$pengaduan->nomor_tiket} berhasil dikirim ke Admin Pusat. Silakan pantau statusnya di halaman ini.");
     }
 
     /**
@@ -135,7 +135,7 @@ class PengaduanController extends Controller
 
         return redirect()
             ->route('cs.pengaduan.show', $pengaduan)
-            ->with('success', "Pengaduan {$pengaduan->nomor_pengaduan} berhasil diperbarui.");
+            ->with('success', "Pengaduan {$pengaduan->nomor_tiket} berhasil diperbarui.");
     }
 
     /**
@@ -145,7 +145,7 @@ class PengaduanController extends Controller
     {
         Gate::authorize('delete', $pengaduan);
 
-        $nomor = $pengaduan->nomor_pengaduan;
+        $nomor = $pengaduan->nomor_tiket;
 
         $this->lampiranService->hapusSemua($pengaduan);
         $pengaduan->delete();

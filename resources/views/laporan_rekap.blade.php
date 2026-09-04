@@ -21,7 +21,7 @@
             Tahun Periode: {{ $selectedYear }}
         </span>
         <a href="{{ route('laporan.export_excel', ['tahun' => $selectedYear, 'master_cabang_id' => $selectedCabang, 'status' => $selectedStatus]) }}" 
-           class="inline-flex items-center gap-2 h-[38px] px-3.5 rounded-xl bg-white hover:bg-slate-100 text-navy font-bold text-xs shadow-xs transition-colors"
+           class="inline-flex items-center gap-2 h-[2.375rem] px-3.5 rounded-xl bg-white hover:bg-slate-100 text-navy font-bold text-xs shadow-xs transition-colors"
            title="Unduh file Excel (.xlsx) dengan tata letak matriks 12 bulan identik">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
@@ -63,14 +63,14 @@
                     <span>Tahun Laporan</span>
                 </label>
                 <div class="relative flex items-center">
-                    <select name="tahun" id="filterTahun" onchange="this.form.submit()" class="w-full h-[42px] px-3.5 pr-8 text-xs font-semibold text-slate-800 bg-slate-50 border border-slate-200 rounded-xl appearance-none cursor-pointer focus:bg-white focus:border-brand-blue focus:ring-3 focus:ring-brand-blue/15 focus:outline-none transition-all">
+                    <select name="tahun" id="filterTahun" onchange="this.form.submit()" class="w-full h-[2.625rem] px-3.5 pr-8 text-xs font-semibold text-slate-800 bg-slate-50 border border-slate-200 rounded-xl appearance-none cursor-pointer focus:bg-white focus:border-brand-blue focus:ring-3 focus:ring-brand-blue/15 focus:outline-none transition-all">
                         @foreach($availableYears as $yr)
                             <option value="{{ $yr }}" {{ $selectedYear == $yr ? 'selected' : '' }}>
                                 Tahun {{ $yr }}
                             </option>
                         @endforeach
                     </select>
-                    <div class="absolute right-3 pointer-events-none text-slate-400">
+                    <div class="absolute right-3 pointer-events-none text-slate-500">
                         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                             <polyline points="6 9 12 15 18 9"></polyline>
                         </svg>
@@ -89,7 +89,7 @@
                     <span>Kantor Cabang</span>
                 </label>
                 <div class="relative flex items-center">
-                    <select name="master_cabang_id" id="filterCabang" onchange="this.form.submit()" class="w-full h-[42px] px-3.5 pr-8 text-xs font-semibold text-slate-800 bg-slate-50 border border-slate-200 rounded-xl appearance-none cursor-pointer focus:bg-white focus:border-brand-blue focus:ring-3 focus:ring-brand-blue/15 focus:outline-none transition-all">
+                    <select name="master_cabang_id" id="filterCabang" onchange="this.form.submit()" class="w-full h-[2.625rem] px-3.5 pr-8 text-xs font-semibold text-slate-800 bg-slate-50 border border-slate-200 rounded-xl appearance-none cursor-pointer focus:bg-white focus:border-brand-blue focus:ring-3 focus:ring-brand-blue/15 focus:outline-none transition-all">
                         <option value="">-- Seluruh Kantor Cabang & KCP --</option>
                         @foreach($cabangs as $c)
                             <option value="{{ $c->id }}" {{ $selectedCabang == $c->id ? 'selected' : '' }}>
@@ -97,7 +97,7 @@
                             </option>
                         @endforeach
                     </select>
-                    <div class="absolute right-3 pointer-events-none text-slate-400">
+                    <div class="absolute right-3 pointer-events-none text-slate-500">
                         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                             <polyline points="6 9 12 15 18 9"></polyline>
                         </svg>
@@ -115,7 +115,7 @@
                     <span>Status Keluhan</span>
                 </label>
                 <div class="relative flex items-center">
-                    <select name="status" id="filterStatus" onchange="this.form.submit()" class="w-full h-[42px] px-3.5 pr-8 text-xs font-semibold text-slate-800 bg-slate-50 border border-slate-200 rounded-xl appearance-none cursor-pointer focus:bg-white focus:border-brand-blue focus:ring-3 focus:ring-brand-blue/15 focus:outline-none transition-all">
+                    <select name="status" id="filterStatus" onchange="this.form.submit()" class="w-full h-[2.625rem] px-3.5 pr-8 text-xs font-semibold text-slate-800 bg-slate-50 border border-slate-200 rounded-xl appearance-none cursor-pointer focus:bg-white focus:border-brand-blue focus:ring-3 focus:ring-brand-blue/15 focus:outline-none transition-all">
                         <option value="">-- Semua Status Keluhan --</option>
                         <option value="Done" {{ $selectedStatus === 'Done' ? 'selected' : '' }}>Done (Selesai)</option>
                         <option value="Success" {{ $selectedStatus === 'Success' ? 'selected' : '' }}>Success (Berhasil)</option>
@@ -123,7 +123,7 @@
                         <option value="Rejected" {{ $selectedStatus === 'Rejected' ? 'selected' : '' }}>Rejected (Ditolak)</option>
                         <option value="-" {{ $selectedStatus === '-' ? 'selected' : '' }}>- (Belum Ditentukan)</option>
                     </select>
-                    <div class="absolute right-3 pointer-events-none text-slate-400">
+                    <div class="absolute right-3 pointer-events-none text-slate-500">
                         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                             <polyline points="6 9 12 15 18 9"></polyline>
                         </svg>
@@ -132,15 +132,15 @@
             </div>
 
             <!-- Tombol Aksi -->
-            <div class="flex items-center gap-2.5 h-[42px]">
-                <button type="submit" class="h-[42px] px-5 rounded-xl bg-gradient-to-r from-navy to-blue-700 hover:from-navy-dark hover:to-blue-800 text-white font-bold text-xs inline-flex items-center gap-2 shadow-sm shadow-navy/20 transition-all cursor-pointer">
+            <div class="flex items-center gap-2.5 h-[2.625rem]">
+                <button type="submit" class="h-[2.625rem] px-5 rounded-xl bg-gradient-to-r from-navy to-blue-700 hover:from-navy-dark hover:to-blue-800 text-white font-bold text-xs inline-flex items-center gap-2 shadow-sm shadow-navy/20 transition-all cursor-pointer">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                         <circle cx="11" cy="11" r="8"></circle>
                         <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
                     </svg>
                     <span>Terapkan</span>
                 </button>
-                <a href="{{ route('laporan.index', ['tahun' => $selectedYear]) }}" class="h-[42px] px-4 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 hover:text-slate-800 font-semibold text-xs border border-slate-200 inline-flex items-center gap-1.5 transition-colors" title="Reset Filter Cabang & Status">
+                <a href="{{ route('laporan.index', ['tahun' => $selectedYear]) }}" class="h-[2.625rem] px-4 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 hover:text-slate-800 font-semibold text-xs border border-slate-200 inline-flex items-center gap-1.5 transition-colors" title="Reset Filter Cabang & Status">
                     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
                         <path d="M3 3v5h5"></path>
@@ -156,7 +156,7 @@
 <div class="bg-white border border-slate-200 rounded-2xl p-3.5 mb-6 shadow-xs">
     <div class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2.5 flex justify-between items-center flex-wrap gap-1">
         <span>PILIH BULAN UNTUK DETAIL DRILL-DOWN</span>
-        <span class="font-normal text-[11.5px] text-slate-400">Klik salah satu bulan untuk melihat rincian & grafik</span>
+        <span class="font-normal text-[0.71875rem] text-slate-500">Klik salah satu bulan untuk melihat rincian & grafik</span>
     </div>
     <div class="grid grid-cols-4 sm:grid-cols-6 lg:grid-cols-12 gap-2">
         @for($m = 1; $m <= 12; $m++)
@@ -166,13 +166,13 @@
             @endphp
             @if($isActive)
                 <div class="flex flex-col items-center justify-center py-2 px-1 rounded-xl border border-navy bg-gradient-to-br from-navy to-blue-800 text-white shadow-md shadow-navy/25 hover:-translate-y-0.5 transition-all cursor-pointer select-none" onclick="selectMonthTab({{ $m }})">
-                    <span class="text-[11.5px] font-bold tracking-wide text-white">{{ strtoupper(substr($monthNames[$m], 0, 3)) }}</span>
-                    <span class="text-[11px] font-semibold mt-0.5 px-2 py-0.5 rounded-full bg-white/25 text-white">{{ $mTotal }}</span>
+                    <span class="text-[0.71875rem] font-bold tracking-wide text-white">{{ strtoupper(substr($monthNames[$m], 0, 3)) }}</span>
+                    <span class="text-[0.71875rem] font-semibold mt-0.5 px-2 py-0.5 rounded-full bg-white/25 text-white">{{ $mTotal }}</span>
                 </div>
             @else
                 <div class="flex flex-col items-center justify-center py-2 px-1 rounded-xl border border-slate-200 bg-slate-50 text-navy hover:bg-sky-50 hover:border-sky-300 hover:-translate-y-0.5 transition-all cursor-pointer select-none" onclick="selectMonthTab({{ $m }})">
-                    <span class="text-[11.5px] font-bold tracking-wide">{{ strtoupper(substr($monthNames[$m], 0, 3)) }}</span>
-                    <span class="text-[11px] font-semibold mt-0.5 px-2 py-0.5 rounded-full bg-slate-200/70 text-slate-700">{{ $mTotal }}</span>
+                    <span class="text-[0.71875rem] font-bold tracking-wide">{{ strtoupper(substr($monthNames[$m], 0, 3)) }}</span>
+                    <span class="text-[0.71875rem] font-semibold mt-0.5 px-2 py-0.5 rounded-full bg-slate-200/70 text-slate-700">{{ $mTotal }}</span>
                 </div>
             @endif
         @endfor
@@ -199,11 +199,11 @@
             <div class="flex flex-col gap-1.5">
                 @foreach(array_slice($monthCategoryRank, 0, 3) as $rk)
                     <div class="flex items-center justify-between text-xs gap-2.5">
-                        <span class="font-semibold text-slate-700 truncate max-w-[220px]" title="{{ $rk['label'] }}">{{ $rk['label'] }}</span>
+                        <span class="font-semibold text-slate-700 truncate max-w-[13.75rem]" title="{{ $rk['label'] }}">{{ $rk['label'] }}</span>
                         <div class="grow h-1.5 bg-slate-200 rounded-full overflow-hidden">
                             <div class="h-full bg-gradient-to-r from-sky-600 to-sky-400 rounded-full" style="width: {{ $rk['percentage'] }}%;"></div>
                         </div>
-                        <span class="text-[11px] font-bold text-navy bg-slate-100 px-2 py-0.5 rounded-full shrink-0">{{ $rk['count'] }} klaim</span>
+                        <span class="text-[0.71875rem] font-bold text-navy bg-slate-100 px-2 py-0.5 rounded-full shrink-0">{{ $rk['count'] }} klaim</span>
                     </div>
                 @endforeach
             </div>
@@ -254,13 +254,13 @@
                 <tr>
                     <th rowspan="2" class="p-2.5 border border-slate-300 bg-slate-100 text-navy font-bold text-center w-10">NO</th>
                     <th rowspan="2" class="p-2.5 border border-slate-300 bg-slate-100 text-navy font-bold text-center w-9"></th>
-                    <th rowspan="2" class="p-2.5 border border-slate-300 bg-slate-100 text-navy font-bold text-left min-w-[240px]">JENIS KLAIM</th>
+                    <th rowspan="2" class="p-2.5 border border-slate-300 bg-slate-100 text-navy font-bold text-left min-w-[15rem]">JENIS KLAIM</th>
                     @for($m = 1; $m <= 12; $m++)
-                        <th class="p-2.5 border border-slate-300 text-navy font-bold text-center min-w-[75px] {{ $selectedMonth == $m ? 'bg-sky-100 text-brand-blue border-sky-400' : 'bg-slate-100' }}">
+                        <th class="p-2.5 border border-slate-300 text-navy font-bold text-center min-w-[4.6875rem] {{ $selectedMonth == $m ? 'bg-sky-100 text-brand-blue border-sky-400' : 'bg-slate-100' }}">
                             {{ strtoupper($monthNames[$m]) }}
                         </th>
                     @endfor
-                    <th rowspan="2" class="p-2.5 border border-slate-300 bg-slate-200 text-navy font-bold text-center min-w-[85px]">TOTAL</th>
+                    <th rowspan="2" class="p-2.5 border border-slate-300 bg-slate-200 text-navy font-bold text-center min-w-[5.3125rem]">TOTAL</th>
                 </tr>
             </thead>
             <tbody>
@@ -320,7 +320,7 @@
                                         {{ $val }}
                                     </a>
                                 @else
-                                    <span class="text-slate-400 font-normal">-</span>
+                                    <span class="text-slate-500 font-normal">-</span>
                                 @endif
                             </td>
                         @endfor
@@ -337,7 +337,7 @@
                 @endforeach
 
                 <!-- FOOTER TOTAL KLAIM -->
-                <tr class="bg-amber-100 text-amber-950 font-extrabold text-[13px] border-t-2 border-amber-500">
+                <tr class="bg-amber-100 text-amber-950 font-extrabold text-[0.8125rem] border-t-2 border-amber-500">
                     <td colspan="3" class="p-2.5 border border-slate-300 text-center tracking-wider font-extrabold">
                         TOTAL KLAIM
                     </td>

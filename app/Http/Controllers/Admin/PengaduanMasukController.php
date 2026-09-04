@@ -92,7 +92,7 @@ class PengaduanMasukController extends Controller
 
         return redirect()
             ->route('admin.pengaduan.show', $pengaduan)
-            ->with('success', "Pengaduan {$pengaduan->nomor_pengaduan} telah diterima. Silakan lanjutkan dengan memasukkannya ke Jurnal Keluhan.");
+            ->with('success', "Pengaduan {$pengaduan->nomor_tiket} telah diterima. Silakan lanjutkan dengan memasukkannya ke Jurnal Keluhan.");
     }
 
     /**
@@ -119,6 +119,6 @@ class PengaduanMasukController extends Controller
 
         return redirect()
             ->route('admin.pengaduan.show', $pengaduan)
-            ->with('success', "Pengaduan {$pengaduan->nomor_pengaduan} telah ditolak dan catatan dikirim ke CS cabang.");
+            ->with('success', "Pengaduan {$pengaduan->nomor_tiket} telah ditolak dan catatan dikirim ke CS cabang.");
     }
 }

@@ -85,11 +85,19 @@ class PengaduanLampiran extends Model
     /**
      * Nama berkas saat dibuka/diunduh, mempertahankan ekstensi asli.
      * Contoh: "Foto KTP Nasabah - PGD-001-20260904-0001.jpg"
+     *
+     * Karakter yang tidak sah pada nama berkas dibersihkan lebih dulu. Header
+     * Content-Disposition menolak "/" dan "\" (label "Kartu ATM / Debit" pernah
+     * memicu galat), sedangkan : * ? " < > | tidak sah sebagai nama berkas Windows.
      */
     public function namaUnduhan(): string
     {
-        $nomor = $this->pengaduan?->nomor_pengaduan ?? 'lampiran';
+        $nomor = $this->pengaduan?->nomor_tiket ?? 'lampiran';
+        $nama = $this->label().' - '.$nomor.'.'.$this->ekstensi();
 
-        return $this->label().' - '.$nomor.'.'.$this->ekstensi();
+        $nama = preg_replace('#[/\\\\:*?"<>|]+#', '-', $nama);
+        $nama = preg_replace('/\s+/', ' ', $nama);
+
+        return trim($nama, " .-\t\n\r\0\x0B") ?: 'lampiran.'.$this->ekstensi();
     }
 }

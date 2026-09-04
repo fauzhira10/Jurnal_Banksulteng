@@ -1,6 +1,7 @@
 <?php
 
 use App\Enums\PengaduanStatus;
+use App\Models\Jurnal;
 use App\Models\Pengaduan;
 use App\Models\PengaduanLampiran;
 use App\Services\LampiranService;
@@ -43,7 +44,8 @@ test('cs dapat mengirim pengaduan dan lampiran disimpan sesuai format aslinya', 
         ->and($pengaduan->nama_nasabah)->toBe('AHMAD RIFAI')
         ->and($pengaduan->kategori)->toBe('TRANSAKSI ATM')
         ->and((float) $pengaduan->nominal_transaksi)->toBe(1500000.0)
-        ->and($pengaduan->nomor_pengaduan)->toMatch('/^PGD-001-\d{8}-0001$/');
+        ->and($pengaduan->nomor_tiket)->toMatch('/^BS-\d{13}$/')
+        ->and($pengaduan->nomor_tiket)->toStartWith('BS-'.now()->format('Ymd'));
 
     // Satu baris per berkas — tidak digabung dan tidak dikonversi
     expect($pengaduan->lampirans)->toHaveCount(3);
@@ -207,6 +209,29 @@ test('berkas pdf tidak pernah diubah isinya', function () {
         ->and($lampiran->mime)->toBe('application/pdf');
 });
 
+test('semua jenis lampiran dapat dibuka meski labelnya mengandung karakter tidak sah', function () {
+    Storage::fake('local');
+
+    $cabang = buatCabang();
+    $cs = buatCs($cabang);
+    $pengaduan = buatPengaduan($cs, buatTransaksi());
+
+    // "Kartu ATM / Debit" mengandung garis miring yang ditolak header Content-Disposition
+    foreach (array_keys(config('pengaduan.jenis_lampiran')) as $jenis) {
+        $lampiran = buatLampiran($pengaduan, $jenis, 'berkas.jpg', 'image/jpeg');
+
+        $this->actingAs($cs)
+            ->get(route('pengaduan.lampiran.show', [$pengaduan, $lampiran]))
+            ->assertStatus(200)
+            ->assertHeader('content-type', 'image/jpeg');
+
+        expect($lampiran->namaUnduhan())
+            ->not->toContain('/')
+            ->not->toContain('\\')
+            ->toEndWith('.jpg');
+    }
+});
+
 test('asal cabang dipilih manual dan wajib diisi', function () {
     Storage::fake('local');
     $cabang = buatCabang('001', 'CABANG UTAMA');
@@ -231,10 +256,11 @@ test('asal cabang dipilih manual dan wajib diisi', function () {
 
     $pengaduan = Pengaduan::first();
     expect($pengaduan->master_cabang_id)->toBe($cabangLain->id)
-        ->and($pengaduan->nomor_pengaduan)->toStartWith('PGD-003-');
+        // Nomor tiket tidak lagi memuat kode cabang, hanya tanggal kirim + angka acak
+        ->and($pengaduan->nomor_tiket)->toStartWith('BS-'.now()->format('Ymd'));
 
     $this->actingAs($cs)->get(route('cs.pengaduan.show', $pengaduan))->assertStatus(200);
-    $this->actingAs($cs)->get(route('cs.pengaduan.index'))->assertStatus(200)->assertSee($pengaduan->nomor_pengaduan);
+    $this->actingAs($cs)->get(route('cs.pengaduan.index'))->assertStatus(200)->assertSee($pengaduan->nomor_tiket);
 });
 
 test('pengaduan tanpa foto ktp ditolak validasi', function () {
@@ -266,7 +292,7 @@ test('berkas dengan format tidak diizinkan ditolak', function () {
     expect(Pengaduan::count())->toBe(0);
 });
 
-test('nomor pengaduan berurutan per cabang per hari', function () {
+test('setiap pengaduan memperoleh nomor tiket unik berformat resmi', function () {
     $cabang = buatCabang('008', 'CABANG PALU BARAT');
     $cs = buatCs($cabang);
     $transaksi = buatTransaksi();
@@ -275,8 +301,11 @@ test('nomor pengaduan berurutan per cabang per hari', function () {
     $p2 = buatPengaduan($cs, $transaksi, ['no_resi' => '654321']);
 
     $tanggal = now()->format('Ymd');
-    expect($p1->nomor_pengaduan)->toBe("PGD-008-{$tanggal}-0001")
-        ->and($p2->nomor_pengaduan)->toBe("PGD-008-{$tanggal}-0002");
+    expect($p1->nomor_tiket)->toStartWith("BS-{$tanggal}")
+        ->and($p2->nomor_tiket)->toStartWith("BS-{$tanggal}")
+        ->and($p1->nomor_tiket)->not->toBe($p2->nomor_tiket)
+        ->and(Jurnal::formatTiketValid($p1->nomor_tiket))->toBeTrue()
+        ->and(Jurnal::formatTiketValid($p2->nomor_tiket))->toBeTrue();
 });
 
 test('lingkup visibilitas cs: kiriman sendiri, cabang asal sama, atau rekan satu cabang', function () {
@@ -297,8 +326,8 @@ test('lingkup visibilitas cs: kiriman sendiri, cabang asal sama, atau rekan satu
     $this->actingAs($csB)->get(route('cs.pengaduan.show', $pengaduan))->assertStatus(200);   // cabang asal
     $this->actingAs($csC)->get(route('cs.pengaduan.show', $pengaduan))->assertForbidden();   // tidak terkait
 
-    $this->actingAs($csB)->get(route('cs.pengaduan.index'))->assertStatus(200)->assertSee($pengaduan->nomor_pengaduan);
-    $this->actingAs($csC)->get(route('cs.pengaduan.index'))->assertStatus(200)->assertDontSee($pengaduan->nomor_pengaduan);
+    $this->actingAs($csB)->get(route('cs.pengaduan.index'))->assertStatus(200)->assertSee($pengaduan->nomor_tiket);
+    $this->actingAs($csC)->get(route('cs.pengaduan.index'))->assertStatus(200)->assertDontSee($pengaduan->nomor_tiket);
 });
 
 test('cs dapat mengedit pengaduan hanya saat status masih terkirim', function () {
