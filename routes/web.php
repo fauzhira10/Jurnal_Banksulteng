@@ -27,6 +27,11 @@ Route::middleware('auth')->group(function () {
     // API AJAX Auto-Fill Biaya Admin & Channel (dipakai form jurnal admin & form pengaduan CS)
     Route::get('/api/transaksi/{id}', [JurnalController::class, 'getDetailTransaksi'])->name('api.transaksi.detail');
 
+    // API AJAX Deteksi Keluhan Berulang (Nama Nasabah + No. Resi).
+    // Awalan /api/duplikat sengaja dipisah dari /api/jurnal/{id} yang tanpa whereNumber,
+    // supaya tidak tertangkap sebagai parameter {id}.
+    Route::get('/api/duplikat/periksa', [JurnalController::class, 'cekDuplikat'])->name('api.duplikat.periksa');
+
     // Lihat lampiran pengaduan (PDF privat, akses dicek lewat PengaduanPolicy)
     Route::get('/pengaduan/{pengaduan}/lampiran/{lampiran}', [PengaduanLampiranController::class, 'show'])
         ->name('pengaduan.lampiran.show')

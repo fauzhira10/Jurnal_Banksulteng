@@ -70,14 +70,23 @@
         formTertunda = null;
     }
 
-    document.querySelectorAll('form[data-konfirmasi]').forEach(form => {
-        form.addEventListener('submit', function (e) {
-            if (form.dataset.konfirmasiLolos === '1') {
-                return; // sudah dikonfirmasi, biarkan terkirim
-            }
-            e.preventDefault();
-            buka(form);
-        });
+    // Pemantauan lewat document (event delegation), bukan diikat satu per satu saat
+    // halaman dimuat. Dengan begitu form yang atribut data-konfirmasi-nya baru
+    // dipasang belakangan lewat JS (mis. peringatan keluhan berulang pada form
+    // jurnal) tetap ikut terkonfirmasi.
+    //
+    // Sengaja memakai fase bubble, sehingga listener submit milik form itu sendiri
+    // sempat berjalan lebih dulu; bila salah satunya sudah membatalkan pengiriman
+    // (validasi lain gagal), dialog ini tidak ikut muncul.
+    document.addEventListener('submit', function (e) {
+        const form = e.target;
+        if (!(form instanceof HTMLFormElement)) return;
+        if (e.defaultPrevented) return;             // sudah dibatalkan validasi lain
+        if (!form.dataset.konfirmasi) return;       // form ini memang tidak perlu konfirmasi
+        if (form.dataset.konfirmasiLolos === '1') return; // sudah dikonfirmasi, biarkan terkirim
+
+        e.preventDefault();
+        buka(form);
     });
 
     btnLanjut.addEventListener('click', function () {

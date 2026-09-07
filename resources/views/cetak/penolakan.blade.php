@@ -4,11 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Form Penolakan Keluhan Nasabah - {{ $jurnal->no_tiket }}</title>
+    <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}">
+    <link rel="shortcut icon" type="image/x-icon" href="{{ asset('favicon.ico') }}">
     <style>
         * {
             box-sizing: border-box;
             font-family: Arial, Helvetica, sans-serif;
             font-size: 11px;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
         }
 
         body {
@@ -16,6 +20,8 @@
             margin: 0;
             padding: 30px 20px;
             color: #000;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
         }
 
         /* Container Formulir Cetak */
@@ -24,9 +30,9 @@
             width: 210mm; /* Standar A4 */
             min-height: 297mm;
             margin: 0 auto 35px auto;
-            padding: 35px 38px;
-            border: 2px solid #000;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            padding: 30px 35px;
+            border: none;
+            box-shadow: none;
             page-break-inside: avoid;
             page-break-after: avoid;
         }
@@ -41,6 +47,10 @@
             border: 1px solid #000;
             padding: 5px 8px;
             vertical-align: middle;
+        }
+
+        .table-form td.no-padding {
+            padding: 0 !important;
         }
 
         /* Header Logo & Title */
@@ -71,6 +81,9 @@
 
         .highlight-yellow {
             background-color: #ffff00 !important;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+            color-adjust: exact !important;
             font-weight: bold;
             padding: 0 2px;
         }
@@ -141,20 +154,69 @@
 
         @page {
             size: A4 portrait;
-            margin: 15mm 18mm 15mm 18mm;
+            margin: 24mm 22mm 22mm 22mm;
+        }
+
+        /* Editable Text Element */
+        .editable-text {
+            display: inline-block;
+            min-width: 40px;
+            padding: 2px 6px;
+            border-radius: 4px;
+            cursor: text;
+            transition: all 0.2s ease;
+        }
+
+        .editable-text:hover {
+            background-color: #fef08a;
+            box-shadow: 0 0 0 1.5px #ca8a04;
+        }
+
+        .editable-text:focus {
+            background-color: #fef9c3;
+            box-shadow: 0 0 0 2px #0284c7;
+            outline: none;
         }
 
         @media print {
+            @page {
+                size: A4 portrait;
+                margin: 24mm 22mm 22mm 22mm;
+            }
             .no-print { display: none !important; }
-            html, body { padding: 0 !important; margin: 0 !important; background: none !important; }
+            html, body { 
+                padding: 0 !important; 
+                margin: 0 !important; 
+                background: none !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+                color-adjust: exact !important;
+            }
             .form-wrapper {
-                border: 1.5px solid #000 !important;
-                width: 100% !important;
-                max-width: 100% !important;
-                padding: 20px 24px !important;
-                margin: 0 auto !important;
+                border: none !important;
+                width: calc(100% - 8mm) !important;
+                max-width: calc(100% - 8mm) !important;
+                padding: 14px 18px !important;
+                margin: 4mm auto !important;
                 box-shadow: none !important;
                 min-height: auto !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+            .table-form td.no-padding {
+                padding: 0 !important;
+            }
+            .highlight-yellow {
+                background-color: #ffff00 !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+                color-adjust: exact !important;
+            }
+            .editable-text {
+                background: transparent !important;
+                box-shadow: none !important;
+                border: none !important;
+                padding: 0 !important;
             }
         }
     </style>
@@ -204,8 +266,8 @@
                 <td colspan="2" class="section-title">LEMBAR HELPDESK</td>
             </tr>
             <tr>
-                <td colspan="2" style="padding: 0;">
-                    <table style="width: 100%; border-collapse: collapse;">
+                <td colspan="2" class="no-padding" style="padding: 0;">
+                    <table style="width: 100%; border-collapse: collapse; table-layout: fixed;">
                         <tr>
                             <td style="width: 25%; border-right: 1px solid #000; border-bottom: 1px solid #000; padding: 4px 8px;">No. Tiket</td>
                             <td style="width: 25%; border-right: 1px solid #000; border-bottom: 1px solid #000; padding: 4px 8px; font-weight: bold;">: {{ $jurnal->no_tiket }}</td>
@@ -214,7 +276,7 @@
                         </tr>
                         <tr>
                             <td style="width: 25%; border-right: 1px solid #000; padding: 4px 8px;">Nama Penerima</td>
-                            <td style="width: 25%; border-right: 1px solid #000; padding: 4px 8px;">: {{ auth()->user()->name ?? 'Mujadid' }}</td>
+                            <td style="width: 25%; border-right: 1px solid #000; padding: 4px 8px;">: <span class="editable-text" contenteditable="true" spellcheck="false" title="Klik untuk mengedit Nama Penerima">MUJADID</span></td>
                             <td style="width: 25%; border-right: 1px solid #000; padding: 4px 8px;">Status</td>
                             <td style="width: 25%; font-weight: bold; text-transform: uppercase; padding: 4px 8px;">: {{ $jurnal->status == 'Done' ? 'SELESAI' : strtoupper($jurnal->status) }}</td>
                         </tr>
@@ -294,7 +356,7 @@
 
             <!-- TINDAK LANJUT PENYELESAIAN -->
             <tr>
-                <td colspan="2" class="section-title">TINDAK LANJUT PENYELESAIAN</td>
+                <td colspan="2" class="section-title" style="text-align: center;">TINDAK LANJUT PENYELESAIAN</td>
             </tr>
             <tr>
                 <td colspan="2" style="padding: 10px 12px 16px 12px;">
@@ -330,11 +392,11 @@
 
             <!-- FOOTER BLOCK TANDA TANGAN (4 KOLOM) -->
             <tr>
-                <td colspan="2" style="padding: 0;">
-                    <table style="width: 100%; border-collapse: collapse;">
+                <td colspan="2" class="no-padding" style="padding: 0;">
+                    <table style="width: 100%; border-collapse: collapse; table-layout: fixed;">
                         <tr>
-                            <td colspan="3" class="sig-header" style="width: 75%; border-right: 1px solid #000;">Di Selesaikan Oleh,</td>
-                            <td class="sig-header" style="width: 25%;">Di ketahui Oleh,</td>
+                            <td colspan="2" class="sig-header" style="width: 50%; border-right: 1px solid #000; border-bottom: 1px solid #000;">Di Selesaikan Oleh,</td>
+                            <td colspan="2" class="sig-header" style="width: 50%; border-bottom: 1px solid #000;">Di ketahui Oleh,</td>
                         </tr>
                         <tr>
                             <!-- Pejabat 1 -->

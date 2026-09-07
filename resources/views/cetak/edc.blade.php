@@ -4,11 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Slip Jurnal EDC (Nota Debet) - {{ $jurnal->no_tiket }}</title>
+    <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}">
+    <link rel="shortcut icon" type="image/x-icon" href="{{ asset('favicon.ico') }}">
     <style>
         * {
             box-sizing: border-box;
             font-family: Arial, Helvetica, sans-serif;
             font-size: 11px;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
         }
 
         body {
@@ -16,6 +20,8 @@
             margin: 0;
             padding: 30px 20px;
             color: #000;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
         }
 
         /* Container Slip Cetak A4 */
@@ -24,8 +30,8 @@
             width: 210mm;
             margin: 0 auto 35px auto;
             padding: 25px 30px;
-            border: 2px solid #000;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            border: none;
+            box-shadow: none;
         }
 
         /* Toolbar Aksi Layar Monitor */
@@ -79,8 +85,19 @@
         }
 
         @media print {
+            @page {
+                size: A4 portrait;
+                margin: 15mm 18mm 15mm 18mm;
+            }
             .no-print { display: none !important; }
-            html, body { padding: 0 !important; margin: 0 !important; background: none !important; }
+            html, body {
+                padding: 0 !important;
+                margin: 0 !important;
+                background: none !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+                color-adjust: exact !important;
+            }
             .form-wrapper {
                 border: none !important;
                 width: 100% !important;
@@ -311,7 +328,7 @@
                                 <td style="border: none; padding: 0; font-weight: bold;">
                                     <div style="display: flex; justify-content: space-between;">
                                         <span>Rp</span>
-                                        <span>{{ number_format($jurnal->nominal_transaksi, 0, ',', '.') }}</span>
+                                        <span>{{ number_format($jurnal->nominal_transaksi + ($jurnal->biaya_admin ?? $jurnal->masterTransaksi->biaya_admin ?? 0), 0, ',', '.') }}</span>
                                     </div>
                                 </td>
                             </tr>

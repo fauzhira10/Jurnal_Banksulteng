@@ -4,11 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Form Keluhan & Slip Jurnal ATM Pulsa / Finnet / PLN - {{ $jurnal->no_tiket }}</title>
+    <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}">
+    <link rel="shortcut icon" type="image/x-icon" href="{{ asset('favicon.ico') }}">
     <style>
         * {
             box-sizing: border-box;
             font-family: Arial, Helvetica, sans-serif;
             font-size: 11px;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
         }
 
         body {
@@ -16,6 +20,8 @@
             margin: 0;
             padding: 25px 20px;
             color: #000;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
         }
 
         /* Container Formulir Cetak A4 */
@@ -25,8 +31,8 @@
             min-height: 297mm;
             margin: 0 auto 30px auto;
             padding: 30px 35px;
-            border: 2px solid #000;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            border: none;
+            box-shadow: none;
             page-break-inside: avoid;
             page-break-after: avoid;
         }
@@ -41,6 +47,10 @@
             border: 1px solid #000;
             padding: 4px 7px;
             vertical-align: middle;
+        }
+
+        .table-form td.no-padding {
+            padding: 0 !important;
         }
 
         /* Header Logo & Title */
@@ -71,6 +81,9 @@
 
         .highlight-yellow {
             background-color: #ffff00 !important;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+            color-adjust: exact !important;
             font-weight: bold;
             padding: 0 2px;
         }
@@ -80,23 +93,23 @@
             font-weight: bold;
         }
 
-        /* Tanda Tangan Footer */
+        /* Tanda Tangan Footer (4 Kolom Sesuai Referensi) */
         .sig-header {
             text-align: center;
             font-weight: bold;
-            padding: 6px 4px !important;
+            padding: 6px 3px !important;
             font-size: 10.5px;
         }
 
         .sig-body {
-            height: 125px;
+            height: 120px;
             text-align: center;
             vertical-align: bottom !important;
-            padding: 8px 6px 10px 6px !important;
+            padding: 8px 4px 10px 4px !important;
         }
 
         .sig-space {
-            height: 70px;
+            height: 60px;
         }
 
         .sig-name {
@@ -105,52 +118,94 @@
             text-transform: uppercase;
             font-size: 10.5px;
             margin-bottom: 3px;
-            letter-spacing: 0.3px;
+            letter-spacing: 0.2px;
         }
 
         .sig-title {
             font-size: 8.5px;
             color: #000;
-            line-height: 1.3;
-            padding: 0 2px;
+            line-height: 1.25;
+            padding: 0 1px;
         }
 
-        /* Editable Text Element on Slip */
-        .editable-text {
-            display: inline-block;
-            min-width: 80px;
-            padding: 1px 4px;
-            border-radius: 3px;
-            cursor: text;
-            transition: all 0.2s ease;
-        }
-
-        .editable-text:hover {
-            background-color: #fef08a;
-            box-shadow: 0 0 0 1.5px #ca8a04;
-        }
-
-        .editable-text:focus {
-            background-color: #fef9c3;
-            box-shadow: 0 0 0 2px #0284c7;
-            outline: none;
-        }
-
-        /* SLIP JURNAL STYLING */
+        /* SLIP JURNAL / NOTA DEBET STYLING */
         .page-break {
-            page-break-before: always;
+            display: none !important;
         }
 
+        .slip-wrapper {
+            page-break-before: always;
+            break-before: page;
+        }
+
+        .slip-header-table {
+            width: 100%;
+            border-collapse: collapse;
+            border: 1.5px solid #000;
+            margin-bottom: -1px;
+        }
+
+        .slip-header-table td {
+            border: 1px solid #000;
+            padding: 5px 8px;
+            vertical-align: middle;
+        }
+
+        .slip-title-main {
+            font-weight: bold;
+            font-size: 13px;
+            text-align: center;
+            letter-spacing: 0.5px;
+        }
+
+        .slip-title-sub {
+            font-weight: bold;
+            font-size: 10px;
+            text-align: center;
+            line-height: 1.25;
+        }
+
+        .table-slip {
+            width: 100%;
+            border-collapse: collapse;
+            border: 1.5px solid #000;
+        }
+
+        .table-slip td, .table-slip th {
+            border: 1px solid #000;
+            padding: 3.5px 5px;
+            vertical-align: top;
+        }
+
+        .slip-col-header {
+            text-align: center;
+            font-weight: bold;
+            font-size: 11px;
+            letter-spacing: 0.4px;
+            background-color: #ffffff;
+            padding: 4px 3px;
+        }
+
+        .ledger-grid {
+            width: 100%;
+            height: 50px;
+            border-collapse: collapse;
+            margin-bottom: 5px;
+        }
+
+        .ledger-grid td {
+            border: 1px solid #94a3b8 !important;
+            padding: 0 !important;
+            width: 20%;
+        }
+
+        /* Tombol Aksi Layar Monitor */
         .no-print {
             width: 210mm;
-            margin: 0 auto 15px auto;
+            margin: 0 auto 12px auto;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background: #fff;
-            padding: 10px 15px;
-            border-radius: 6px;
-            border: 1px solid #cbd5e1;
         }
 
         .btn {
@@ -170,24 +225,96 @@
 
         @page {
             size: A4 portrait;
-            margin: 10mm 15mm 10mm 15mm;
+            margin: 15mm 18mm 15mm 18mm;
+        }
+
+        /* Editable Text Element on Slip */
+        .editable-text {
+            display: inline-block;
+            min-width: 120px;
+            padding: 2px 5px;
+            border-radius: 4px;
+            cursor: text;
+            transition: all 0.2s ease;
+        }
+
+        .editable-text:hover {
+            background-color: #fef08a;
+            box-shadow: 0 0 0 1.5px #ca8a04;
+        }
+
+        .editable-text:focus {
+            background-color: #fef9c3;
+            box-shadow: 0 0 0 2px #0284c7;
+            outline: none;
         }
 
         @media print {
+            @page {
+                size: A4 portrait;
+                margin: 12mm 15mm 12mm 15mm;
+            }
             .no-print { display: none !important; }
-            html, body { padding: 0 !important; margin: 0 !important; background: none !important; }
-            .form-wrapper {
-                border: 1.5px solid #000 !important;
-                width: 100% !important;
-                max-width: 100% !important;
-                padding: 15px 20px !important;
-                margin: 0 auto !important;
+            .page-break { display: none !important; }
+            html, body {
+                padding: 0 !important;
+                margin: 0 !important;
+                background: none !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+                color-adjust: exact !important;
+            }
+            .form-wrapper:not(.slip-wrapper) {
+                border: none !important;
+                width: calc(100% - 8mm) !important;
+                max-width: calc(100% - 8mm) !important;
+                padding: 14px 18px !important;
+                margin: 4mm auto !important;
                 box-shadow: none !important;
-                min-height: auto !important;
+                min-height: 0 !important;
+                height: auto !important;
+                page-break-inside: avoid !important;
+                break-inside: avoid !important;
+                page-break-after: avoid !important;
+                break-after: avoid !important;
+            }
+            .table-form {
+                page-break-inside: avoid !important;
+                break-inside: avoid !important;
+            }
+            .table-form td, .table-form th {
+                padding: 3.5px 6px !important;
+            }
+            .table-form td.no-padding {
+                padding: 0 !important;
+            }
+            .sig-body {
+                height: 95px !important;
+                padding: 6px 4px 8px 4px !important;
+            }
+            .sig-space {
+                height: 45px !important;
             }
             .slip-wrapper {
                 border: none !important;
-                padding: 5px 0 !important;
+                box-shadow: none !important;
+                width: 100% !important;
+                max-width: 100% !important;
+                padding: 10px 15px !important;
+                margin: 0 auto !important;
+                min-height: 0 !important;
+                height: auto !important;
+                background: transparent !important;
+                page-break-before: always !important;
+                break-before: page !important;
+                page-break-inside: avoid !important;
+                break-inside: avoid !important;
+            }
+            .highlight-yellow {
+                background-color: #ffff00 !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+                color-adjust: exact !important;
             }
             .editable-text {
                 background: transparent !important;
@@ -237,8 +364,8 @@
             </tr>
             <tr><td colspan="2" class="section-title">LEMBAR HELPDESK</td></tr>
             <tr>
-                <td colspan="2" style="padding: 0;">
-                    <table style="width: 100%; border-collapse: collapse;">
+                <td colspan="2" class="no-padding" style="padding: 0;">
+                    <table style="width: 100%; border-collapse: collapse; table-layout: fixed;">
                         <tr>
                             <td style="width: 25%; border-right: 1px solid #000; border-bottom: 1px solid #000; padding: 4px 8px;">No. Tiket</td>
                             <td style="width: 25%; border-right: 1px solid #000; border-bottom: 1px solid #000; padding: 4px 8px; font-weight: bold;">: {{ $jurnal->no_tiket }}</td>
@@ -247,7 +374,7 @@
                         </tr>
                         <tr>
                             <td style="width: 25%; border-right: 1px solid #000; padding: 4px 8px;">Nama Penerima</td>
-                            <td style="width: 25%; border-right: 1px solid #000; padding: 4px 8px;">: {{ auth()->user()->name ?? 'Mujadid' }}</td>
+                            <td style="width: 25%; border-right: 1px solid #000; padding: 4px 8px;">: <span class="editable-text" contenteditable="true" spellcheck="false" title="Klik untuk mengedit Nama Penerima">MUJADID</span></td>
                             <td style="width: 25%; border-right: 1px solid #000; padding: 4px 8px;">Status</td>
                             <td style="width: 25%; font-weight: bold; text-transform: uppercase; padding: 4px 8px;">: {{ $jurnal->status == 'Done' ? 'SELESAI' : strtoupper($jurnal->status) }}</td>
                         </tr>
@@ -314,7 +441,7 @@
                     </table>
                 </td>
             </tr>
-            <tr><td colspan="2" class="section-title">TINDAK LANJUT PENYELESAIAN</td></tr>
+            <tr><td colspan="2" class="section-title" style="text-align: center;">TINDAK LANJUT PENYELESAIAN</td></tr>
             <tr>
                 <td colspan="2" style="padding: 8px 12px 14px 12px;">
                     <table style="width: 100%; border-collapse: collapse;">
@@ -379,8 +506,8 @@
                 </td>
             </tr>
             <tr>
-                <td colspan="2" style="padding: 0;">
-                    <table style="width: 100%; border-collapse: collapse;">
+                <td colspan="2" class="no-padding" style="padding: 0;">
+                    <table style="width: 100%; border-collapse: collapse; table-layout: fixed;">
                         <tr>
                             <td colspan="4" style="text-align: right; padding: 4px 10px; border-bottom: 1px solid #000;">Palu, {{ \Carbon\Carbon::parse($jurnal->tgl_selesai)->translatedFormat('d F Y') }}</td>
                         </tr>
@@ -402,8 +529,6 @@
         </table>
     </div>
 
-    <div class="page-break"></div>
-
     <div class="form-wrapper slip-wrapper" style="border: none; box-shadow: none; padding: 10px 20px;">
         <table style="width: 100%; border-collapse: collapse; margin-bottom: 6px;">
             <tr>
@@ -424,12 +549,12 @@
                 <tr>
                     <td style="border-left: 1.5px solid #000; border-right: 1px solid #000; border-top: 1.5px solid #000; border-bottom: none; padding: 1.5px 6px; text-align: center; font-weight: bold;"><span class="editable-text" contenteditable="true" spellcheck="false" title="Klik untuk edit">{{ $isPLN ? 'KEWAJIBAN PLN PREPAID' : 'KEWAJIBAN TELKOMSEL FINNET ATM' }}</span></td>
                     <td style="border: 1px solid #000; width: 2.4%;"></td><td style="border: 1px solid #000; width: 2.4%;"></td><td style="border: 1px solid #000; width: 2.4%;"></td><td style="border: 1px solid #000; width: 2.4%;"></td><td style="border: 1px solid #000; width: 2.4%;"></td>
-                    <td style="border-left: 1px solid #000; border-right: 1.5px solid #000; border-top: 1.5px solid #000; border-bottom: none; padding: 1.5px 6px; text-align: center; font-weight: bold; text-transform: uppercase;"><span class="editable-text" contenteditable="true" spellcheck="false" title="Klik untuk edit">{{ $jurnal->nama_nasabah }}</span></td>
+                    <td style="border-left: 1px solid #000; border-right: 1.5px solid #000; border-top: 1.5px solid #000; border-bottom: none; padding: 1.5px 6px; text-align: center; font-weight: bold; text-transform: uppercase;">{{ $jurnal->nama_nasabah }}</td>
                 </tr>
                 <tr>
                     <td style="border-left: 1.5px solid #000; border-right: 1px solid #000; border-top: none; border-bottom: 1px solid #000; padding: 1px 6px 2.5px 6px; text-align: center; font-weight: bold;"><span class="editable-text" contenteditable="true" spellcheck="false" title="Klik untuk edit">{{ $isPLN ? '000.00.2310708.002360' : '00000.2310703.001.360' }}</span></td>
                     <td style="border: 1px solid #000;"></td><td style="border: 1px solid #000;"></td><td style="border: 1px solid #000;"></td><td style="border: 1px solid #000;"></td><td style="border: 1px solid #000;"></td>
-                    <td style="border-left: 1px solid #000; border-right: 1.5px solid #000; border-top: none; border-bottom: 1px solid #000; padding: 1px 6px 2.5px 6px; text-align: center; font-weight: bold;"><span class="editable-text" contenteditable="true" spellcheck="false" title="Klik untuk edit">{{ $jurnal->no_rekening }}</span></td>
+                    <td style="border-left: 1px solid #000; border-right: 1.5px solid #000; border-top: none; border-bottom: 1px solid #000; padding: 1px 6px 2.5px 6px; text-align: center; font-weight: bold;">{{ $jurnal->no_rekening }}</td>
                 </tr>
                 <tr>
                     <td style="border-left: 1.5px solid #000; border-right: 1px solid #000; border-top: 1px solid #000; border-bottom: 1px solid #000; padding: 1.5px 6px;"><span class="editable-text" contenteditable="true" spellcheck="false">{{ $isPLN ? 'REV FEE PLN PREPAID' : 'REV FEE TELKOMSEL PULSA' }}</span></td>
@@ -536,9 +661,9 @@
                     <td style="border-left: 1px solid #000; border-right: 1.5px solid #000; border-top: 1px solid #000; border-bottom: none; padding: 1px 6px;"><span class="editable-text" contenteditable="true" spellcheck="false">{{ $isPLN ? 'REV FEE PLN PREPAID' : 'REV FEE TELKOMSEL PULSA' }}</span></td>
                 </tr>
                 <tr>
-                    <td style="border-left: 1.5px solid #000; border-right: 1px solid #000; border-top: none; border-bottom: 1px solid #000; padding: 1px 6px 2px 6px; font-weight: bold; text-transform: uppercase;"><span class="editable-text" contenteditable="true" spellcheck="false">{{ $jurnal->nama_nasabah }}</span></td>
+                    <td style="border-left: 1.5px solid #000; border-right: 1px solid #000; border-top: none; border-bottom: 1px solid #000; padding: 1px 6px 2px 6px; font-weight: bold; text-transform: uppercase;">{{ $jurnal->nama_nasabah }}</td>
                     <td style="border: 1px solid #000;"></td><td style="border: 1px solid #000;"></td><td style="border: 1px solid #000;"></td><td style="border: 1px solid #000;"></td><td style="border: 1px solid #000;"></td>
-                    <td style="border-left: 1px solid #000; border-right: 1.5px solid #000; border-top: none; border-bottom: 1px solid #000; padding: 1px 6px 2px 6px; font-weight: bold; text-transform: uppercase;"><span class="editable-text" contenteditable="true" spellcheck="false">{{ $jurnal->nama_nasabah }}</span></td>
+                    <td style="border-left: 1px solid #000; border-right: 1.5px solid #000; border-top: none; border-bottom: 1px solid #000; padding: 1px 6px 2px 6px; font-weight: bold; text-transform: uppercase;">{{ $jurnal->nama_nasabah }}</td>
                 </tr>
                 <tr>
                     <td style="border-left: 1.5px solid #000; border-right: 1px solid #000; border-top: 1px solid #000; border-bottom: 1px solid #000; padding: 1px 6px;">
@@ -594,13 +719,13 @@
                 <tr>
                     <td style="border-left: 1.5px solid #000; border-right: 1px solid #000; border-top: 1.5px solid #000; border-bottom: none; padding: 1.5px 6px; text-align: center; font-weight: bold;"><span class="editable-text" contenteditable="true" spellcheck="false" title="Klik untuk edit">RRA - BEBAN {{ $namaCabangBeban }}</span></td>
                     <td style="border: 1px solid #000; width: 2.4%;"></td><td style="border: 1px solid #000; width: 2.4%;"></td><td style="border: 1px solid #000; width: 2.4%;"></td><td style="border: 1px solid #000; width: 2.4%;"></td><td style="border: 1px solid #000; width: 2.4%;"></td>
-                    <td style="border-left: 1px solid #000; border-right: 1.5px solid #000; border-top: 1.5px solid #000; border-bottom: none; padding: 1.5px 6px; text-align: center; font-weight: bold; text-transform: uppercase;"><span class="editable-text" contenteditable="true" spellcheck="false" title="Klik untuk edit">{{ $jurnal->nama_nasabah }}</span></td>
+                    <td style="border-left: 1px solid #000; border-right: 1.5px solid #000; border-top: 1.5px solid #000; border-bottom: none; padding: 1.5px 6px; text-align: center; font-weight: bold; text-transform: uppercase;">{{ $jurnal->nama_nasabah }}</td>
                 </tr>
                 <!-- Baris 11: Nomor Rekening -->
                 <tr>
                     <td style="border-left: 1.5px solid #000; border-right: 1px solid #000; border-top: none; border-bottom: 1px solid #000; padding: 1px 6px 2.5px 6px; text-align: center; font-weight: bold;"><span class="editable-text" contenteditable="true" spellcheck="false" title="Klik untuk edit">000.00.1239902.006.360</span></td>
                     <td style="border: 1px solid #000;"></td><td style="border: 1px solid #000;"></td><td style="border: 1px solid #000;"></td><td style="border: 1px solid #000;"></td><td style="border: 1px solid #000;"></td>
-                    <td style="border-left: 1px solid #000; border-right: 1.5px solid #000; border-top: none; border-bottom: 1px solid #000; padding: 1px 6px 2.5px 6px; text-align: center; font-weight: bold;"><span class="editable-text" contenteditable="true" spellcheck="false" title="Klik untuk edit">{{ $jurnal->no_rekening }}</span></td>
+                    <td style="border-left: 1px solid #000; border-right: 1.5px solid #000; border-top: none; border-bottom: 1px solid #000; padding: 1px 6px 2.5px 6px; text-align: center; font-weight: bold;">{{ $jurnal->no_rekening }}</td>
                 </tr>
                 <!-- Baris 12: Header Rev -->
                 <tr>
@@ -610,9 +735,9 @@
                 </tr>
                 <!-- Baris 13: Nama Nasabah Sub -->
                 <tr>
-                    <td style="border-left: 1.5px solid #000; border-right: 1px solid #000; border-top: none; border-bottom: 1px solid #000; padding: 1px 6px 2px 6px; font-weight: bold; text-transform: uppercase;"><span class="editable-text" contenteditable="true" spellcheck="false">{{ $jurnal->nama_nasabah }}</span></td>
+                    <td style="border-left: 1.5px solid #000; border-right: 1px solid #000; border-top: none; border-bottom: 1px solid #000; padding: 1px 6px 2px 6px; font-weight: bold; text-transform: uppercase;">{{ $jurnal->nama_nasabah }}</td>
                     <td style="border: 1px solid #000;"></td><td style="border: 1px solid #000;"></td><td style="border: 1px solid #000;"></td><td style="border: 1px solid #000;"></td><td style="border: 1px solid #000;"></td>
-                    <td style="border-left: 1px solid #000; border-right: 1.5px solid #000; border-top: none; border-bottom: 1px solid #000; padding: 1px 6px 2px 6px; font-weight: bold; text-transform: uppercase;"><span class="editable-text" contenteditable="true" spellcheck="false">{{ $jurnal->nama_nasabah }}</span></td>
+                    <td style="border-left: 1px solid #000; border-right: 1.5px solid #000; border-top: none; border-bottom: 1px solid #000; padding: 1px 6px 2px 6px; font-weight: bold; text-transform: uppercase;">{{ $jurnal->nama_nasabah }}</td>
                 </tr>
                 <!-- Baris 14: No Kartu ATM -->
                 <tr>

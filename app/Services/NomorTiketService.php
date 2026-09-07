@@ -78,6 +78,32 @@ class NomorTiketService
     }
 
     /**
+     * Rapikan nomor tiket yang diketik petugas.
+     *
+     *   "BS - 2026081347674"  →  "BS-2026081347674"
+     *   "bs 2026081347674"    →  "BS-2026081347674"
+     *
+     * Hanya berlaku untuk nilai yang memang sudah berbentuk nomor BS, yaitu
+     * awalan "BS" diikuti angka. Nomor manual berupa teks bebas seperti
+     * "PRO AKTIF" dibiarkan utuh, sebab jurnal yang diinput langsung Admin Pusat
+     * nomornya diketik dari berkas kertas dan format apa pun memang diterima.
+     */
+    public static function rapikan(?string $nomor): string
+    {
+        $bersih = trim((string) $nomor);
+
+        // Awalan huruf, tanda hubung boleh tidak diketik, spasi di mana pun dibuang.
+        $awalan = rtrim(static::PREFIX, '-');
+        $pola = '/^'.preg_quote($awalan, '/').'\s*-?\s*([\d\s]+)$/i';
+
+        if (preg_match($pola, $bersih, $cocok)) {
+            return static::PREFIX.preg_replace('/\s+/', '', $cocok[1]);
+        }
+
+        return $bersih;
+    }
+
+    /**
      * Apakah pola nomor sesuai format resmi BS-{YYYYMMDD}{5 angka}.
      */
     public static function formatValid(?string $nomor): bool

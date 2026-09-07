@@ -70,7 +70,9 @@ class DashboardController extends Controller
             'rejected' => (clone $baseQuery)->where('status', 'Rejected')->count(),
         ];
 
-        // === 7. Resolution Rate = (Done + Success) / Total × 100 ===
+        // === 7. Tingkat Penyelesaian = (Done + Success) / Total × 100 ===
+        // Status kustom yang diketik manual sengaja tidak dihitung tuntas, sejalan
+        // dengan kartu ringkasan di halaman Data Keluhan.
         $resolvedCount  = $statusStats['done'] + $statusStats['success'];
         $resolutionRate = $totalKasus > 0 ? round(($resolvedCount / $totalKasus) * 100, 1) : 0.0;
 

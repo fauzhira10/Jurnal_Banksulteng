@@ -38,6 +38,38 @@
     </div>
     @endif
 
+    @if(session('error'))
+    <div class="bg-rose-50 border-l-4 border-rose-500 p-4 rounded-r-lg mb-6 shadow-sm flex items-start gap-3">
+        <svg class="text-rose-500 mt-0.5 shrink-0" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="8" x2="12" y2="12"></line>
+            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+        </svg>
+        <div>
+            <h4 class="text-rose-800 font-bold text-sm">Pemberitahuan</h4>
+            <p class="text-rose-700 text-xs mt-0.5">{{ session('error') }}</p>
+        </div>
+    </div>
+    @endif
+
+    @php
+        $isMenunggu = strtolower(trim($jurnal->status ?? '')) === 'menunggu';
+    @endphp
+
+    @if($isMenunggu)
+    <div class="bg-amber-50 border-l-4 border-amber-500 p-4 rounded-r-lg mb-6 shadow-sm flex items-start gap-3">
+        <svg class="text-amber-600 mt-0.5 shrink-0" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="8" x2="12" y2="12"></line>
+            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+        </svg>
+        <div>
+            <h4 class="text-amber-800 font-bold text-sm">Status Masih Menunggu</h4>
+            <p class="text-amber-700 text-xs mt-0.5">Formulir keluhan nasabah belum dapat dicetak karena status saat ini masih <strong>Menunggu</strong>. Silakan perbarui status penyelesaian keluhan (misalnya menjadi <em>Done / Selesai</em>, <em>Success</em>, atau <em>Rejected</em>) agar formulir cetak dapat diterbitkan.</p>
+        </div>
+    </div>
+    @endif
+
     @if($jurnal->pengaduan)
         <div class="bg-sky-50 border border-sky-200 text-sky-900 rounded-xl p-4 mb-5 text-[0.8125rem] flex items-start gap-3 shadow-xs">
             <span class="text-lg leading-none">📨</span>
@@ -225,7 +257,22 @@
             </a>
             
             <div class="flex items-center gap-2.5 flex-wrap">
-                @if($hasLog)
+                @if($isMenunggu)
+                    <div class="inline-flex items-center gap-2 h-11 px-4 rounded-xl bg-amber-100/80 border border-amber-300 text-amber-900 text-xs font-semibold">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="text-amber-700">
+                            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                        </svg>
+                        <span>Status Menunggu — Belum Dapat Dicetak 🔒</span>
+                    </div>
+                    <a href="{{ route('jurnal.edit', $jurnal->id) }}" class="inline-flex items-center gap-1.5 h-11 px-5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs shadow-md shadow-amber-600/20 transition-all hover:-translate-y-0.5">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                        </svg>
+                        <span>⚡ Ubah Status Keluhan</span>
+                    </a>
+                @elseif($hasLog)
                     <a href="{{ route('jurnal.download', $jurnal->id) }}?format=normal" target="_blank" class="inline-flex items-center gap-2 h-11 px-5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-md shadow-emerald-600/20 transition-all hover:-translate-y-0.5">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                             <polyline points="6 9 6 2 18 2 18 9"></polyline>

@@ -6,6 +6,7 @@ use App\Enums\PengaduanStatus;
 use App\Http\Controllers\Controller;
 use App\Models\MasterCabang;
 use App\Models\Pengaduan;
+use App\Services\DeteksiDuplikatService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 
@@ -69,7 +70,17 @@ class PengaduanMasukController extends Controller
 
         $pengaduan->load(['cabang', 'transaksi', 'lampirans', 'user', 'penerima', 'jurnal.masterTransaksi']);
 
-        return view('admin.pengaduan_show', compact('pengaduan'));
+        // Peringatan bila keluhan dengan nama nasabah + no resi yang sama sudah pernah
+        // ditangani, supaya admin tahu sebelum menekan "Input ke Jurnal".
+        $duplikat = DeteksiDuplikatService::periksa(
+            $pengaduan->nama_nasabah,
+            $pengaduan->no_resi,
+            null,
+            $pengaduan->jurnal_id,
+            $pengaduan->id
+        );
+
+        return view('admin.pengaduan_show', compact('pengaduan', 'duplikat'));
     }
 
     /**

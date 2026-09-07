@@ -9,8 +9,12 @@ use App\Models\MasterCabang;
 use App\Models\MasterTransaksi;
 use App\Models\Pengaduan;
 use App\Observers\JurnalObserver;
+use App\Services\DeteksiDuplikatService;
+use App\Services\NomorTiketService;
 use Carbon\Carbon;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
 use PhpOffice\PhpSpreadsheet\Cell\DataType;
 use PhpOffice\PhpSpreadsheet\IOFactory;
@@ -151,7 +155,20 @@ class JurnalController extends Controller
             });
         }
 
-        // 5. Filter Rentang Tanggal Transaksi
+        // 5. Filter Hanya Data Berulang (nama nasabah + no resi yang sama muncul lebih dari sekali).
+        // Subquery berkorelasi dipakai agar tetap jalan di MySQL maupun SQLite dan
+        // memanfaatkan prefix kiri index jurnal_unique_kombinasi.
+        if ($request->boolean('duplikat')) {
+            $query->whereExists(function ($sub) {
+                $sub->selectRaw('1')
+                    ->from('jurnals as j2')
+                    ->whereColumn('j2.nama_nasabah', 'jurnals.nama_nasabah')
+                    ->whereColumn('j2.no_resi', 'jurnals.no_resi')
+                    ->whereColumn('j2.id', '!=', 'jurnals.id');
+            });
+        }
+
+        // 6. Filter Rentang Tanggal Transaksi
         if ($request->filled('tgl_dari')) {
             $query->whereDate('tgl_transaksi', '>=', $request->tgl_dari);
         }
@@ -175,6 +192,10 @@ class JurnalController extends Controller
         }
 
         $jurnals = $query->paginate($perPage)->withQueryString();
+
+        // Jumlah kembaran (nama nasabah + no resi sama) untuk baris di halaman ini saja,
+        // dipakai menandai baris dengan badge "Berulang" di tabel Data Keluhan.
+        $jumlahBerulang = $this->hitungBerulang($jurnals->getCollection());
 
         // Ambil data Master untuk pilihan filter
         $cabangs = MasterCabang::orderBy('kode_cabang')->get();
@@ -201,7 +222,33 @@ class JurnalController extends Controller
             ->filter(fn ($s) => trim((string) $s) !== '')
             ->values();
 
-        return view('jurnal_data', compact('jurnals', 'cabangs', 'transaksis', 'stats', 'atmsGrouped', 'statusKustom'));
+        return view('jurnal_data', compact('jurnals', 'cabangs', 'transaksis', 'stats', 'atmsGrouped', 'statusKustom', 'jumlahBerulang'));
+    }
+
+    /**
+     * Hitung berapa kali tiap kombinasi "NAMA|RESI" muncul di tabel jurnal,
+     * khusus untuk baris yang sedang ditampilkan. Cukup satu query tambahan
+     * per halaman, bukan satu query per baris.
+     *
+     * @param  Collection<int, Jurnal>  $barisHalaman
+     * @return array<string, int>
+     */
+    private function hitungBerulang($barisHalaman): array
+    {
+        $namaHalaman = $barisHalaman->pluck('nama_nasabah')->filter()->unique()->values();
+
+        if ($namaHalaman->isEmpty()) {
+            return [];
+        }
+
+        return Jurnal::query()
+            ->selectRaw('nama_nasabah, no_resi, COUNT(*) as jml')
+            ->whereIn('nama_nasabah', $namaHalaman)
+            ->groupBy('nama_nasabah', 'no_resi')
+            ->havingRaw('COUNT(*) > 1')
+            ->get()
+            ->mapWithKeys(fn ($b) => [$b->nama_nasabah.'|'.$b->no_resi => (int) $b->jml])
+            ->all();
     }
 
     /**
@@ -250,13 +297,91 @@ class JurnalController extends Controller
     }
 
     /**
-     * Menyimpan data jurnal dengan Validasi Hard (Anti-Duplikat)
+     * Endpoint AJAX pemeriksaan keluhan berulang, dipanggil dari form jurnal
+     * (admin) dan form pengaduan (CS) sambil petugas mengetik.
+     *
+     * Panel peringatannya dirender di sini sebagai HTML jadi, supaya tampilannya
+     * hanya ditulis sekali di partials/panel_duplikat.blade.php.
+     */
+    public function cekDuplikat(Request $request)
+    {
+        $cek = DeteksiDuplikatService::periksa(
+            $request->input('nama'),
+            $request->input('resi'),
+            $request->input('tgl'),
+            $request->filled('abaikan') ? (int) $request->input('abaikan') : null,
+            $request->filled('abaikan_pengaduan') ? (int) $request->input('abaikan_pengaduan') : null
+        );
+
+        // CS cabang tidak punya akses ke modul jurnal pusat, jadi panelnya ringkas:
+        // tanpa nomor rekening/kartu dan tanpa tautan ke data jurnal.
+        $ringkas = ! ($request->user()?->isAdmin() ?? false);
+
+        return response()->json([
+            'tingkat' => $cek['tingkat'],
+            'jumlah' => $cek['jumlah'],
+            'token' => $cek['token'],
+            'html' => view('partials.panel_duplikat', ['duplikat' => $cek, 'ringkas' => $ringkas])->render(),
+        ]);
+    }
+
+    /**
+     * Penjaga sisi server untuk keluhan berulang. Dipakai store() dan update().
+     *
+     * KEMBAR   selalu ditolak — index unik jurnal_unique_kombinasi memang melarangnya.
+     * BERULANG ditolak hanya bila petugas belum menyetujui kombinasi ini; penanda
+     *          persetujuannya berisi nama + resi yang diperiksa, jadi tidak bisa
+     *          dipakai ulang untuk nasabah atau resi yang lain.
+     *
+     * @param  int|null  $abaikanJurnalId  Jurnal yang sedang diedit, supaya tidak melaporkan dirinya sendiri.
+     * @param  int|null  $abaikanPengaduanId  Pengaduan CS yang menjadi sumber jurnal ini.
+     * @return RedirectResponse|null null bila aman untuk disimpan.
+     */
+    private function tolakBilaBerulang(
+        Request $request,
+        string $namaNorm,
+        string $resiNorm,
+        ?string $tglTransaksi,
+        ?int $abaikanJurnalId = null,
+        ?int $abaikanPengaduanId = null
+    ) {
+        $cek = DeteksiDuplikatService::periksa($namaNorm, $resiNorm, $tglTransaksi, $abaikanJurnalId, $abaikanPengaduanId);
+
+        if ($cek['tingkat'] === DeteksiDuplikatService::KEMBAR) {
+            return back()->withInput()->with('duplikat', $cek)->withErrors([
+                'no_resi' => 'Keluhan atas nasabah ini dengan No. Resi dan Tanggal Transaksi yang sama sudah pernah dijurnal. Periksa rincian di bawah kolom No. Resi.',
+            ]);
+        }
+
+        if ($cek['tingkat'] === DeteksiDuplikatService::BERULANG
+            && $request->input('konfirmasi_duplikat') !== $cek['token']) {
+            return back()->withInput()->with('duplikat', $cek)->withErrors([
+                'no_resi' => 'Keluhan atas nasabah ini dengan No. Resi yang sama sudah pernah ditangani. Periksa rincian di bawah kolom No. Resi, lalu simpan sekali lagi untuk melanjutkan.',
+            ]);
+        }
+
+        return null;
+    }
+
+    /**
+     * Menyimpan data jurnal dengan deteksi keluhan berulang (Nama + No. Resi).
+     *
+     * @see DeteksiDuplikatService untuk aturan dua tingkat KEMBAR / BERULANG.
      */
     public function store(Request $request)
     {
+        if ($request->has('nominal_transaksi')) {
+            $cleanNominal = preg_replace('/[^\d]/', '', (string) $request->input('nominal_transaksi'));
+            $request->merge(['nominal_transaksi' => $cleanNominal !== '' ? (float) $cleanNominal : null]);
+        }
+        if ($request->has('biaya_admin')) {
+            $cleanBiaya = preg_replace('/[^\d]/', '', (string) $request->input('biaya_admin'));
+            $request->merge(['biaya_admin' => $cleanBiaya !== '' ? (float) $cleanBiaya : null]);
+        }
+
         $request->validate([
             'nama_nasabah' => 'required|string|max:255',
-            'no_resi' => 'required|string|max:255|unique:jurnals,no_resi,NULL,id,nama_nasabah,'.$request->nama_nasabah.',tgl_transaksi,'.$request->tgl_transaksi,
+            'no_resi' => 'required|string|max:255',
             'no_rekening' => 'required|string|max:255',
             'no_kartu' => 'nullable|string|max:255',
             'no_tiket' => 'nullable|string|max:255',
@@ -272,9 +397,29 @@ class JurnalController extends Controller
             'permasalahan' => 'nullable|string|max:255',
             'keterangan_log' => 'nullable|string',
             'pengaduan_id' => 'nullable|integer|exists:pengaduans,id',
-        ], [
-            'no_resi.unique' => 'Gagal! Keluhan atas nama nasabah ini dengan No. Resi dan Tanggal tersebut sudah pernah dijurnal.',
+            'konfirmasi_duplikat' => 'nullable|string|max:512',
         ]);
+
+        // Deteksi keluhan berulang. Nilainya dirapikan lebih dulu agar yang
+        // dibandingkan sama persis dengan yang nanti disimpan ke database.
+        $namaNorm = DeteksiDuplikatService::normalNama($request->nama_nasabah);
+        $resiNorm = DeteksiDuplikatService::normalResi($request->no_resi);
+
+        // Pengaduan yang menjadi sumber jurnal ini dikecualikan: tautannya baru dibuat
+        // setelah jurnal tersimpan, jadi tanpa ini setiap jurnal dari CS akan dianggap
+        // berulang terhadap pengaduannya sendiri.
+        $gagal = $this->tolakBilaBerulang(
+            $request,
+            $namaNorm,
+            $resiNorm,
+            $request->tgl_transaksi,
+            null,
+            $request->filled('pengaduan_id') ? (int) $request->pengaduan_id : null
+        );
+
+        if ($gagal) {
+            return $gagal;
+        }
 
         // Pengaduan CS cabang yang menjadi sumber (opsional)
         $pengaduanSumber = null;
@@ -287,8 +432,9 @@ class JurnalController extends Controller
             }
         }
 
-        $data = $request->except('pengaduan_id');
-        $data['nama_nasabah'] = strtoupper(trim($request->nama_nasabah));
+        $data = $request->except(['pengaduan_id', 'konfirmasi_duplikat']);
+        $data['nama_nasabah'] = $namaNorm;
+        $data['no_resi'] = $resiNorm;
         $data['biaya_admin'] = $request->filled('biaya_admin') ? (float) $request->biaya_admin : 0;
         $data['status'] = $this->normalisasiStatus($request->status);
         $data['no_kartu'] = $request->filled('no_kartu') ? $request->no_kartu : '-';
@@ -320,7 +466,7 @@ class JurnalController extends Controller
         // (cabang → penyelia → Divisi Literasi), bukan dari tanggal terima di form ini.
         $data['no_tiket'] = $pengaduanSumber
             ? $pengaduanSumber->nomor_tiket
-            : ($request->filled('no_tiket') ? trim($request->no_tiket) : '-');
+            : ($request->filled('no_tiket') ? NomorTiketService::rapikan($request->no_tiket) : '-');
 
         $jurnal = Jurnal::create($data);
 
@@ -428,9 +574,18 @@ class JurnalController extends Controller
     {
         $jurnal = Jurnal::with('pengaduan')->findOrFail($id);
 
+        if ($request->has('nominal_transaksi')) {
+            $cleanNominal = preg_replace('/[^\d]/', '', (string) $request->input('nominal_transaksi'));
+            $request->merge(['nominal_transaksi' => $cleanNominal !== '' ? (float) $cleanNominal : null]);
+        }
+        if ($request->has('biaya_admin')) {
+            $cleanBiaya = preg_replace('/[^\d]/', '', (string) $request->input('biaya_admin'));
+            $request->merge(['biaya_admin' => $cleanBiaya !== '' ? (float) $cleanBiaya : null]);
+        }
+
         $request->validate([
             'nama_nasabah' => 'required|string|max:255',
-            'no_resi' => 'required|string|max:255|unique:jurnals,no_resi,'.$id.',id,nama_nasabah,'.$request->nama_nasabah.',tgl_transaksi,'.$request->tgl_transaksi,
+            'no_resi' => 'required|string|max:255',
             'no_rekening' => 'required|string|max:255',
             'no_kartu' => 'nullable|string|max:255',
             'no_tiket' => 'nullable|string|max:255',
@@ -445,12 +600,20 @@ class JurnalController extends Controller
             'status' => 'required|string|max:50',
             'permasalahan' => 'nullable|string|max:255',
             'keterangan_log' => 'nullable|string',
-        ], [
-            'no_resi.unique' => 'Gagal! Keluhan atas nama nasabah ini dengan No. Resi dan Tanggal tersebut sudah pernah dijurnal (Duplikat saat Update).',
+            'konfirmasi_duplikat' => 'nullable|string|max:512',
         ]);
 
-        $data = $request->all();
-        $data['nama_nasabah'] = strtoupper(trim($request->nama_nasabah));
+        $namaNorm = DeteksiDuplikatService::normalNama($request->nama_nasabah);
+        $resiNorm = DeteksiDuplikatService::normalResi($request->no_resi);
+
+        // Jurnal ini sendiri diabaikan supaya tidak melaporkan dirinya sebagai kembaran.
+        if ($gagal = $this->tolakBilaBerulang($request, $namaNorm, $resiNorm, $request->tgl_transaksi, (int) $id)) {
+            return $gagal;
+        }
+
+        $data = $request->except('konfirmasi_duplikat');
+        $data['nama_nasabah'] = $namaNorm;
+        $data['no_resi'] = $resiNorm;
         $data['biaya_admin'] = $request->filled('biaya_admin') ? (float) $request->biaya_admin : 0;
         $data['status'] = $this->normalisasiStatus($request->status);
         $data['no_kartu'] = $request->filled('no_kartu') ? $request->no_kartu : '-';
@@ -460,7 +623,7 @@ class JurnalController extends Controller
         // karena nomor tiketnya berasal dari proses sebelum masuk ke Divisi IT.
         $data['no_tiket'] = $jurnal->pengaduan
             ? $jurnal->no_tiket
-            : ($request->filled('no_tiket') ? trim($request->no_tiket) : ($jurnal->no_tiket ?: '-'));
+            : ($request->filled('no_tiket') ? NomorTiketService::rapikan($request->no_tiket) : ($jurnal->no_tiket ?: '-'));
         $data['terminal_transaksi'] = $request->filled('terminal_transaksi') ? $request->terminal_transaksi : '-';
         $data['permasalahan'] = $request->filled('permasalahan') ? strtoupper(trim($request->permasalahan)) : '-';
         $data['keterangan_log'] = $request->filled('keterangan_log') ? trim($request->keterangan_log) : '-';
@@ -1519,6 +1682,7 @@ class JurnalController extends Controller
         $insertedCount = 0;
         $updatedCount = 0;
         $skippedCount = 0;
+        $berulangCount = 0;
 
         // 5. Cari baris mulai data di mana nomor urut dimulai dari angka "1" (bukan satu Romawi)
         $startRow = $headerRow + 1;
@@ -1592,7 +1756,8 @@ class JurnalController extends Controller
             $status = $this->parseStatus($rawStatus);
 
             $noKartu = $this->getCellValue($sheet, $columnMap, 'no_kartu', $row) ?: '-';
-            $noTiket = $this->getCellValue($sheet, $columnMap, 'no_tiket', $row) ?: '-';
+            // Berkas Excel lama bisa memuat nomor berspasi ("BS - 2026…"), jadi ikut dirapikan.
+            $noTiket = NomorTiketService::rapikan($this->getCellValue($sheet, $columnMap, 'no_tiket', $row)) ?: '-';
             $terminal = $this->getCellValue($sheet, $columnMap, 'terminal_transaksi', $row) ?: '-';
             $permasalahan = $this->getCellValue($sheet, $columnMap, 'permasalahan', $row) ?: '-';
             $keteranganLog = $this->getCellValue($sheet, $columnMap, 'keterangan_log', $row) ?: '-';
@@ -1626,12 +1791,23 @@ class JurnalController extends Controller
                 $existing->update($dataPayload);
                 $updatedCount++;
             } else {
+                // Baris baru, tetapi nama nasabah + no resinya sudah pernah ada dengan
+                // tanggal transaksi berbeda. Tetap disimpan (bisa jadi klaim yang sah),
+                // hanya dilaporkan supaya petugas dapat menelitinya kembali.
+                if (Jurnal::where('nama_nasabah', $namaNasabah)->where('no_resi', $noResi)->exists()) {
+                    $berulangCount++;
+                }
+
                 Jurnal::create($dataPayload);
                 $insertedCount++;
             }
         }
 
         $message = "Proses import selesai! Total: {$totalRead} baris data diproses ({$insertedCount} data baru berhasil disimpan, {$updatedCount} data diperbarui).";
+
+        if ($berulangCount > 0) {
+            $message .= " Perhatian: {$berulangCount} data baru memiliki Nama Nasabah & No. Resi yang sama dengan keluhan lama (tanggal transaksi berbeda) — periksa lewat filter \"Cek data berulang\".";
+        }
 
         if ($request->ajax() || $request->wantsJson()) {
             return response()->json([
@@ -1642,6 +1818,7 @@ class JurnalController extends Controller
                     'inserted' => $insertedCount,
                     'updated' => $updatedCount,
                     'skipped' => $skippedCount,
+                    'berulang' => $berulangCount,
                 ],
             ]);
         }
@@ -2155,18 +2332,41 @@ class JurnalController extends Controller
     public function downloadDokumen(Request $request, $id)
     {
         $jurnal = Jurnal::with(['masterCabang', 'masterTransaksi'])->findOrFail($id);
+
+        // Validasi: Status 'Menunggu' belum dapat dicetak untuk keluhan nasabah
+        if (strtolower(trim($jurnal->status ?? '')) === 'menunggu') {
+            return redirect()->route('jurnal.preview', $jurnal->id)
+                ->with('error', "Dokumen keluhan nasabah {$jurnal->nama_nasabah} (Tiket: {$jurnal->no_tiket}) belum dapat dicetak karena status saat ini masih Menunggu. Silakan perbarui status penyelesaian keluhan terlebih dahulu.");
+        }
+
         $format = strtolower(trim($request->query('format', '')));
 
         if ($format === 'penolakan' || $format === 'tolak') {
             return view('cetak.penolakan', compact('jurnal'));
         }
 
+        $logOptions = config('keluhan_logs.atm_lokal', []);
+
+        if ($format === 'form' || $format === 'keluhan') {
+            return view('cetak.lokal', compact('jurnal', 'logOptions'));
+        }
+
         $channel = strtoupper(trim($jurnal->masterTransaksi->channel ?? ''));
         $jenis = strtoupper(trim($jurnal->masterTransaksi->jenis_transaksi ?? ''));
         $permasalahan = strtoupper(trim($jurnal->permasalahan ?? ''));
-        $logOptions = config('keluhan_logs.atm_lokal', []);
+        $jurnalJenis = strtoupper(trim($jurnal->jenis_transaksi ?? ''));
 
-        // 1. MOBILE BANKING / DIGI / BPJS / DANA (M-Banking Pembayaran, Transfer, Pulsa, PLN, BPJS, DANA, Top Up, dll.)
+        // 1. QRIS (Prioritas Utama: Khusus transaksi QRIS, selalu gunakan slip QRIS walaupun channelnya Mobile Banking)
+        $isQris = str_contains($jenis, 'QRIS') ||
+                  str_contains($channel, 'QRIS') ||
+                  str_contains($permasalahan, 'QRIS') ||
+                  str_contains($jurnalJenis, 'QRIS');
+
+        if ($isQris) {
+            return view('cetak.qris', compact('jurnal'));
+        }
+
+        // 2. MOBILE BANKING / DIGI / BPJS / DANA (M-Banking Pembayaran, Transfer, Pulsa, PLN, BPJS, DANA, Top Up, dll. - Kecuali QRIS)
         if (
             str_contains($channel, 'MOBILE') || str_contains($channel, 'MBANKING') || str_contains($channel, 'M-BANKING') || str_contains($channel, 'DIGI') ||
             str_contains($jenis, 'MBANKING') || str_contains($jenis, 'M-BANKING') || str_contains($jenis, 'MOBILE BANKING') || str_contains($jenis, 'DIGI') ||
@@ -2175,11 +2375,6 @@ class JurnalController extends Controller
             str_contains($permasalahan, 'MBANKING') || str_contains($permasalahan, 'M-BANKING') || str_contains($permasalahan, 'MOBILE BANKING') || str_contains($permasalahan, 'DIGI')
         ) {
             return view('cetak.mbanking', compact('jurnal'));
-        }
-
-        // 2. QRIS (Prioritas jika jenis transaksi, channel, atau permasalahan mengandung QRIS)
-        if (str_contains($jenis, 'QRIS') || str_contains($channel, 'QRIS') || str_contains($permasalahan, 'QRIS')) {
-            return view('cetak.qris', compact('jurnal'));
         }
 
         // 3. EDC / DEBIT / EDC BANK LAIN (Untuk semua jenis EDC)

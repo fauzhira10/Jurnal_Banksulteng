@@ -7,11 +7,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Form Keluhan & Slip Jurnal SMS Banking - {{ $jurnal->no_tiket }}</title>
+    <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}">
+    <link rel="shortcut icon" type="image/x-icon" href="{{ asset('favicon.ico') }}">
     <style>
         * {
             box-sizing: border-box;
             font-family: Arial, Helvetica, sans-serif;
             font-size: 11px;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
         }
 
         body {
@@ -19,15 +23,21 @@
             margin: 0;
             padding: 30px 20px;
             color: #000;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
         }
 
+        /* Container Formulir Cetak */
         .form-wrapper {
             background: #ffffff;
             width: 210mm;
+            min-height: 297mm;
             margin: 0 auto 35px auto;
-            padding: 28px 30px;
-            border: 2px solid #000;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            padding: 30px 35px;
+            border: none;
+            box-shadow: none;
+            page-break-inside: avoid;
+            page-break-after: avoid;
         }
 
         .table-form {
@@ -42,14 +52,19 @@
             vertical-align: middle;
         }
 
+        .table-form td.no-padding {
+            padding: 0 !important;
+        }
+
         .logo-cell {
             width: 25%;
             text-align: center;
-            padding: 8px !important;
+            padding: 10px !important;
         }
 
         .logo-img {
-            max-width: 130px;
+            max-width: 140px;
+            max-height: 48px;
             height: auto;
         }
 
@@ -68,6 +83,9 @@
 
         .highlight-yellow {
             background-color: #ffff00 !important;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+            color-adjust: exact !important;
             font-weight: bold;
         }
 
@@ -76,34 +94,44 @@
             font-weight: bold;
         }
 
-        /* Tanda Tangan Form */
+        /* Tanda Tangan Footer */
         .sig-header {
             text-align: center;
             font-weight: bold;
-            padding: 4px !important;
+            padding: 6px 4px !important;
+            font-size: 11px;
         }
 
         .sig-body {
-            height: 70px;
+            height: 125px;
             text-align: center;
             vertical-align: bottom !important;
-            padding-bottom: 6px !important;
+            padding: 10px 4px 8px 4px !important;
+        }
+
+        .sig-space {
+            height: 75px;
         }
 
         .sig-name {
             font-weight: bold;
             text-decoration: underline;
             text-transform: uppercase;
+            font-size: 11px;
+            margin-bottom: 4px;
+            letter-spacing: 0.3px;
         }
 
         .sig-title {
-            font-size: 9px;
-            color: #333;
+            font-size: 8.5px;
+            color: #000;
+            line-height: 1.35;
+            padding: 0 2px;
         }
 
-        /* SLIP JURNAL / NOTA DEBET STYLING */
+        /* SLIP JURNAL STYLING */
         .page-break {
-            page-break-before: always;
+            display: none !important;
         }
 
         .slip-header-table {
@@ -116,18 +144,21 @@
         .slip-header-table td {
             border: 1px solid #000;
             padding: 6px 10px;
+            vertical-align: middle;
         }
 
         .slip-title-main {
             font-weight: bold;
             font-size: 13px;
             text-align: center;
+            letter-spacing: 0.5px;
         }
 
         .slip-title-sub {
             font-weight: bold;
-            font-size: 11px;
+            font-size: 10px;
             text-align: center;
+            line-height: 1.3;
         }
 
         .table-slip {
@@ -145,8 +176,23 @@
         .slip-col-header {
             text-align: center;
             font-weight: bold;
-            font-size: 12px;
-            background-color: #f8fafc;
+            font-size: 11.5px;
+            letter-spacing: 0.5px;
+            background-color: #ffffff;
+            padding: 5px 4px;
+        }
+
+        .ledger-grid {
+            width: 100%;
+            height: 60px;
+            border-collapse: collapse;
+            margin-bottom: 6px;
+        }
+
+        .ledger-grid td {
+            border: 1px solid #94a3b8 !important;
+            padding: 0 !important;
+            width: 20%;
         }
 
         /* Tombol Aksi */
@@ -175,7 +221,7 @@
 
         @page {
             size: A4 portrait;
-            margin: 12mm 15mm;
+            margin: 15mm 18mm 15mm 18mm;
         }
 
         /* Editable Text Element on Slip */
@@ -199,25 +245,94 @@
             outline: none;
         }
 
+        /* SLIP PAGE STYLING (HALAMAN 2: NOTA DEBET / SLIP JURNAL) */
+        .slip-page {
+            background: #ffffff;
+            width: 210mm;
+            margin: 0 auto 35px auto;
+            padding: 25px 30px;
+            border: 2px solid #000;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            page-break-before: always;
+            break-before: page;
+            page-break-inside: avoid;
+            break-inside: avoid;
+            box-sizing: border-box;
+        }
+
         @media print {
+            @page {
+                size: A4 portrait;
+                margin: 12mm 15mm 12mm 15mm;
+            }
             .no-print { display: none !important; }
-            html, body { padding: 0 !important; margin: 0 !important; background: none !important; }
+            .page-break { display: none !important; }
+            html, body {
+                padding: 0 !important;
+                margin: 0 !important;
+                background: none !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+                color-adjust: exact !important;
+            }
             .form-wrapper {
-                border: 1.5px solid #000 !important;
+                border: none !important;
+                width: calc(100% - 8mm) !important;
+                max-width: calc(100% - 8mm) !important;
+                padding: 14px 18px !important;
+                margin: 4mm auto !important;
+                box-shadow: none !important;
+                min-height: 0 !important;
+                height: auto !important;
+                page-break-inside: avoid !important;
+                break-inside: avoid !important;
+                page-break-after: avoid !important;
+                break-after: avoid !important;
+            }
+            .table-form {
+                page-break-inside: avoid !important;
+                break-inside: avoid !important;
+            }
+            .table-form td, .table-form th {
+                padding: 3.5px 6px !important;
+            }
+            .table-form td.no-padding {
+                padding: 0 !important;
+            }
+            .sig-body {
+                height: 95px !important;
+                padding: 6px 4px 8px 4px !important;
+            }
+            .sig-space {
+                height: 45px !important;
+            }
+            .slip-page {
+                border: none !important;
+                box-shadow: none !important;
                 width: 100% !important;
                 max-width: 100% !important;
-                padding: 18px 20px !important;
+                padding: 10px 15px !important;
                 margin: 0 auto !important;
-                box-shadow: none !important;
+                min-height: 0 !important;
+                height: auto !important;
+                background: transparent !important;
+                page-break-before: always !important;
+                break-before: page !important;
+                page-break-inside: avoid !important;
+                break-inside: avoid !important;
+            }
+            .highlight-yellow {
+                background-color: #ffff00 !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+                color-adjust: exact !important;
             }
             .editable-text {
                 background: transparent !important;
                 box-shadow: none !important;
-                outline: none !important;
                 border: none !important;
                 padding: 0 !important;
             }
-            .page-break { page-break-before: always; }
         }
     </style>
 </head>
@@ -262,12 +377,13 @@
                 </td>
             </tr>
 
+            <!-- LEMBAR HELPDESK -->
             <tr>
                 <td colspan="2" class="section-title">LEMBAR HELPDESK:</td>
             </tr>
             <tr>
-                <td colspan="2" style="padding: 0;">
-                    <table style="width: 100%; border-collapse: collapse;">
+                <td colspan="2" class="no-padding" style="padding: 0;">
+                    <table style="width: 100%; border-collapse: collapse; table-layout: fixed;">
                         <tr>
                             <td style="width: 15%; border-right: 1px solid #000; border-bottom: 1px solid #000;">No. Tiket</td>
                             <td style="width: 35%; border-right: 1px solid #000; border-bottom: 1px solid #000; font-weight: bold;">: {{ $jurnal->no_tiket }}</td>
@@ -276,7 +392,7 @@
                         </tr>
                         <tr>
                             <td style="border-right: 1px solid #000;">Nama Penerima</td>
-                            <td style="border-right: 1px solid #000;">: {{ auth()->user()->name ?? 'Mujadid' }}</td>
+                            <td style="border-right: 1px solid #000;">: <span class="editable-text" contenteditable="true" spellcheck="false" title="Klik untuk mengedit Nama Penerima">MUJADID</span></td>
                             <td style="border-right: 1px solid #000;">Status</td>
                             <td style="font-weight: bold; text-transform: uppercase;">: {{ $jurnal->status == 'Done' ? 'SELESAI' : $jurnal->status }}</td>
                         </tr>
@@ -395,12 +511,13 @@
                 </td>
             </tr>
 
+            <!-- FOOTER BLOCK TANDA TANGAN (4 KOLOM) -->
             <tr>
-                <td colspan="2" style="padding: 0;">
-                    <table style="width: 100%; border-collapse: collapse;">
+                <td colspan="2" class="no-padding" style="padding: 0;">
+                    <table style="width: 100%; border-collapse: collapse; table-layout: fixed;">
                         <tr>
-                            <td colspan="3" class="sig-header" style="width: 75%; border-right: 1px solid #000;">Di Selesaikan Oleh,</td>
-                            <td class="sig-header" style="width: 25%;">Di ketahui Oleh,</td>
+                            <td colspan="2" class="sig-header" style="width: 50%; border-right: 1px solid #000; border-bottom: 1px solid #000;">Di Selesaikan Oleh,</td>
+                            <td colspan="2" class="sig-header" style="width: 50%; border-bottom: 1px solid #000;">Di ketahui Oleh,</td>
                         </tr>
                         <tr>
                             <td class="sig-body" style="width: 25%; border-right: 1px solid #000;">
@@ -426,11 +543,8 @@
         </table>
     </div>
 
-    <!-- PAGE BREAK UNTUK CETAK SLIP JURNAL -->
-    <div class="page-break"></div>
-
     <!-- BAGIAN 2: NOTA DEBET / SLIP JURNAL DIVISI IT (SMS BANKING) -->
-    <div class="form-wrapper">
+    <div class="slip-page">
         <table class="slip-header-table">
             <tr>
                 <td style="width: 30%; text-align: center;">
@@ -519,7 +633,7 @@
                     <td style="vertical-align: top; text-align: right; padding: 10px 6px;">
                         <div style="display: flex; justify-content: space-between; margin-top: 28px;">
                             <span>Rp</span>
-                            <span>{{ number_format($jurnal->masterTransaksi->biaya_admin ?? 0, 0, ',', '.') ?: '-' }}</span>
+                            <span>{{ number_format($jurnal->biaya_admin ?? $jurnal->masterTransaksi->biaya_admin ?? 0, 0, ',', '.') ?: '-' }}</span>
                         </div>
                     </td>
 
@@ -527,7 +641,7 @@
                     <td style="vertical-align: bottom; text-align: right; padding: 10px 6px;">
                         <div style="font-weight: bold; display: flex; justify-content: space-between;">
                             <span>Rp</span>
-                            <span>{{ number_format($jurnal->nominal_transaksi, 0, ',', '.') }}</span>
+                            <span>{{ number_format($jurnal->nominal_transaksi + ($jurnal->biaya_admin ?? $jurnal->masterTransaksi->biaya_admin ?? 0), 0, ',', '.') }}</span>
                         </div>
                     </td>
                 </tr>

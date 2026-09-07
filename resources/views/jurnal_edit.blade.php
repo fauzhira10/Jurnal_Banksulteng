@@ -15,6 +15,9 @@
 @endsection
 
 @section('content')
+@php
+    $nominalAwal = (int) preg_replace('/[^\d]/', '', (string) old('nominal_transaksi', (int) round((float) $jurnal->nominal_transaksi)));
+@endphp
 <div class="max-w-[59.375rem] mx-auto">
     @if($jurnal->pengaduan)
         <div class="bg-sky-50 border border-sky-200 text-sky-900 rounded-xl p-4 mb-5 text-[0.8125rem] flex items-start gap-3 shadow-xs">
@@ -65,7 +68,7 @@
                     <!-- Nama Nasabah -->
                     <div class="flex flex-col gap-1.5">
                         <label class="font-semibold text-[0.8125rem] text-slate-700 flex items-center gap-1">Nama Nasabah <span class="text-rose-600 font-bold">*</span></label>
-                        <input type="text" name="nama_nasabah" value="{{ old('nama_nasabah', $jurnal->nama_nasabah) }}" required placeholder="Contoh: BUDI SANTOSO" class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm bg-white text-slate-800 placeholder-slate-400 uppercase transition-all duration-200 focus:border-brand-blue focus:ring-3 focus:ring-brand-blue/15 focus:outline-none" oninput="this.value = this.value.toUpperCase()">
+                        <input type="text" name="nama_nasabah" id="nama_nasabah" value="{{ old('nama_nasabah', $jurnal->nama_nasabah) }}" required placeholder="Contoh: BUDI SANTOSO" class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm bg-white text-slate-800 placeholder-slate-400 uppercase transition-all duration-200 focus:border-brand-blue focus:ring-3 focus:ring-brand-blue/15 focus:outline-none" oninput="this.value = this.value.toUpperCase()">
                     </div>
 
                     <!-- No. Rekening -->
@@ -77,8 +80,15 @@
                     <!-- No. Resi / Trace Number -->
                     <div class="flex flex-col gap-1.5">
                         <label class="font-semibold text-[0.8125rem] text-slate-700 flex items-center gap-1">No. Resi / Trace Number <span class="text-rose-600 font-bold">*</span></label>
-                        <input type="text" name="no_resi" value="{{ old('no_resi', $jurnal->no_resi) }}" required placeholder="Contoh: 00000000" class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm bg-white text-slate-800 placeholder-slate-400 transition-all duration-200 focus:border-brand-blue focus:ring-3 focus:ring-brand-blue/15 focus:outline-none">
+                        <input type="text" name="no_resi" id="no_resi" value="{{ old('no_resi', $jurnal->no_resi) }}" required placeholder="Contoh: 00000000" class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm bg-white text-slate-800 placeholder-slate-400 transition-all duration-200 focus:border-brand-blue focus:ring-3 focus:ring-brand-blue/15 focus:outline-none">
                     </div>
+
+                    {{-- Peringatan keluhan berulang (Nama Nasabah + No. Resi). Jurnal yang
+                         sedang diedit dikecualikan, jadi tidak melaporkan dirinya sendiri. --}}
+                    <div class="md:col-span-2" id="panelDuplikat">
+                        @include('partials.panel_duplikat', ['duplikat' => session('duplikat')])
+                    </div>
+                    <input type="hidden" name="konfirmasi_duplikat" id="konfirmasi_duplikat" value="{{ old('konfirmasi_duplikat') ?: (session('duplikat')['token'] ?? '') }}">
 
                     <!-- Nomor Kartu -->
                     <div class="flex flex-col gap-1.5">
@@ -293,7 +303,22 @@
                             <span class="inline-flex items-center px-3.5 py-2.5 bg-slate-50 text-slate-500 font-semibold text-xs border-r border-slate-200 select-none">
                                 Rp
                             </span>
-                            <input type="number" name="nominal_transaksi" value="{{ old('nominal_transaksi', $jurnal->nominal_transaksi) }}" required placeholder="Contoh: 1000000" min="0" step="any" class="block w-full px-3.5 py-2.5 text-sm bg-white text-slate-800 placeholder-slate-400 border-0 focus:outline-none focus:ring-0">
+                            <input 
+                                type="text" 
+                                id="nominal_display" 
+                                value="{{ $nominalAwal > 0 ? number_format($nominalAwal, 0, ',', '.') : '' }}" 
+                                required 
+                                inputmode="numeric" 
+                                placeholder="Contoh: 1.000.000" 
+                                autocomplete="off" 
+                                class="block w-full px-3.5 py-2.5 text-sm bg-white text-slate-800 placeholder-slate-400 border-0 focus:outline-none focus:ring-0"
+                            >
+                            <input 
+                                type="hidden" 
+                                name="nominal_transaksi" 
+                                id="nominal_transaksi" 
+                                value="{{ $nominalAwal > 0 ? $nominalAwal : '' }}"
+                            >
                         </div>
                     </div>
 
@@ -322,7 +347,7 @@
                     <!-- Tanggal Transaksi -->
                     <div class="flex flex-col gap-1.5">
                         <label class="font-semibold text-[0.8125rem] text-slate-700 flex items-center gap-1">Tanggal Transaksi Bermasalah <span class="text-rose-600 font-bold">*</span></label>
-                        <input type="date" name="tgl_transaksi" value="{{ old('tgl_transaksi', $jurnal->tgl_transaksi) }}" required class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm bg-white text-slate-800 transition-all duration-200 focus:border-brand-blue focus:ring-3 focus:ring-brand-blue/15 focus:outline-none">
+                        <input type="date" name="tgl_transaksi" id="tgl_transaksi" value="{{ old('tgl_transaksi', $jurnal->tgl_transaksi) }}" required class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm bg-white text-slate-800 transition-all duration-200 focus:border-brand-blue focus:ring-3 focus:ring-brand-blue/15 focus:outline-none">
                     </div>
 
                     <!-- Tanggal Terima -->
@@ -360,7 +385,7 @@
                     <a href="{{ route('jurnal.index') }}" class="inline-flex items-center justify-center px-4 py-2.5 rounded-xl text-[0.84375rem] font-semibold bg-slate-100 text-slate-700 border border-slate-300 hover:bg-slate-200 hover:text-slate-900 transition-colors">
                         <span>Batal</span>
                     </a>
-                    <button type="submit" class="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-[0.84375rem] font-semibold bg-gradient-to-r from-brand-blue to-navy text-white hover:opacity-95 hover:shadow-lg shadow-brand-blue/25 transition-all cursor-pointer">
+                    <button type="submit" id="btnSimpanJurnal" class="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-[0.84375rem] font-semibold bg-gradient-to-r from-brand-blue to-navy text-white hover:opacity-95 hover:shadow-lg shadow-brand-blue/25 transition-all cursor-pointer">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
                             <polyline points="17 21 17 13 7 13 7 21"></polyline>
@@ -374,6 +399,9 @@
     </div>
 </div>
 @endsection
+
+@include('partials.skrip_duplikat', ['abaikanJurnalId' => $jurnal->id])
+@include('partials.skrip_nomor_tiket')
 
 @push('scripts')
 <script>
@@ -724,10 +752,28 @@
         });
     }
 
+    // ---------- Format Titik Ribuan Otomatis untuk Nominal Transaksi ----------
+    const nominalDisplay = document.getElementById('nominal_display');
+    const nominalHidden = document.getElementById('nominal_transaksi');
+    const fmtNominal = new Intl.NumberFormat('id-ID');
+
+    function syncNominal() {
+        if (!nominalDisplay || !nominalHidden) return;
+        const digits = (nominalDisplay.value || '').replace(/[^\d]/g, '');
+        nominalHidden.value = digits;
+        nominalDisplay.value = digits ? fmtNominal.format(Number(digits)) : '';
+    }
+
+    if (nominalDisplay) {
+        nominalDisplay.addEventListener('input', syncNominal);
+        nominalDisplay.addEventListener('blur', syncNominal);
+    }
+
     // Jalankan saat load pertama kali
     window.addEventListener('DOMContentLoaded', function() {
         populateAtmDropdown(initialTerminalVal);
         highlightActiveAdminPreset();
+        syncNominal();
         if (transaksiEl && transaksiEl.value && channelSelect && !channelSelect.value) {
             loadDetailTransaksi(transaksiEl.value);
         }

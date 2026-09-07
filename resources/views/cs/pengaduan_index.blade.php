@@ -66,7 +66,7 @@
                                 <th>Data Nasabah</th>
                                 <th>Transaksi</th>
                                 <th>Nominal</th>
-                                <th>Status Pusat</th>
+                                <th class="whitespace-nowrap">Status Pusat</th>
                                 <th style="text-align:center; width: 150px;">Aksi</th>
                             </tr>
                         </thead>
@@ -75,7 +75,7 @@
                                 <tr>
                                     <td style="text-align:center; color:#64748b; font-weight:600;">{{ ($pengaduans->currentPage() - 1) * $pengaduans->perPage() + $loop->iteration }}</td>
                                     <td>
-                                        <div class="font-bold text-navy font-mono text-[0.78125rem]">{{ $p->nomor_tiket }}</div>
+                                        <div class="font-extrabold text-navy font-mono text-[0.875rem] tracking-wide">{{ $p->nomor_tiket }}</div>
                                         <div class="text-[0.71875rem] text-slate-500 mt-0.5">{{ $p->created_at->translatedFormat('d M Y, H:i') }}</div>
                                         <div class="text-[0.71875rem] text-slate-500">Pelapor: {{ $p->nama_pelapor }}</div>
                                     </td>

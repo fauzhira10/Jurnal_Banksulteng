@@ -38,6 +38,14 @@
         </div>
     </div>
 
+    {{-- Peringatan bila keluhan dengan Nama Nasabah + No. Resi yang sama sudah pernah
+         ditangani, ditempatkan sebelum panel tindak lanjut agar terbaca lebih dulu. --}}
+    @if(!empty($duplikat))
+        <div class="mb-5">
+            @include('partials.panel_duplikat', ['duplikat' => $duplikat])
+        </div>
+    @endif
+
     <div class="grid grid-cols-1 xl:grid-cols-[1fr_340px] gap-5 items-start">
         {{-- Rincian --}}
         <div>

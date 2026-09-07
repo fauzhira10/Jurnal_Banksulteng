@@ -192,6 +192,73 @@ test('validasi format nomor tiket menolak pola yang salah', function () {
         ->and(NomorTiketService::formatValid(null))->toBeFalse();
 });
 
+/*
+|--------------------------------------------------------------------------
+| Perapian nomor tiket yang diketik petugas (spasi di sekitar tanda hubung)
+|--------------------------------------------------------------------------
+*/
+
+test('nomor tiket berspasi dirapikan menjadi bentuk resmi', function () {
+    expect(NomorTiketService::rapikan('BS - 2026081347674'))->toBe('BS-2026081347674')
+        ->and(NomorTiketService::rapikan('BS- 2026081347674'))->toBe('BS-2026081347674')
+        ->and(NomorTiketService::rapikan('BS -2026081347674'))->toBe('BS-2026081347674')
+        ->and(NomorTiketService::rapikan('bs - 2026081347674'))->toBe('BS-2026081347674')
+        ->and(NomorTiketService::rapikan('BS 2026081347674'))->toBe('BS-2026081347674')
+        ->and(NomorTiketService::rapikan('  BS - 2026081347674  '))->toBe('BS-2026081347674')
+        ->and(NomorTiketService::rapikan('BS-2026081347674'))->toBe('BS-2026081347674');
+});
+
+test('nomor tiket manual berupa teks bebas tidak ikut diubah', function () {
+    // Jurnal input langsung memang menerima format apa pun; jangan sampai
+    // perapian ini merusak nomor lama seperti "PRO AKTIF" (28 baris di produksi).
+    expect(NomorTiketService::rapikan('PRO AKTIF'))->toBe('PRO AKTIF')
+        ->and(NomorTiketService::rapikan('-'))->toBe('-')
+        ->and(NomorTiketService::rapikan(''))->toBe('')
+        ->and(NomorTiketService::rapikan(null))->toBe('')
+        ->and(NomorTiketService::rapikan('PROAKTIF'))->toBe('PROAKTIF')
+        ->and(NomorTiketService::rapikan('Manual 123'))->toBe('Manual 123')
+        ->and(NomorTiketService::rapikan('KLAIM BS-2026'))->toBe('KLAIM BS-2026')
+        ->and(NomorTiketService::rapikan('BS/2026-01'))->toBe('BS/2026-01');
+});
+
+test('menyimpan jurnal merapikan nomor tiket berspasi yang diketik petugas', function () {
+    $admin = buatAdmin();
+    $cabang = buatCabang();
+    $transaksi = buatTransaksi();
+
+    $this->actingAs($admin)->post(route('jurnal.store'), dataJurnal($cabang, $transaksi, [
+        'no_tiket' => 'BS - 2026081347674',
+    ]))->assertRedirect(route('jurnal.index'));
+
+    expect(Jurnal::first()->no_tiket)->toBe('BS-2026081347674');
+});
+
+test('memperbarui jurnal juga merapikan nomor tiket berspasi', function () {
+    $admin = buatAdmin();
+    $cabang = buatCabang();
+    $transaksi = buatTransaksi();
+
+    $jurnal = Jurnal::create(dataJurnalDb($cabang, $transaksi));
+
+    $this->actingAs($admin)->put(route('jurnal.update', $jurnal->id), dataJurnal($cabang, $transaksi, [
+        'no_tiket' => 'BS -  2026081847820',
+    ]))->assertRedirect(route('jurnal.index'));
+
+    expect($jurnal->fresh()->no_tiket)->toBe('BS-2026081847820');
+});
+
+test('nomor tiket manual tetap tersimpan utuh lewat form jurnal', function () {
+    $admin = buatAdmin();
+    $cabang = buatCabang();
+    $transaksi = buatTransaksi();
+
+    $this->actingAs($admin)->post(route('jurnal.store'), dataJurnal($cabang, $transaksi, [
+        'no_tiket' => 'PRO AKTIF',
+    ]))->assertRedirect(route('jurnal.index'));
+
+    expect(Jurnal::first()->no_tiket)->toBe('PRO AKTIF');
+});
+
 test('penghapusan pengaduan tidak menyisakan nomor tiket kembar', function () {
     $cabang = buatCabang();
     $cs = buatCs($cabang);

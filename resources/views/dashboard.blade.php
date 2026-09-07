@@ -95,7 +95,7 @@
         <div id="sparkNominal" class="mt-1 h-10"></div>
     </div>
 
-    {{-- Card 3: Avg Resolution --}}
+    {{-- Kartu 3: Rata-rata lama penanganan, dihitung dari Tanggal Terima sampai Tanggal Selesai --}}
     <div class="bg-white border border-slate-200 rounded-2xl p-4 shadow-xs hover:-translate-y-0.5 hover:shadow-md transition-all">
         <div class="flex items-start justify-between mb-1">
             <div class="w-10 h-10 rounded-xl bg-amber-100 text-amber-600 flex items-center justify-center shrink-0">
@@ -110,8 +110,11 @@
         <div class="text-[0.71875rem] text-slate-500 mt-2">{{ $resolvedCount }} keluhan selesai</div>
     </div>
 
-    {{-- Card 4: Resolution Rate --}}
-    <div class="bg-white border border-slate-200 rounded-2xl p-4 shadow-xs hover:-translate-y-0.5 hover:shadow-md transition-all">
+    {{-- Kartu 4: Tingkat Penyelesaian — bagian keluhan yang sudah tuntas (Done + Success)
+         dibanding seluruh keluhan pada periode terpilih. Status kustom yang diketik manual
+         tidak dihitung tuntas, sama seperti kartu ringkasan di halaman Data Keluhan. --}}
+    <div class="bg-white border border-slate-200 rounded-2xl p-4 shadow-xs hover:-translate-y-0.5 hover:shadow-md transition-all"
+         title="Keluhan berstatus Done atau Success dibagi seluruh keluhan pada periode ini, lalu dikali 100.">
         <div class="flex items-start justify-between mb-1">
             <div class="w-10 h-10 rounded-xl bg-purple-100 text-purple-600 flex items-center justify-center shrink-0">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
@@ -126,11 +129,12 @@
                 </span>
             @endif
         </div>
-        <h4 class="text-[0.71875rem] text-slate-500 font-bold uppercase tracking-wider m-0 mb-0.5">Resolution Rate</h4>
+        <h4 class="text-[0.71875rem] text-slate-500 font-bold uppercase tracking-wider m-0 mb-0.5">Tingkat Penyelesaian</h4>
         <div class="text-2xl font-black text-navy leading-tight">{{ number_format($resolutionRate, 1, ',', '.') }}<span class="text-sm font-bold text-slate-500">%</span></div>
         <div class="mt-2 h-1.5 rounded-full bg-slate-100 overflow-hidden">
             <div class="h-full bg-gradient-to-r from-purple-500 to-emerald-500 rounded-full" style="width: {{ min($resolutionRate, 100) }}%"></div>
         </div>
+        <div class="text-[0.71875rem] text-slate-500 mt-1.5">{{ number_format($resolvedCount, 0, ',', '.') }} dari {{ number_format($totalKasus, 0, ',', '.') }} keluhan tuntas</div>
     </div>
 
     {{-- Card 5: Cabang Aktif --}}

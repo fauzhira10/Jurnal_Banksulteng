@@ -4,11 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Form Keluhan & Slip Jurnal ATM Bersama - {{ $jurnal->no_tiket }}</title>
+    <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}">
+    <link rel="shortcut icon" type="image/x-icon" href="{{ asset('favicon.ico') }}">
     <style>
         * {
             box-sizing: border-box;
             font-family: Arial, Helvetica, sans-serif;
             font-size: 11px;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
         }
 
         body {
@@ -16,6 +20,8 @@
             margin: 0;
             padding: 30px 20px;
             color: #000;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
         }
 
         /* Container Formulir Cetak A4 */
@@ -24,9 +30,9 @@
             width: 210mm;
             min-height: 297mm;
             margin: 0 auto 35px auto;
-            padding: 35px 38px;
-            border: 2px solid #000;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            padding: 30px 35px;
+            border: none;
+            box-shadow: none;
             page-break-inside: avoid;
             page-break-after: avoid;
         }
@@ -41,6 +47,10 @@
             border: 1px solid #000;
             padding: 5px 8px;
             vertical-align: middle;
+        }
+
+        .table-form td.no-padding {
+            padding: 0 !important;
         }
 
         /* Header Logo & Title */
@@ -71,6 +81,9 @@
 
         .highlight-yellow {
             background-color: #ffff00 !important;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+            color-adjust: exact !important;
             font-weight: bold;
             padding: 0 2px;
         }
@@ -231,17 +244,87 @@
             outline: none;
         }
 
+        /* SLIP PAGE STYLING (HALAMAN 2: NOTA DEBET / SLIP JURNAL) */
+        .slip-page {
+            background: #ffffff;
+            width: 210mm;
+            margin: 0 auto 35px auto;
+            padding: 25px 30px;
+            border: 2px solid #000;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            page-break-before: always;
+            break-before: page;
+            page-break-inside: avoid;
+            break-inside: avoid;
+            box-sizing: border-box;
+        }
+
         @media print {
+            @page {
+                size: A4 portrait;
+                margin: 12mm 15mm 12mm 15mm;
+            }
             .no-print { display: none !important; }
-            html, body { padding: 0 !important; margin: 0 !important; background: none !important; }
+            .page-break { display: none !important; }
+            html, body {
+                padding: 0 !important;
+                margin: 0 !important;
+                background: none !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+                color-adjust: exact !important;
+            }
             .form-wrapper {
-                border: 1.5px solid #000 !important;
+                border: none !important;
+                width: calc(100% - 8mm) !important;
+                max-width: calc(100% - 8mm) !important;
+                padding: 14px 18px !important;
+                margin: 4mm auto !important;
+                box-shadow: none !important;
+                min-height: 0 !important;
+                height: auto !important;
+                page-break-inside: avoid !important;
+                break-inside: avoid !important;
+                page-break-after: avoid !important;
+                break-after: avoid !important;
+            }
+            .table-form {
+                page-break-inside: avoid !important;
+                break-inside: avoid !important;
+            }
+            .table-form td, .table-form th {
+                padding: 3.5px 6px !important;
+            }
+            .table-form td.no-padding {
+                padding: 0 !important;
+            }
+            .sig-body {
+                height: 95px !important;
+                padding: 6px 4px 8px 4px !important;
+            }
+            .sig-space {
+                height: 45px !important;
+            }
+            .slip-page {
+                border: none !important;
+                box-shadow: none !important;
                 width: 100% !important;
                 max-width: 100% !important;
-                padding: 20px 24px !important;
+                padding: 10px 15px !important;
                 margin: 0 auto !important;
-                box-shadow: none !important;
-                min-height: auto !important;
+                min-height: 0 !important;
+                height: auto !important;
+                background: transparent !important;
+                page-break-before: always !important;
+                break-before: page !important;
+                page-break-inside: avoid !important;
+                break-inside: avoid !important;
+            }
+            .highlight-yellow {
+                background-color: #ffff00 !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+                color-adjust: exact !important;
             }
             .editable-text {
                 background: transparent !important;
@@ -301,8 +384,8 @@
                 <td colspan="2" class="section-title">LEMBAR HELPDESK</td>
             </tr>
             <tr>
-                <td colspan="2" style="padding: 0;">
-                    <table style="width: 100%; border-collapse: collapse;">
+                <td colspan="2" class="no-padding" style="padding: 0;">
+                    <table style="width: 100%; border-collapse: collapse; table-layout: fixed;">
                         <tr>
                             <td style="width: 25%; border-right: 1px solid #000; border-bottom: 1px solid #000; padding: 4px 8px;">No. Tiket</td>
                             <td style="width: 25%; border-right: 1px solid #000; border-bottom: 1px solid #000; padding: 4px 8px; font-weight: bold;">: {{ $jurnal->no_tiket }}</td>
@@ -311,7 +394,7 @@
                         </tr>
                         <tr>
                             <td style="width: 25%; border-right: 1px solid #000; padding: 4px 8px;">Nama Penerima</td>
-                            <td style="width: 25%; border-right: 1px solid #000; padding: 4px 8px;">: {{ auth()->user()->name ?? 'Mujadid' }}</td>
+                            <td style="width: 25%; border-right: 1px solid #000; padding: 4px 8px;">: <span class="editable-text" contenteditable="true" spellcheck="false" title="Klik untuk mengedit Nama Penerima">MUJADID</span></td>
                             <td style="width: 25%; border-right: 1px solid #000; padding: 4px 8px;">Status</td>
                             <td style="width: 25%; font-weight: bold; text-transform: uppercase; padding: 4px 8px;">: {{ $jurnal->status == 'Done' ? 'SELESAI' : strtoupper($jurnal->status) }}</td>
                         </tr>
@@ -391,7 +474,7 @@
 
             <!-- TINDAK LANJUT PENYELESAIAN -->
             <tr>
-                <td colspan="2" class="section-title">TINDAK LANJUT PENYELESAIAN</td>
+                <td colspan="2" class="section-title" style="text-align: center;">TINDAK LANJUT PENYELESAIAN</td>
             </tr>
             <tr>
                 <td colspan="2" style="padding: 10px 12px 16px 12px;">
@@ -443,11 +526,11 @@
 
             <!-- FOOTER BLOCK TANDA TANGAN (4 KOLOM) -->
             <tr>
-                <td colspan="2" style="padding: 0;">
-                    <table style="width: 100%; border-collapse: collapse;">
+                <td colspan="2" class="no-padding" style="padding: 0;">
+                    <table style="width: 100%; border-collapse: collapse; table-layout: fixed;">
                         <tr>
-                            <td colspan="3" class="sig-header" style="width: 75%; border-right: 1px solid #000;">Di Selesaikan Oleh,</td>
-                            <td class="sig-header" style="width: 25%;">Di ketahui Oleh,</td>
+                            <td colspan="2" class="sig-header" style="width: 50%; border-right: 1px solid #000; border-bottom: 1px solid #000;">Di Selesaikan Oleh,</td>
+                            <td colspan="2" class="sig-header" style="width: 50%; border-bottom: 1px solid #000;">Di ketahui Oleh,</td>
                         </tr>
                         <tr>
                             <!-- Pejabat 1 -->
@@ -481,11 +564,8 @@
         </table>
     </div>
 
-    <!-- ================= PAGE BREAK UNTUK CETAK SLIP JURNAL ================= -->
-    <div class="page-break"></div>
-
     <!-- ================= HALAMAN 2: NOTA DEBET / SLIP JURNAL DIVISI IT ================= -->
-    <div class="form-wrapper" style="border: none; box-shadow: none; padding: 20px 25px;">
+    <div class="slip-page">
         <!-- KOP SLIP JURNAL (TANPA BORDER LUAR) -->
         <table style="width: 100%; border-collapse: collapse; margin-bottom: 12px;">
             <tr>
@@ -525,7 +605,7 @@
                     <td style="border: 1px solid #000; width: 2.4%;"></td>
                     <td style="border: 1px solid #000; width: 2.4%;"></td>
                     <td style="border-left: 1px solid #000; border-right: 1.5px solid #000; border-top: 1.5px solid #000; border-bottom: none; padding: 2px 6px; text-align: center; font-weight: bold; text-transform: uppercase;">
-                        <span class="editable-text" contenteditable="true" spellcheck="false" title="Klik untuk mengedit Nama Nasabah">{{ $jurnal->nama_nasabah }}</span>
+                        {{ $jurnal->nama_nasabah }}
                     </td>
                 </tr>
 
@@ -540,7 +620,7 @@
                     <td style="border: 1px solid #000;"></td>
                     <td style="border: 1px solid #000;"></td>
                     <td style="border-left: 1px solid #000; border-right: 1.5px solid #000; border-top: none; border-bottom: 1px solid #000; padding: 2px 6px 4px 6px; text-align: center; font-weight: bold;">
-                        <span class="editable-text" contenteditable="true" spellcheck="false" title="Klik untuk mengedit Nomor Rekening Nasabah">{{ $jurnal->no_rekening }}</span>
+                        {{ $jurnal->no_rekening }}
                     </td>
                 </tr>
 
@@ -710,7 +790,7 @@
                                 <td style="border: none; padding: 0; font-weight: bold;">
                                     <div style="display: flex; justify-content: space-between;">
                                         <span>Rp</span>
-                                        <span class="editable-text" contenteditable="true" spellcheck="false" title="Klik untuk mengedit Nominal Transaksi">{{ number_format($jurnal->nominal_transaksi, 0, ',', '.') }}</span>
+                                        <span class="editable-text" contenteditable="true" spellcheck="false" title="Klik untuk mengedit Total Kredit">{{ number_format($jurnal->nominal_transaksi + ($jurnal->biaya_admin ?? $jurnal->masterTransaksi->biaya_admin ?? 0), 0, ',', '.') }}</span>
                                     </div>
                                 </td>
                             </tr>

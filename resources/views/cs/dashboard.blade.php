@@ -37,56 +37,76 @@
 
     <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
         {{-- Pengaduan terbaru --}}
-        <div class="xl:col-span-2 bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
-            <div class="px-5 py-4 border-b border-slate-200 flex items-center justify-between">
-                <div class="text-[0.9375rem] font-bold text-navy">Pengaduan Terbaru</div>
-                <a href="{{ route('cs.pengaduan.index') }}" class="text-xs font-semibold text-brand-blue hover:underline">Lihat semua →</a>
+        <div class="xl:col-span-2 bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden flex flex-col justify-between">
+            <div>
+                <div class="px-5 py-4 border-b border-slate-200 flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <div class="text-[0.9375rem] font-bold text-navy">Pengaduan Terbaru</div>
+                        @if(!$terbaru->isEmpty())
+                            <span class="px-2 py-0.5 rounded-full text-[0.6875rem] font-bold bg-slate-100 text-slate-600 border border-slate-200">
+                                {{ $terbaru->count() }} Data
+                            </span>
+                        @endif
+                    </div>
+                    <a href="{{ route('cs.pengaduan.index') }}" class="text-xs font-semibold text-brand-blue hover:underline inline-flex items-center gap-1">
+                        Lihat semua &rarr;
+                    </a>
+                </div>
+                @if($terbaru->isEmpty())
+                    <div class="p-10 text-center text-slate-500">
+                        <div class="text-4xl mb-2">📭</div>
+                        <p class="text-sm font-semibold">Belum ada pengaduan dari cabang Anda.</p>
+                        <a href="{{ route('cs.pengaduan.create') }}" class="inline-flex mt-3 items-center gap-2 px-4 py-2 rounded-lg bg-brand-blue text-white text-xs font-bold hover:opacity-90">+ Buat pengaduan pertama</a>
+                    </div>
+                @else
+                    <div class="p-4 sm:p-5">
+                        <div class="overflow-x-auto rounded-xl border border-slate-200/90 shadow-2xs bg-white">
+                            <table class="w-full text-left border-collapse text-[0.8125rem]" style="min-width: 600px;">
+                                <thead>
+                                    <tr class="bg-slate-50/80 border-b border-slate-200 text-slate-600 text-[0.75rem] font-bold">
+                                        <th class="px-4 py-3 text-left whitespace-nowrap">Nomor / Tanggal</th>
+                                        <th class="px-4 py-3 text-left whitespace-nowrap">Nasabah</th>
+                                        <th class="px-4 py-3 text-left whitespace-nowrap">Transaksi</th>
+                                        <th class="px-4 py-3 text-left whitespace-nowrap">Nominal</th>
+                                        <th class="px-4 py-3 text-left whitespace-nowrap">Status</th>
+                                        <th class="px-4 py-3 text-center whitespace-nowrap">Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-slate-100">
+                                    @foreach($terbaru as $p)
+                                        <tr class="hover:bg-slate-50/60 transition-colors">
+                                            <td class="px-4 py-3.5 whitespace-nowrap align-middle">
+                                                <div class="font-extrabold text-navy font-mono text-[0.875rem] tracking-wide">{{ $p->nomor_tiket }}</div>
+                                                <div class="text-[0.71875rem] text-slate-500 mt-0.5 flex items-center gap-1">
+                                                    <svg class="w-3 h-3 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                                                    <span>{{ $p->created_at->translatedFormat('d M Y, H:i') }}</span>
+                                                </div>
+                                            </td>
+                                            <td class="px-4 py-3.5 align-middle">
+                                                <div class="font-semibold text-slate-800">{{ $p->nama_nasabah }}</div>
+                                                <div class="text-[0.71875rem] text-slate-500 font-mono mt-0.5">Rek: {{ $p->no_rekening }}</div>
+                                            </td>
+                                            <td class="px-4 py-3.5 align-middle">
+                                                <div class="text-[0.78125rem] font-medium text-slate-700 leading-snug">{{ $p->transaksi->jenis_transaksi ?? '-' }}</div>
+                                                <span class="badge badge-channel mt-1">{{ $p->channel }}</span>
+                                            </td>
+                                            <td class="px-4 py-3.5 whitespace-nowrap font-bold text-emerald-600 align-middle">
+                                                {{ $p->nominalRupiah() }}
+                                            </td>
+                                            <td class="px-4 py-3.5 whitespace-nowrap align-middle">
+                                                @include('partials.pengaduan_status_badge', ['status' => $p->status])
+                                            </td>
+                                            <td class="px-4 py-3.5 text-center whitespace-nowrap align-middle">
+                                                <a href="{{ route('cs.pengaduan.show', $p) }}" class="btn btn-secondary btn-sm" style="padding: 5px 12px; font-size: 0.75rem; border-radius: 8px;">Detail</a>
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                @endif
             </div>
-            @if($terbaru->isEmpty())
-                <div class="p-10 text-center text-slate-500">
-                    <div class="text-4xl mb-2">📭</div>
-                    <p class="text-sm font-semibold">Belum ada pengaduan dari cabang Anda.</p>
-                    <a href="{{ route('cs.pengaduan.create') }}" class="inline-flex mt-3 items-center gap-2 px-4 py-2 rounded-lg bg-brand-blue text-white text-xs font-bold hover:opacity-90">+ Buat pengaduan pertama</a>
-                </div>
-            @else
-                <div style="overflow-x: auto;">
-                    <table class="custom-table" style="width: 100%; min-width: 640px;">
-                        <thead>
-                            <tr>
-                                <th>Nomor / Tanggal</th>
-                                <th>Nasabah</th>
-                                <th>Transaksi</th>
-                                <th>Nominal</th>
-                                <th>Status</th>
-                                <th style="text-align:center;">Aksi</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach($terbaru as $p)
-                                <tr>
-                                    <td>
-                                        <div class="font-bold text-navy font-mono text-[0.78125rem]">{{ $p->nomor_tiket }}</div>
-                                        <div class="text-[0.71875rem] text-slate-500 mt-0.5">{{ $p->created_at->translatedFormat('d M Y, H:i') }}</div>
-                                    </td>
-                                    <td>
-                                        <div class="font-semibold text-slate-800">{{ $p->nama_nasabah }}</div>
-                                        <div class="text-[0.71875rem] text-slate-500">Rek: {{ $p->no_rekening }}</div>
-                                    </td>
-                                    <td>
-                                        <div class="text-[0.78125rem] font-medium text-slate-700">{{ $p->transaksi->jenis_transaksi ?? '-' }}</div>
-                                        <span class="badge badge-channel" style="margin-top:3px;">{{ $p->channel }}</span>
-                                    </td>
-                                    <td style="white-space:nowrap;" class="font-bold text-emerald-600">{{ $p->nominalRupiah() }}</td>
-                                    <td>@include('partials.pengaduan_status_badge', ['status' => $p->status])</td>
-                                    <td style="text-align:center;">
-                                        <a href="{{ route('cs.pengaduan.show', $p) }}" class="btn btn-secondary btn-sm" style="padding: 5px 11px; font-size: 0.75rem;">Detail</a>
-                                    </td>
-                                </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
-                </div>
-            @endif
         </div>
 
         {{-- Perlu perhatian --}}
@@ -99,7 +119,7 @@
                 @forelse($perluPerhatian as $p)
                     <a href="{{ route('cs.pengaduan.show', $p) }}" class="block p-3 rounded-xl border border-slate-200 hover:border-brand-blue/40 hover:bg-sky-50/50 transition-colors">
                         <div class="flex items-center justify-between gap-2">
-                            <span class="font-mono text-[0.75rem] font-bold text-navy truncate">{{ $p->nomor_tiket }}</span>
+                            <span class="font-mono text-[0.8125rem] font-extrabold text-navy tracking-wide truncate">{{ $p->nomor_tiket }}</span>
                             @include('partials.pengaduan_status_badge', ['status' => $p->status, 'singkat' => true])
                         </div>
                         <div class="text-[0.78125rem] font-semibold text-slate-700 mt-1 truncate">{{ $p->nama_nasabah }}</div>

@@ -38,11 +38,11 @@
     </div>
 
     <!-- Body Card -->
-    <div class="p-6 space-y-4">
-        <form id="filterForm" method="GET" action="{{ route('jurnal.index') }}" onsubmit="return false;">
+    <div class="p-6 sm:p-7">
+        <form id="filterForm" method="GET" action="{{ route('jurnal.index') }}" onsubmit="return false;" class="flex flex-col gap-5 sm:gap-6">
             <!-- Tier 1: Hero Search Input -->
             <div class="relative">
-                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-500">
+                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="text-brand-blue">
                         <circle cx="11" cy="11" r="8"></circle>
                         <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
@@ -53,12 +53,13 @@
                     id="searchInput" 
                     name="q" 
                     value="{{ request('q') }}" 
-                    class="w-full h-12 pl-11 pr-24 text-[0.84375rem] font-medium text-slate-800 bg-slate-50/70 border border-slate-200 rounded-xl placeholder:text-slate-500 placeholder:text-xs sm:placeholder:text-[0.8125rem] focus:bg-white focus:border-brand-blue focus:ring-4 focus:ring-brand-blue/10 focus:outline-none transition-all shadow-2xs" 
+                    style="padding-left: 54px !important; padding-right: 125px !important;"
+                    class="w-full h-12 text-[0.84375rem] font-medium text-slate-800 bg-slate-50/70 border border-slate-200/90 rounded-xl placeholder:text-slate-400 placeholder:text-xs sm:placeholder:text-[0.8125rem] focus:bg-white focus:border-brand-blue focus:ring-4 focus:ring-brand-blue/10 focus:outline-none transition-all shadow-2xs" 
                     placeholder="Ketik nama nasabah, nomor resi/trace, nomor rekening, nomor kartu debit, atau nomor tiket CS..." 
                     autocomplete="off"
                 >
                 <!-- Right Action Buttons inside Search Input -->
-                <div class="absolute inset-y-0 right-0 pr-3 flex items-center gap-1.5">
+                <div class="absolute inset-y-0 right-0 pr-3.5 flex items-center gap-2">
                     <button 
                         type="button" 
                         id="btnClearSearch" 
@@ -70,18 +71,18 @@
                             <line x1="6" y1="6" x2="18" y2="18"></line>
                         </svg>
                     </button>
-                    <span class="hidden sm:inline-flex items-center text-[0.71875rem] font-bold text-slate-500 bg-slate-200/60 px-2 py-0.5 rounded-md border border-slate-300/50">
+                    <span class="hidden sm:inline-flex items-center text-[0.71875rem] font-bold text-slate-500 bg-slate-200/70 px-2.5 py-1 rounded-md border border-slate-300/50">
                         Live Search
                     </span>
                 </div>
             </div>
 
             <!-- Tier 2: Filter Grid Controls (4 Balanced Columns) -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5 pt-1">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
                 <!-- 1. Filter Kantor Cabang -->
-                <div class="flex flex-col gap-1.5">
+                <div class="flex flex-col gap-2">
                     <label for="filterCabang" class="text-xs font-bold text-slate-700 flex items-center gap-1.5">
-                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="text-brand-blue">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="text-brand-blue">
                             <path d="M3 21h18"></path>
                             <path d="M5 21V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16"></path>
                             <path d="M9 9h1"></path>
@@ -94,7 +95,7 @@
                         <span>Kantor Cabang</span>
                     </label>
                     <div class="relative">
-                        <select id="filterCabang" name="master_cabang_id" class="w-full h-10 px-3 pr-8 text-xs font-semibold text-slate-800 bg-slate-50 border border-slate-200 rounded-xl appearance-none cursor-pointer focus:bg-white focus:border-brand-blue focus:ring-3 focus:ring-brand-blue/15 focus:outline-none transition-all">
+                        <select id="filterCabang" name="master_cabang_id" class="w-full h-10.5 px-3.5 pr-9 text-xs font-semibold text-slate-800 bg-slate-50/80 border border-slate-200 rounded-xl appearance-none cursor-pointer focus:bg-white focus:border-brand-blue focus:ring-3 focus:ring-brand-blue/15 focus:outline-none transition-all">
                             <option value="" data-kode="">-- Semua Cabang --</option>
                             @foreach($cabangs as $c)
                                 <option value="{{ $c->id }}" data-kode="{{ $c->kode_cabang ?? '' }}" {{ request('master_cabang_id') == $c->id ? 'selected' : '' }}>
@@ -102,7 +103,7 @@
                                 </option>
                             @endforeach
                         </select>
-                        <div class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-500">
+                        <div class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
                             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                                 <polyline points="6 9 12 15 18 9"></polyline>
                             </svg>
@@ -111,9 +112,9 @@
                 </div>
 
                 <!-- 2. Filter Terminal / Mesin ATM -->
-                <div class="flex flex-col gap-1.5">
+                <div class="flex flex-col gap-2">
                     <label for="filterTerminal" class="text-xs font-bold text-slate-700 flex items-center gap-1.5">
-                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="text-brand-blue">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="text-brand-blue">
                             <rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect>
                             <rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect>
                             <line x1="6" y1="6" x2="6.01" y2="6"></line>
@@ -122,10 +123,10 @@
                         <span>Terminal / Mesin ATM</span>
                     </label>
                     <div class="relative">
-                        <select id="filterTerminal" name="terminal_transaksi" class="w-full h-10 px-3 pr-8 text-xs font-semibold text-slate-800 bg-slate-50 border border-slate-200 rounded-xl appearance-none cursor-pointer focus:bg-white focus:border-brand-blue focus:ring-3 focus:ring-brand-blue/15 focus:outline-none transition-all">
+                        <select id="filterTerminal" name="terminal_transaksi" class="w-full h-10.5 px-3.5 pr-9 text-xs font-semibold text-slate-800 bg-slate-50/80 border border-slate-200 rounded-xl appearance-none cursor-pointer focus:bg-white focus:border-brand-blue focus:ring-3 focus:ring-brand-blue/15 focus:outline-none transition-all">
                             <option value="">-- Semua Terminal / Mesin --</option>
                         </select>
-                        <div class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-500">
+                        <div class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
                             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                                 <polyline points="6 9 12 15 18 9"></polyline>
                             </svg>
@@ -134,16 +135,16 @@
                 </div>
 
                 <!-- 3. Filter Status Penanganan -->
-                <div class="flex flex-col gap-1.5">
+                <div class="flex flex-col gap-2">
                     <label for="filterStatus" class="text-xs font-bold text-slate-700 flex items-center gap-1.5">
-                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="text-brand-blue">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="text-brand-blue">
                             <circle cx="12" cy="12" r="10"></circle>
                             <polyline points="12 6 12 12 14 14"></polyline>
                         </svg>
                         <span>Status Keluhan</span>
                     </label>
                     <div class="relative">
-                        <select id="filterStatus" name="status" class="w-full h-10 px-3 pr-8 text-xs font-semibold text-slate-800 bg-slate-50 border border-slate-200 rounded-xl appearance-none cursor-pointer focus:bg-white focus:border-brand-blue focus:ring-3 focus:ring-brand-blue/15 focus:outline-none transition-all">
+                        <select id="filterStatus" name="status" class="w-full h-10.5 px-3.5 pr-9 text-xs font-semibold text-slate-800 bg-slate-50/80 border border-slate-200 rounded-xl appearance-none cursor-pointer focus:bg-white focus:border-brand-blue focus:ring-3 focus:ring-brand-blue/15 focus:outline-none transition-all">
                             <option value="">-- Semua Status --</option>
                             <option value="-" {{ request('status') === '-' ? 'selected' : '' }}>⚪ - (Belum Ditentukan)</option>
                             <option value="Menunggu" {{ request('status') == 'Menunggu' ? 'selected' : '' }}>🟡 Menunggu</option>
@@ -158,7 +159,7 @@
                                 </optgroup>
                             @endif
                         </select>
-                        <div class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-500">
+                        <div class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
                             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                                 <polyline points="6 9 12 15 18 9"></polyline>
                             </svg>
@@ -167,9 +168,9 @@
                 </div>
 
                 <!-- 4. Filter Rentang Tanggal Transaksi (Dari s/d Sampai) -->
-                <div class="flex flex-col gap-1.5">
+                <div class="flex flex-col gap-2">
                     <label class="text-xs font-bold text-slate-700 flex items-center gap-1.5">
-                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="text-brand-blue">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="text-brand-blue">
                             <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
                             <line x1="16" y1="2" x2="16" y2="6"></line>
                             <line x1="8" y1="2" x2="8" y2="6"></line>
@@ -177,13 +178,13 @@
                         </svg>
                         <span>Periode Transaksi (Dari - Sampai)</span>
                     </label>
-                    <div class="grid grid-cols-2 gap-2">
+                    <div class="grid grid-cols-2 gap-2.5">
                         <input 
                             type="date" 
                             id="filterTglDari" 
                             name="tgl_dari" 
                             value="{{ request('tgl_dari') }}" 
-                            class="w-full h-10 px-2.5 text-xs font-semibold text-slate-800 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-brand-blue focus:ring-3 focus:ring-brand-blue/15 focus:outline-none transition-all cursor-pointer" 
+                            class="w-full h-10.5 px-3 text-xs font-semibold text-slate-800 bg-slate-50/80 border border-slate-200 rounded-xl focus:bg-white focus:border-brand-blue focus:ring-3 focus:ring-brand-blue/15 focus:outline-none transition-all cursor-pointer" 
                             title="Tanggal Transaksi (Dari)"
                         >
                         <input 
@@ -191,15 +192,31 @@
                             id="filterTglSampai" 
                             name="tgl_sampai" 
                             value="{{ request('tgl_sampai') }}" 
-                            class="w-full h-10 px-2.5 text-xs font-semibold text-slate-800 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-brand-blue focus:ring-3 focus:ring-brand-blue/15 focus:outline-none transition-all cursor-pointer" 
+                            class="w-full h-10.5 px-3 text-xs font-semibold text-slate-800 bg-slate-50/80 border border-slate-200 rounded-xl focus:bg-white focus:border-brand-blue focus:ring-3 focus:ring-brand-blue/15 focus:outline-none transition-all cursor-pointer" 
                             title="Tanggal Transaksi (Sampai)"
                         >
                     </div>
+
+                    <!-- 5. Filter Keluhan Berulang (Nama Nasabah + No. Resi sama lebih dari sekali) -->
+                    <label for="filterDuplikat" class="mt-2.5 flex items-center gap-2.5 px-3.5 py-2.5 bg-amber-50 border border-amber-200 rounded-xl cursor-pointer hover:bg-amber-100 transition-colors">
+                        <input
+                            type="checkbox"
+                            id="filterDuplikat"
+                            name="duplikat"
+                            value="1"
+                            {{ request()->boolean('duplikat') ? 'checked' : '' }}
+                            class="w-4 h-4 accent-amber-500 cursor-pointer"
+                        >
+                        <span class="text-xs font-bold text-amber-900 leading-snug">
+                            Cek data berulang
+                            <span class="block text-[0.71875rem] font-semibold text-amber-700">Nama nasabah &amp; No. Resi yang sama tercatat lebih dari sekali</span>
+                        </span>
+                    </label>
                 </div>
             </div>
 
             <!-- Tier 3: Active Filter Chips Bar (Dynamic Pills) -->
-            <div id="activeFilterChipsContainer" class="hidden pt-3 border-t border-slate-100 flex flex-wrap items-center gap-2">
+            <div id="activeFilterChipsContainer" class="hidden pt-4 border-t border-slate-100 flex flex-wrap items-center gap-2.5">
                 <span class="text-[0.71875rem] font-bold text-slate-500 uppercase tracking-wider">Filter Aktif:</span>
                 <div id="activeFilterChipsList" class="flex flex-wrap items-center gap-1.5">
                     <!-- Populated dynamically via JS -->
@@ -304,6 +321,21 @@
                                         <span>•</span>
                                         <span>Resi: <strong class="highlightable">{{ $jurnal->no_resi }}</strong></span>
                                     </div>
+                                    @php
+                                        // Penanda keluhan berulang: nama nasabah + no resi yang sama
+                                        // muncul lebih dari satu kali di jurnal. Sengaja TANPA kelas
+                                        // "highlightable" agar tidak ikut disorot kuning saat pencarian.
+                                        $kunciBerulang = $jurnal->nama_nasabah.'|'.$jurnal->no_resi;
+                                        $jmlBerulang = $jumlahBerulang[$kunciBerulang] ?? 0;
+                                    @endphp
+                                    @if($jmlBerulang > 1)
+                                        <a href="{{ route('jurnal.index', ['q' => $jurnal->no_resi]) }}"
+                                           class="badge badge-menunggu"
+                                           style="margin-top: 4px; text-decoration: none;"
+                                           title="Nama nasabah & No. Resi ini tercatat {{ $jmlBerulang }} kali. Klik untuk melihat seluruhnya.">
+                                            &#8635; Berulang &times;{{ $jmlBerulang }}
+                                        </a>
+                                    @endif
                                     @if($jurnal->no_tiket)
                                         <div style="font-size: 0.71875rem; color: var(--bs-blue); margin-top: 2px;">
                                             Tiket: <strong class="highlightable">{{ $jurnal->no_tiket }}</strong>
@@ -375,6 +407,7 @@
                                 </td>
                                 <td style="text-align: center; vertical-align: middle; white-space: nowrap;">
                                     @php
+                                        $isMenunggu = strtolower(trim($jurnal->status ?? '')) === 'menunggu';
                                         $hasLog = !empty($jurnal->keterangan_log) && trim($jurnal->keterangan_log) !== '-' && trim($jurnal->keterangan_log) !== '' && trim(strtolower($jurnal->keterangan_log)) !== 'tidak ada keterangan tambahan.';
                                     @endphp
                                     <button type="button" class="btn btn-secondary btn-sm" onclick="showDetailModal({{ json_encode($jurnal) }})" title="Lihat Rincian & Aksi" style="padding: 6px 12px; font-size: 0.78125rem; font-weight: 600; display: inline-flex; align-items: center; gap: 5px;">
@@ -385,7 +418,15 @@
                                         </svg>
                                         <span>Detail</span>
                                     </button>
-                                    @if($hasLog)
+                                    @if($isMenunggu)
+                                        <button type="button" onclick="showMenungguWarning({{ json_encode($jurnal) }})" class="btn btn-sm btn-cetak-action" data-jurnal-id="{{ $jurnal->id }}" style="background-color: #fef3c7; color: #92400e; padding: 6px 11px; font-size: 0.75rem; font-weight: 600; display: inline-flex; align-items: center; gap: 4px; border-radius: 4px; margin-left: 5px; border: 1px solid #fde68a; cursor: pointer;" title="Status keluhan masih Menunggu. Ubah status penanganan terlebih dahulu untuk dapat mencetak.">
+                                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                                                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                                            </svg>
+                                            <span>Menunggu 🔒</span>
+                                        </button>
+                                    @elseif($hasLog)
                                         <button type="button" onclick="openPrintChoiceModal({{ json_encode($jurnal) }})" class="btn btn-sm btn-cetak-action" data-jurnal-id="{{ $jurnal->id }}" style="background-color: #0284c7; color: white; padding: 6px 12px; font-size: 0.78125rem; font-weight: 600; display: inline-flex; align-items: center; gap: 5px; text-decoration: none; border-radius: 4px; margin-left: 5px; border: 1px solid #0369a1; cursor: pointer;" title="Pilih Format Cetak Dokumen">
                                             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                                 <polyline points="6 9 6 2 18 2 18 9"></polyline>
@@ -756,6 +797,70 @@
             <button type="button" class="btn btn-secondary" onclick="closePrintChoiceModal()">
                 Tutup
             </button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Pop-Up Peringatan Status Menunggu Belum Dapat Dicetak -->
+<div class="modal-backdrop" id="menungguWarningModal" style="z-index: 1300;">
+    <div class="modal-content" style="max-width: 500px; border-top: 4px solid #f59e0b; animation: modalFadeIn 0.2s ease-out;">
+        <div class="modal-header" style="background-color: #fffbeb; border-bottom: 1px solid #fef3c7;">
+            <h3 style="color: #b45309; display: flex; align-items: center; gap: 8px; font-size: 1rem; font-weight: 700;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="8" x2="12" y2="12"></line>
+                    <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                </svg>
+                <span>Keluhan Belum Dapat Dicetak</span>
+            </h3>
+            <button class="btn-close-modal" onclick="closeMenungguWarningModal()">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+        </div>
+
+        <div class="modal-body" style="padding: 20px 24px;">
+            <div style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 12px 16px; margin-bottom: 16px; font-size: 0.75rem;">
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 8px;">
+                    <div><span style="color: #64748b;">No. Tiket:</span> <strong id="menungguTiket" style="color: #0369a1;">-</strong></div>
+                    <div><span style="color: #64748b;">Nasabah:</span> <strong id="menungguNama" style="color: #0f172a;">-</strong></div>
+                    <div><span style="color: #64748b;">No. Resi/Trace:</span> <strong id="menungguResi" style="color: #0284c7;">-</strong></div>
+                    <div><span style="color: #64748b;">Status:</span> <span class="badge badge-menunggu" style="font-size: 0.6875rem; padding: 2px 8px;">MENUNGGU</span></div>
+                </div>
+            </div>
+
+            <div style="display: flex; gap: 12px; align-items: flex-start; margin-bottom: 14px;">
+                <div style="width: 38px; height: 38px; border-radius: 8px; background: #fef3c7; color: #d97706; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 1.25rem;">
+                    🔒
+                </div>
+                <div>
+                    <div style="font-size: 0.84375rem; font-weight: 700; color: #1e293b; margin-bottom: 4px;">
+                        Status Penanganan Masih Menunggu
+                    </div>
+                    <p style="font-size: 0.75rem; color: #475569; line-height: 1.5; margin: 0;">
+                        Formulir penyelesaian keluhan atau penolakan klaim nasabah belum dapat dicetak karena status saat ini masih <strong>Menunggu</strong>.
+                    </p>
+                </div>
+            </div>
+
+            <div style="background: #fffbeb; border: 1px solid #fde68a; border-radius: 8px; padding: 10px 12px; font-size: 0.71875rem; color: #92400e; line-height: 1.45;">
+                💡 <strong>Petunjuk:</strong> Selesaikan hasil investigasi transaksi, lalu ubah status keluhan menjadi <strong>Selesai (Done / Success)</strong> atau <strong>Ditolak (Rejected)</strong> untuk mengaktifkan formulir cetak resmi.
+            </div>
+        </div>
+
+        <div class="modal-footer" style="padding: 12px 24px; border-top: 1px solid var(--bs-gray-200); background: #fafafa; display: flex; justify-content: space-between; align-items: center; gap: 10px;">
+            <button type="button" class="btn btn-secondary" onclick="closeMenungguWarningModal()" style="font-size: 0.75rem;">
+                Tutup
+            </button>
+            <a id="menungguBtnEdit" href="#" class="btn btn-warning" style="background-color: #f59e0b; color: #ffffff; border: 1px solid #d97706; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; font-weight: 600; padding: 7px 16px; border-radius: 6px; font-size: 0.75rem;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                </svg>
+                <span>⚡ Ubah Status Keluhan</span>
+            </a>
         </div>
     </div>
 </div>
@@ -1358,11 +1463,13 @@
         const terminalVal = document.getElementById('filterTerminal') ? document.getElementById('filterTerminal').value : '';
         const tglDariVal = document.getElementById('filterTglDari') ? document.getElementById('filterTglDari').value : '';
         const tglSampaiVal = document.getElementById('filterTglSampai') ? document.getElementById('filterTglSampai').value : '';
+        const duplikatEl = document.getElementById('filterDuplikat');
+        const duplikatVal = duplikatEl && duplikatEl.checked ? '1' : '';
         const perPageEl = document.getElementById('perPageSelect');
         const perPageVal = perPageEl ? perPageEl.value : '10';
 
         // Tampilkan / Sembunyikan Tombol Reset
-        const hasFilters = qVal || statusVal || cabangVal || terminalVal || tglDariVal || tglSampaiVal;
+        const hasFilters = qVal || statusVal || cabangVal || terminalVal || tglDariVal || tglSampaiVal || duplikatVal;
         const btnReset = document.getElementById('btnResetFilter');
         if (btnReset) btnReset.style.display = hasFilters ? 'inline-flex' : 'none';
 
@@ -1375,6 +1482,7 @@
             if (terminalVal) params.set('terminal_transaksi', terminalVal);
             if (tglDariVal) params.set('tgl_dari', tglDariVal);
             if (tglSampaiVal) params.set('tgl_sampai', tglSampaiVal);
+            if (duplikatVal) params.set('duplikat', duplikatVal);
             if (perPageVal && perPageVal !== '10') params.set('per_page', perPageVal);
             url = "{{ route('jurnal.index') }}?" + params.toString();
         }
@@ -1392,6 +1500,7 @@
             if (terminalVal) exportParams.set('terminal_transaksi', terminalVal);
             if (tglDariVal) exportParams.set('tgl_dari', tglDariVal);
             if (tglSampaiVal) exportParams.set('tgl_sampai', tglSampaiVal);
+            if (duplikatVal) exportParams.set('duplikat', duplikatVal);
             btnExport.href = "{{ route('jurnal.export_excel') }}?" + exportParams.toString();
         }
 
@@ -1502,6 +1611,15 @@
             }));
         }
 
+        const duplikatEl = document.getElementById('filterDuplikat');
+        if (duplikatEl && duplikatEl.checked) {
+            count++;
+            chipsList.appendChild(createChipElement('Keluhan', 'Cek data berulang', () => {
+                duplikatEl.checked = false;
+                fetchServerFilteredData();
+            }));
+        }
+
         if (count > 0) {
             chipsContainer.classList.remove('hidden');
             chipsContainer.classList.add('flex');
@@ -1541,6 +1659,7 @@
         if (document.getElementById('filterTerminal')) document.getElementById('filterTerminal').value = '';
         if (document.getElementById('filterTglDari')) document.getElementById('filterTglDari').value = '';
         if (document.getElementById('filterTglSampai')) document.getElementById('filterTglSampai').value = '';
+        if (document.getElementById('filterDuplikat')) document.getElementById('filterDuplikat').checked = false;
         populateFilterTerminalData('');
         performClientSideFilter('');
         fetchServerFilteredData();
@@ -1554,6 +1673,7 @@
         const terminalVal = document.getElementById('filterTerminal') ? document.getElementById('filterTerminal').value : '';
         const tglDariVal = document.getElementById('filterTglDari') ? document.getElementById('filterTglDari').value : '';
         const tglSampaiVal = document.getElementById('filterTglSampai') ? document.getElementById('filterTglSampai').value : '';
+        const duplikatEl = document.getElementById('filterDuplikat');
 
         const params = new URLSearchParams();
         if (qVal) params.set('q', qVal);
@@ -1562,6 +1682,7 @@
         if (terminalVal) params.set('terminal_transaksi', terminalVal);
         if (tglDariVal) params.set('tgl_dari', tglDariVal);
         if (tglSampaiVal) params.set('tgl_sampai', tglSampaiVal);
+        if (duplikatEl && duplikatEl.checked) params.set('duplikat', '1');
         if (val && val !== '10') params.set('per_page', val);
         params.set('page', '1'); // Reset ke halaman 1 saat mengubah jumlah baris
 
@@ -1591,6 +1712,7 @@
         const filterTerminal = document.getElementById('filterTerminal');
         const filterTglDari = document.getElementById('filterTglDari');
         const filterTglSampai = document.getElementById('filterTglSampai');
+        const filterDuplikat = document.getElementById('filterDuplikat');
 
         // 1. Live Instant Typing on Search Input
         if (searchInput) {
@@ -1614,7 +1736,7 @@
         }
 
         // 3. Auto Filter on Dropdown & Date Changes
-        [filterStatus, filterCabang, filterTerminal, filterTglDari, filterTglSampai].forEach(el => {
+        [filterStatus, filterCabang, filterTerminal, filterTglDari, filterTglSampai, filterDuplikat].forEach(el => {
             if (el) {
                 el.addEventListener('change', function() {
                     fetchServerFilteredData();
@@ -1843,6 +1965,10 @@
     let currentPrintChoiceJurnal = null;
 
     function openPrintChoiceModal(jurnal) {
+        if (jurnal && (jurnal.status || '').toLowerCase().trim() === 'menunggu') {
+            showMenungguWarning(jurnal);
+            return;
+        }
         currentPrintChoiceJurnal = jurnal;
         document.getElementById('printChoiceNasabah').textContent = jurnal.nama_nasabah || '-';
         document.getElementById('printChoiceNoResi').textContent = jurnal.no_resi || '-';
@@ -1871,6 +1997,24 @@
         if (modal) modal.classList.remove('show');
     }
 
+    // Handlers Modal Peringatan Status Menunggu
+    function showMenungguWarning(jurnal) {
+        document.getElementById('menungguTiket').textContent = jurnal.no_tiket || '-';
+        document.getElementById('menungguNama').textContent = jurnal.nama_nasabah || '-';
+        document.getElementById('menungguResi').textContent = jurnal.no_resi || '-';
+        const editBtn = document.getElementById('menungguBtnEdit');
+        if (editBtn) {
+            editBtn.href = '/jurnal/' + jurnal.id + '/edit';
+        }
+        const modal = document.getElementById('menungguWarningModal');
+        if (modal) modal.classList.add('show');
+    }
+
+    function closeMenungguWarningModal() {
+        const modal = document.getElementById('menungguWarningModal');
+        if (modal) modal.classList.remove('show');
+    }
+
     // Quick Log Modal Handlers
     function openQuickLogModal(jurnal, autoPrint = false) {
         currentQuickLogJurnal = jurnal;
@@ -1882,6 +2026,12 @@
         const ch = (jurnal.master_transaksi ? jurnal.master_transaksi.channel : '') || '';
         const tm = (jurnal.terminal_transaksi || '-').trim();
         document.getElementById('quickLogTerminal').textContent = ch ? `${tm} (${ch})` : tm;
+
+        const isMenunggu = (jurnal.status || '').toLowerCase().trim() === 'menunggu';
+        const btnSavePrint = document.getElementById('btnSaveQuickLogAndPrint');
+        if (btnSavePrint) {
+            btnSavePrint.style.display = isMenunggu ? 'none' : 'inline-flex';
+        }
 
         const rawLog = (jurnal.keterangan_log && jurnal.keterangan_log.trim() !== '-' && jurnal.keterangan_log.trim().toLowerCase() !== 'tidak ada keterangan tambahan.') ? jurnal.keterangan_log : '';
         const textarea = document.getElementById('quickLogTextarea');
@@ -1966,16 +2116,29 @@
                 // Perbarui tombol aksi di baris tabel yang bersangkutan jika ada di DOM
                 const tableRowBtn = document.querySelector(`.btn-cetak-action[data-jurnal-id="${currentQuickLogJurnal.id}"]`);
                 if (tableRowBtn) {
-                    tableRowBtn.outerHTML = `
-                        <button type="button" onclick='openPrintChoiceModal(${JSON.stringify(currentQuickLogJurnal)})' class="btn btn-sm btn-cetak-action" data-jurnal-id="${currentQuickLogJurnal.id}" style="background-color: #0284c7; color: white; padding: 6px 12px; font-size: 0.78125rem; font-weight: 600; display: inline-flex; align-items: center; gap: 5px; text-decoration: none; border-radius: 4px; margin-left: 5px; border: 1px solid #0369a1; cursor: pointer;" title="Pilih Format Cetak Dokumen">
-                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <polyline points="6 9 6 2 18 2 18 9"></polyline>
-                                <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
-                                <rect x="6" y="14" width="12" height="8"></rect>
-                            </svg>
-                            <span>Cetak ▾</span>
-                        </button>
-                    `;
+                    const isMenunggu = (currentQuickLogJurnal.status || '').toLowerCase().trim() === 'menunggu';
+                    if (isMenunggu) {
+                        tableRowBtn.outerHTML = `
+                            <button type="button" onclick='showMenungguWarning(${JSON.stringify(currentQuickLogJurnal)})' class="btn btn-sm btn-cetak-action" data-jurnal-id="${currentQuickLogJurnal.id}" style="background-color: #fef3c7; color: #92400e; padding: 6px 11px; font-size: 0.75rem; font-weight: 600; display: inline-flex; align-items: center; gap: 4px; border-radius: 4px; margin-left: 5px; border: 1px solid #fde68a; cursor: pointer;" title="Status keluhan masih Menunggu. Ubah status penanganan terlebih dahulu untuk dapat mencetak.">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                                    <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                                </svg>
+                                <span>Menunggu 🔒</span>
+                            </button>
+                        `;
+                    } else {
+                        tableRowBtn.outerHTML = `
+                            <button type="button" onclick='openPrintChoiceModal(${JSON.stringify(currentQuickLogJurnal)})' class="btn btn-sm btn-cetak-action" data-jurnal-id="${currentQuickLogJurnal.id}" style="background-color: #0284c7; color: white; padding: 6px 12px; font-size: 0.78125rem; font-weight: 600; display: inline-flex; align-items: center; gap: 5px; text-decoration: none; border-radius: 4px; margin-left: 5px; border: 1px solid #0369a1; cursor: pointer;" title="Pilih Format Cetak Dokumen">
+                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <polyline points="6 9 6 2 18 2 18 9"></polyline>
+                                    <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+                                    <rect x="6" y="14" width="12" height="8"></rect>
+                                </svg>
+                                <span>Cetak ▾</span>
+                            </button>
+                        `;
+                    }
                 }
 
                 // Perbarui modal detail jika sedang aktif
@@ -1987,7 +2150,12 @@
                 closeQuickLogModal();
 
                 if (autoPrint) {
-                    openPrintChoiceModal(currentQuickLogJurnal);
+                    const isMenunggu = (currentQuickLogJurnal.status || '').toLowerCase().trim() === 'menunggu';
+                    if (isMenunggu) {
+                        showMenungguWarning(currentQuickLogJurnal);
+                    } else {
+                        openPrintChoiceModal(currentQuickLogJurnal);
+                    }
                 }
             } else {
                 if (feedback) {
@@ -2031,6 +2199,8 @@
         const detailModal = document.getElementById('detailModal');
         const quickModal = document.getElementById('quickLogModal');
         const deleteModal = document.getElementById('deleteConfirmModal');
+        const printChoiceModal = document.getElementById('printChoiceModal');
+        const menungguModal = document.getElementById('menungguWarningModal');
         const importModal = document.getElementById('importModal');
         const successModal = document.getElementById('importSuccessModal');
         const errorModal = document.getElementById('importErrorModal');
@@ -2038,6 +2208,8 @@
         if (e.target === detailModal) closeDetailModal();
         if (e.target === quickModal) closeQuickLogModal();
         if (e.target === deleteModal) closeDeleteConfirmModal();
+        if (e.target === printChoiceModal) closePrintChoiceModal();
+        if (e.target === menungguModal) closeMenungguWarningModal();
         if (e.target === importModal) closeImportModal();
         if (e.target === successModal) closeImportSuccessModal();
         if (e.target === errorModal) closeImportErrorModal();
@@ -2050,6 +2222,8 @@
             closeDetailModal();
             closeQuickLogModal();
             closeDeleteConfirmModal();
+            closePrintChoiceModal();
+            closeMenungguWarningModal();
             closeImportModal();
             closeImportSuccessModal();
             closeImportErrorModal();

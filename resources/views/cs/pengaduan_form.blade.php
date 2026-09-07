@@ -108,7 +108,7 @@
 
                     <div class="flex flex-col gap-1.5">
                         <label class="{{ $labelCls }}">Nama Nasabah <span class="text-rose-600 font-bold">*</span></label>
-                        <input type="text" name="nama_nasabah" value="{{ $nilai('nama_nasabah') }}" required maxlength="255" placeholder="Sesuai KTP, contoh: BUDI SANTOSO" class="{{ $inputCls }} uppercase" oninput="this.value = this.value.toUpperCase()">
+                        <input type="text" name="nama_nasabah" id="nama_nasabah" value="{{ $nilai('nama_nasabah') }}" required maxlength="255" placeholder="Sesuai KTP, contoh: BUDI SANTOSO" class="{{ $inputCls }} uppercase" oninput="this.value = this.value.toUpperCase()">
                     </div>
 
                     <div class="flex flex-col gap-1.5">
@@ -160,8 +160,12 @@
 
                     <div class="flex flex-col gap-1.5">
                         <label class="{{ $labelCls }}">Nomor Resi / Trace Number <span class="text-rose-600 font-bold">*</span></label>
-                        <input type="text" name="no_resi" value="{{ $nilai('no_resi') }}" required maxlength="100" placeholder="Nomor resi / trace pada struk" class="{{ $inputCls }} font-mono">
+                        <input type="text" name="no_resi" id="no_resi" value="{{ $nilai('no_resi') }}" required maxlength="100" placeholder="Nomor resi / trace pada struk" class="{{ $inputCls }} font-mono">
                     </div>
+
+                    {{-- Pemberitahuan bila keluhan nasabah ini sudah pernah tercatat di pusat.
+                         Sifatnya hanya informasi — pengiriman pengaduan tidak pernah dihalangi. --}}
+                    <div class="md:col-span-2" id="panelDuplikat"></div>
 
                     <div class="flex flex-col gap-1.5">
                         <label class="{{ $labelCls }}">Terminal Transaksi / Mesin ATM</label>
@@ -182,7 +186,7 @@
 
                     <div class="flex flex-col gap-1.5">
                         <label class="{{ $labelCls }}">Tanggal Transaksi <span class="text-rose-600 font-bold">*</span></label>
-                        <input type="date" name="tgl_transaksi" value="{{ $tglTransaksiAwal }}" required max="{{ date('Y-m-d') }}" class="{{ $inputCls }}">
+                        <input type="date" name="tgl_transaksi" id="tgl_transaksi" value="{{ $tglTransaksiAwal }}" required max="{{ date('Y-m-d') }}" class="{{ $inputCls }}">
                     </div>
 
                     {{-- ================= 4. LAMPIRAN ================= --}}
@@ -275,6 +279,11 @@
     @endif
 </div>
 @endsection
+
+@include('partials.skrip_duplikat', [
+    'informatif' => true,
+    'abaikanPengaduanId' => $edit ? $pengaduan->id : null,
+])
 
 @push('scripts')
 <script>

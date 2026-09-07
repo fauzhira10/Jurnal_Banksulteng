@@ -17,7 +17,7 @@ Projek **Jurnal_Banksulteng** adalah aplikasi web berbasis **Laravel 12/13** yan
 - **Master Data 41 Kantor Cabang**: Mendukung seluruh jaringan kantor cabang, KCP, dan Bank Lain di seluruh wilayah Sulawesi Tengah & Jakarta.
 - **Pencatatan Terpusat**: Menggantikan pencatatan manual keluhan nasabah ke dalam sistem web yang terstruktur.
 - **Sidebar Navigasi Modern**: Memudahkan transisi antar menu "Input Jurnal Keluhan" dan "Data Keluhan", lengkap dengan info username aktif dan tombol logout.
-- **Hard Anti-Duplikat**: Mencegah klaim ganda atas transaksi keluhan nasabah yang sama (berdasarkan kombinasi Nama Nasabah + No. Resi + Tanggal Transaksi).
+- **Deteksi Keluhan Berulang (Anti-Duplikat Bertingkat)**: Mencegah klaim ganda atas transaksi keluhan nasabah yang sama. Kombinasi **Nama Nasabah + No. Resi + Tanggal Transaksi** yang sama persis ditolak, sedangkan **Nama Nasabah + No. Resi** yang sama dengan tanggal berbeda hanya diperingatkan dan dapat dilanjutkan setelah petugas menyetujui. Peringatannya muncul sejak petugas mengetik, lengkap dengan rincian keluhan lama.
 - **Otomatisasi Channel & Biaya Admin**: Mempercepat pengisian form dengan mekanisme *auto-fill* berbasis AJAX saat jenis transaksi dipilih.
 - **Keamanan & Kepatuhan**: Menyiapkan rekam jejak audit (*audit trail*) berbasis hash chaining untuk integritas data perbankan.
 
@@ -49,7 +49,7 @@ Projek **Jurnal_Banksulteng** adalah aplikasi web berbasis **Laravel 12/13** yan
 | 7 | **Fitur Edit Data Jurnal** | Formulir edit data keluhan dengan pre-fill data, auto-fill AJAX, dan tombol edit via modal Detail | **Selesai** | **100%** |
 | 8 | **Modal Konfirmasi Hapus Data** | Dialog konfirmasi interaktif dengan rincian data nasabah sebelum penghapusan permanen | **Selesai** | **100%** |
 | 9 | **Fitur Auto-Fill AJAX** | Auto-fill biaya admin dan channel saat memilih jenis transaksi | **Selesai** | **100%** |
-| 10 | **Validasi Hard Anti-Duplikat** | Logika penolakan klaim ganda (Nama + No. Resi + Tanggal) | **Selesai** | **100%** |
+| 10 | **Deteksi Keluhan Berulang** | Dua tingkat: kembar persis (Nama + Resi + Tanggal) ditolak, berulang (Nama + Resi) diperingatkan; pemeriksaan langsung saat mengetik, panel rincian keluhan lama, penanda & filter di Data Keluhan | **Selesai** | **100%** |
 | 11 | **Case-Insensitive Live Search & Highlight** | Pencarian instan otomatis tanpa peduli huruf besar/kecil dengan highlight kuning | **Selesai** | **100%** |
 | 12 | **Tabel Data Keluhan Ultra Rapi** | Tabel daftar jurnal 9 kolom (termasuk kolom Channel terpisah) dengan single button "Detail" di kolom aksi | **Selesai** | **100%** |
 | 13 | **Pusat Aksi di Modal Detail** | Pop-up modal rincian 16 field lengkap dengan tombol Edit Data dan Hapus Data berdampingan | **Selesai** | **100%** |
@@ -219,6 +219,7 @@ Karena itu **Tanggal Terima Keluhan** pada form jurnal adalah tanggal berkas sel
 |:---|:---|
 | Jalur pengaduan CS | Nomor dibuat sistem saat pengaduan dikirim, memakai tanggal pengiriman. Pada form jurnal nomor tampil **terkunci** dan tidak dapat diubah, agar rujukan CS cabang tetap sama. |
 | Jalur jurnal langsung | Nomor **diketik petugas** sesuai berkas, wajib diisi, dan bebas format karena bisa saja mengikuti penomoran lama. |
+| Perapian penulisan | Nomor berformat BS ditulis rapat tanpa spasi. Ketikan seperti `BS - 2026081347674`, `BS- 2026…`, `bs - 2026…`, bahkan `BS 2026…` yang lupa tanda hubung, otomatis dirapikan menjadi `BS-2026081347674` — baik saat mengetik di form, saat disimpan, maupun saat import Excel. Nomor manual berupa teks bebas seperti `PRO AKTIF` **tidak ikut diubah**. |
 | Angka acak (jalur CS) | Diambil dengan pembangkit acak kriptografis, lalu dipastikan belum terpakai pada tanggal yang sama, dicek ke data pengaduan maupun jurnal. |
 | Kapasitas | 100.000 nomor untuk setiap tanggal. |
 | Bila bentrok | Sistem mencoba angka lain hingga 25 kali, lalu beralih mencari angka bebas secara berurutan sehingga pengiriman tidak pernah gagal. |
@@ -238,6 +239,44 @@ Kolom **Status Keluhan** pada form Input Jurnal maupun Edit Jurnal berupa isian 
 | Kartu statistik | Kartu ringkasan hanya menghitung status standar. Status kustom masuk hitungan **Total Keluhan** tetapi tidak pada kartu Menunggu / Success / Done / Rejected. |
 | Lencana tabel | Status kustom tampil dengan lencana abu-abu netral. |
 | Status pengaduan CS | Jurnal berstatus kustom membuat pengaduan cabang berstatus **Dalam Proses Jurnal**. Status **Selesai** hanya tercapai bila status jurnal `Done` atau `Success`, dan **Ditolak** bila `Rejected`. |
+
+### Deteksi Keluhan Berulang
+Sistem memeriksa apakah satu keluhan sudah pernah ditangani berdasarkan kombinasi **Nama Nasabah + Nomor Resi**. Pemeriksaan berjalan otomatis begitu kedua kolom itu terisi, jadi petugas mengetahuinya sebelum mengisi kolom-kolom lain.
+
+```text
+Isi Nama Nasabah + No. Resi
+            │
+            ▼
+    ┌───────┴────────┬─────────────────┐
+    ▼                ▼                 ▼
+  AMAN            BERULANG           KEMBAR
+ tidak ada     Nama & Resi sama,   Nama, Resi, DAN
+ peringatan    tanggal berbeda     tanggal sama persis
+    │                │                 │
+    │          panel kuning       panel merah
+    │          + konfirmasi       tombol Simpan
+    │          saat menyimpan     dinonaktifkan
+```
+
+| Tingkat | Kondisi | Perlakuan |
+|:---|:---|:---|
+| **Kembar Persis** | Nama Nasabah, No. Resi, **dan** Tanggal Transaksi sama | **Ditolak.** Data seperti ini memang dilarang tersimpan dua kali. Perbarui jurnal yang sudah ada, atau perbaiki tanggal transaksinya. |
+| **Berulang** | Nama Nasabah dan No. Resi sama, tanggal transaksi **berbeda** | **Diperingatkan, boleh dilanjutkan.** Petugas menekan **Saya paham, tetap simpan** pada dialog konfirmasi. |
+| **Aman** | Selain itu | Tidak ada peringatan. |
+
+Keluhan **Berulang** sengaja tidak diblokir. Nomor resi (*trace number*) mesin ATM berputar dan dipakai ulang, sehingga satu nasabah dapat benar-benar memiliki nomor resi yang sama pada tanggal yang berbeda. Pada data yang ada saat ini pun terdapat 17 nomor resi yang dipakai oleh nasabah yang berbeda-beda, jadi nomor resi saja tidak pernah dijadikan patokan.
+
+| Bagian | Perilaku |
+|:---|:---|
+| Panel peringatan | Muncul tepat di bawah kolom No. Resi, memuat nomor tiket, status, tanggal transaksi, cabang, dan nominal keluhan lama, beserta tautan **Lihat jurnal ini**. |
+| Pengaduan cabang | Pengaduan CS yang belum dijurnal ikut terdeteksi, sehingga keluhan yang sedang berjalan di cabang juga ketahuan. |
+| Halaman Data Keluhan | Baris yang punya kembaran ditandai lencana **Berulang ×n**. Tersedia penyaring **Cek data berulang** pada panel filter. |
+| Form Pengaduan CS | CS mendapat pemberitahuan ringkas bila keluhan itu sudah tercatat di pusat, **tanpa pernah menghalangi** pengiriman pengaduan. |
+| Halaman Pengaduan Masuk | Peringatan tampil sebelum tombol **Input ke Jurnal**, sehingga Admin Pusat tahu lebih dulu. |
+| Import Excel | Tidak pernah diblokir. Jumlah baris berulang dilaporkan pada pesan hasil import. |
+| Edit jurnal | Jurnal yang sedang diubah tidak dilaporkan sebagai kembaran dirinya sendiri. |
+
+Penulisan huruf besar/kecil dan spasi berlebih tidak memengaruhi hasil pemeriksaan: `budi santoso` tetap dikenali sama dengan `BUDI SANTOSO`.
 
 ---
 
