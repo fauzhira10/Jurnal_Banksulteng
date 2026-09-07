@@ -29,9 +29,10 @@
             width: 210mm;
             min-height: 297mm;
             margin: 0 auto 35px auto;
-            padding: 30px 35px;
+            padding: 18mm 20mm 12mm 20mm;
             border: none;
-            box-shadow: none;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            box-sizing: border-box;
             page-break-inside: avoid;
             page-break-after: avoid;
         }
@@ -151,7 +152,7 @@
 
         @page {
             size: A4 portrait;
-            margin: 24mm 22mm 22mm 22mm;
+            margin: 0;
         }
 
         /* Editable Text Element */
@@ -178,7 +179,7 @@
         @media print {
             @page {
                 size: A4 portrait;
-                margin: 24mm 22mm 22mm 22mm;
+                margin: 0;
             }
             .no-print { display: none !important; }
             html, body {
@@ -191,14 +192,21 @@
             }
             .form-wrapper {
                 border: none !important;
-                width: calc(100% - 8mm) !important;
-                max-width: calc(100% - 8mm) !important;
-                padding: 14px 18px !important;
-                margin: 4mm auto !important;
+                width: 210mm !important;
+                max-width: 210mm !important;
+                box-sizing: border-box !important;
+                padding: 18mm 20mm 12mm 20mm !important;
+                margin: 0 auto !important;
                 box-shadow: none !important;
                 min-height: auto !important;
+                page-break-inside: avoid !important;
+                page-break-after: avoid !important;
                 -webkit-print-color-adjust: exact !important;
                 print-color-adjust: exact !important;
+            }
+            .table-form {
+                width: 100% !important;
+                margin: 0 !important;
             }
             .table-form td.no-padding {
                 padding: 0 !important;
@@ -214,6 +222,8 @@
                 box-shadow: none !important;
                 border: none !important;
                 padding: 0 !important;
+                min-width: 0 !important;
+                display: inline !important;
             }
         }
     </style>
@@ -370,23 +380,23 @@
                 <td colspan="2" class="no-padding" style="padding: 0;">
                     <table style="width: 100%; border-collapse: collapse; table-layout: fixed;">
                         <tr>
-                            <td colspan="2" class="sig-header" style="width: 50%; border-right: 1px solid #000; border-bottom: 1px solid #000;">Di Selesaikan Oleh,</td>
-                            <td colspan="2" class="sig-header" style="width: 50%; border-bottom: 1px solid #000;">Di ketahui Oleh,</td>
+                            <td colspan="3" class="sig-header" style="width: 74%; border-right: 1px solid #000; border-bottom: 1px solid #000;">Di Selesaikan Oleh,</td>
+                            <td class="sig-header" style="width: 26%; border-bottom: 1px solid #000;">Di ketahui Oleh,</td>
                         </tr>
                         <tr>
-                            <td class="sig-body" style="width: 25%; border-right: 1px solid #000;">
+                            <td class="sig-body" style="width: 24%; border-right: 1px solid #000;">
                                 <div class="sig-name">MUJADID</div>
                                 <div class="sig-title">Staf Layanan Keluhan dan Monitoring Transaksi Kartu</div>
                             </td>
-                            <td class="sig-body" style="width: 25%; border-right: 1px solid #000;">
+                            <td class="sig-body" style="width: 26%; border-right: 1px solid #000;">
                                 <div class="sig-name">AYU FEBRIANTI</div>
                                 <div class="sig-title">Pemimpin Unit Layanan Keluhan dan Monitoring Transaksi Kartu</div>
                             </td>
-                            <td class="sig-body" style="width: 25%; border-right: 1px solid #000;">
+                            <td class="sig-body" style="width: 24%; border-right: 1px solid #000;">
                                 <div class="sig-name">WACHYUNI MADARAYU</div>
                                 <div class="sig-title">PINBAG E- CHANEL</div>
                             </td>
-                            <td class="sig-body" style="width: 25%;">
+                            <td class="sig-body" style="width: 26%;">
                                 <div class="sig-name">DIANA, ST</div>
                                 <div class="sig-title">Pemimpin Divisi IT</div>
                             </td>

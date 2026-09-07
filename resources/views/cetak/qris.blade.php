@@ -30,9 +30,10 @@
             width: 210mm;
             min-height: 297mm;
             margin: 0 auto 35px auto;
-            padding: 30px 35px;
+            padding: 18mm 20mm 12mm 20mm;
             border: none;
-            box-shadow: none;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            box-sizing: border-box;
             page-break-inside: avoid;
             page-break-after: avoid;
         }
@@ -138,8 +139,8 @@
             background: #ffffff;
             width: 210mm;
             margin: 0 auto 35px auto;
-            padding: 25px 30px;
-            border: 2px solid #000;
+            padding: 20mm;
+            border: none;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
             page-break-before: always;
             break-before: page;
@@ -210,13 +211,13 @@
 
         @page {
             size: A4 portrait;
-            margin: 12mm 15mm 12mm 15mm;
+            margin: 0;
         }
 
         @media print {
             @page {
                 size: A4 portrait;
-                margin: 12mm 15mm 12mm 15mm;
+                margin: 0;
             }
             .no-print { display: none !important; }
             .page-break { display: none !important; }
@@ -230,10 +231,11 @@
             }
             .form-wrapper {
                 border: none !important;
-                width: calc(100% - 8mm) !important;
-                max-width: calc(100% - 8mm) !important;
-                padding: 14px 18px !important;
-                margin: 4mm auto !important;
+                width: 210mm !important;
+                max-width: 210mm !important;
+                box-sizing: border-box !important;
+                padding: 18mm 20mm 12mm 20mm !important;
+                margin: 0 auto !important;
                 box-shadow: none !important;
                 min-height: 0 !important;
                 height: auto !important;
@@ -243,6 +245,8 @@
                 break-after: avoid !important;
             }
             .table-form {
+                width: 100% !important;
+                margin: 0 !important;
                 page-break-inside: avoid !important;
                 break-inside: avoid !important;
             }
@@ -262,9 +266,10 @@
             .slip-page {
                 border: none !important;
                 box-shadow: none !important;
-                width: 100% !important;
-                max-width: 100% !important;
-                padding: 10px 15px !important;
+                width: 210mm !important;
+                max-width: 210mm !important;
+                box-sizing: border-box !important;
+                padding: 18mm 20mm 12mm 20mm !important;
                 margin: 0 auto !important;
                 min-height: 0 !important;
                 height: auto !important;
@@ -274,7 +279,13 @@
                 page-break-inside: avoid !important;
                 break-inside: avoid !important;
             }
+            .table-slip {
+                width: 100% !important;
+                margin: 0 !important;
+            }
             .slip-table {
+                width: 100% !important;
+                margin: 0 !important;
                 page-break-inside: avoid !important;
                 break-inside: avoid !important;
             }
@@ -289,6 +300,8 @@
                 box-shadow: none !important;
                 border: none !important;
                 padding: 0 !important;
+                min-width: 0 !important;
+                display: inline !important;
             }
         }
     </style>
@@ -344,16 +357,16 @@
                 <td colspan="2" class="no-padding" style="padding: 0;">
                     <table style="width: 100%; border-collapse: collapse; table-layout: fixed;">
                         <tr>
-                            <td style="width: 25%; border-right: 1px solid #000; border-bottom: 1px solid #000; padding: 4px 8px;">No. Tiket</td>
-                            <td style="width: 25%; border-right: 1px solid #000; border-bottom: 1px solid #000; padding: 4px 8px; font-weight: bold;">: {{ $jurnal->no_tiket }}</td>
-                            <td style="width: 25%; border-right: 1px solid #000; border-bottom: 1px solid #000; padding: 4px 8px;">Tanggal Terima</td>
-                            <td style="width: 25%; border-bottom: 1px solid #000; padding: 4px 8px;">: {{ \Carbon\Carbon::parse($jurnal->tgl_terima)->translatedFormat('d F Y') }}</td>
+                            <td style="width: 20%; border-right: 1px solid #000; border-bottom: 1px solid #000; padding: 4px 8px;">No. Tiket</td>
+                            <td style="width: 30%; border-right: 1px solid #000; border-bottom: 1px solid #000; padding: 4px 8px; font-weight: bold;">: {{ $jurnal->no_tiket }}</td>
+                            <td style="width: 20%; border-right: 1px solid #000; border-bottom: 1px solid #000; padding: 4px 8px;">Tanggal Terima</td>
+                            <td style="width: 30%; border-bottom: 1px solid #000; padding: 4px 8px;">: {{ \Carbon\Carbon::parse($jurnal->tgl_terima)->translatedFormat('d F Y') }}</td>
                         </tr>
                         <tr>
-                            <td style="width: 25%; border-right: 1px solid #000; padding: 4px 8px;">Nama Penerima</td>
-                            <td style="width: 25%; border-right: 1px solid #000; padding: 4px 8px;">: <span class="editable-text" contenteditable="true" spellcheck="false" title="Klik untuk mengedit Nama Penerima">MUJADID</span></td>
-                            <td style="width: 25%; border-right: 1px solid #000; padding: 4px 8px;">Status</td>
-                            <td style="width: 25%; font-weight: bold; text-transform: uppercase; padding: 4px 8px;">: {{ $jurnal->status == 'Done' ? 'SELESAI' : strtoupper($jurnal->status) }}</td>
+                            <td style="width: 20%; border-right: 1px solid #000; padding: 4px 8px;">Nama Penerima</td>
+                            <td style="width: 30%; border-right: 1px solid #000; padding: 4px 8px;">: <span class="editable-text" contenteditable="true" spellcheck="false" title="Klik untuk mengedit Nama Penerima">MUJADID</span></td>
+                            <td style="width: 20%; border-right: 1px solid #000; padding: 4px 8px;">Status</td>
+                            <td style="width: 30%; font-weight: bold; text-transform: uppercase; padding: 4px 8px;">: {{ $jurnal->status == 'Done' ? 'SELESAI' : strtoupper($jurnal->status) }}</td>
                         </tr>
                     </table>
                 </td>
@@ -488,30 +501,30 @@
                 <td colspan="2" class="no-padding" style="padding: 0;">
                     <table style="width: 100%; border-collapse: collapse; table-layout: fixed;">
                         <tr>
-                            <td colspan="2" class="sig-header" style="width: 50%; border-right: 1px solid #000; border-bottom: 1px solid #000;">Di Selesaikan Oleh,</td>
-                            <td colspan="2" class="sig-header" style="width: 50%; border-bottom: 1px solid #000;">Di ketahui Oleh,</td>
+                            <td colspan="3" class="sig-header" style="width: 74%; border-right: 1px solid #000; border-bottom: 1px solid #000;">Di Selesaikan Oleh,</td>
+                            <td class="sig-header" style="width: 26%; border-bottom: 1px solid #000;">Di ketahui Oleh,</td>
                         </tr>
                         <tr>
                             <!-- Pejabat 1 -->
-                            <td class="sig-body" style="width: 25%; border-right: 1px solid #000;">
+                            <td class="sig-body" style="width: 24%; border-right: 1px solid #000;">
                                 <div class="sig-space"></div>
                                 <div class="sig-name">MUJADID</div>
                                 <div class="sig-title">Staf Layanan Keluhan dan Monitoring Transaksi Kartu</div>
                             </td>
                             <!-- Pejabat 2 -->
-                            <td class="sig-body" style="width: 25%; border-right: 1px solid #000;">
+                            <td class="sig-body" style="width: 26%; border-right: 1px solid #000;">
                                 <div class="sig-space"></div>
                                 <div class="sig-name">AYU FEBRIANTI</div>
                                 <div class="sig-title">Pemimpin Unit Layanan Keluhan dan Monitoring Transaksi Kartu</div>
                             </td>
                             <!-- Pejabat 3 -->
-                            <td class="sig-body" style="width: 25%; border-right: 1px solid #000;">
+                            <td class="sig-body" style="width: 24%; border-right: 1px solid #000;">
                                 <div class="sig-space"></div>
                                 <div class="sig-name">WACHYUNI MADARAYU</div>
                                 <div class="sig-title">PINBAG E- CHANEL</div>
                             </td>
                             <!-- Pejabat 4 -->
-                            <td class="sig-body" style="width: 25%;">
+                            <td class="sig-body" style="width: 26%;">
                                 <div class="sig-space"></div>
                                 <div class="sig-name">DIANA, ST</div>
                                 <div class="sig-title">Pemimpin Divisi IT</div>
@@ -722,13 +735,10 @@
                     <td style="border-left: 1px solid #000; border-right: 1.5px solid #000; border-top: 1px solid #000; border-bottom: 1.5px solid #000; padding: 2px 8px;">
                         <table style="width: 100%; border-collapse: collapse; border: none; font-size: 10px;">
                             <tr>
-                                <td style="width: 140px; border: none; padding: 0;"></td>
-                                <td style="width: 14px; border: none; padding: 0;"></td>
-                                <td style="border: none; padding: 0; font-weight: bold;">
-                                    <div style="display: flex; justify-content: space-between; padding-right: 4px;">
-                                        <span>Rp</span>
-                                        <span>{{ number_format($jurnal->nominal_transaksi + ($jurnal->biaya_admin ?? $jurnal->masterTransaksi->biaya_admin ?? 0), 0, ',', '.') }}</span>
-                                    </div>
+                                <td style="width: 40%; border: none; padding: 0;"></td>
+                                <td style="width: 12%; border: none; padding: 0; font-weight: bold; text-align: left;">Rp</td>
+                                <td style="width: 48%; border: none; padding: 0; font-weight: bold; text-align: right;">
+                                    <span class="editable-text" contenteditable="true" spellcheck="false" title="Klik untuk mengedit Total Kredit">{{ number_format($jurnal->nominal_transaksi + ($jurnal->biaya_admin ?? $jurnal->masterTransaksi->biaya_admin ?? 0), 0, ',', '.') }}</span>
                                 </td>
                             </tr>
                         </table>

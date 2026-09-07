@@ -30,9 +30,10 @@
             width: 210mm;
             min-height: 297mm;
             margin: 0 auto 30px auto;
-            padding: 30px 35px;
+            padding: 18mm 20mm 12mm 20mm;
             border: none;
-            box-shadow: none;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            box-sizing: border-box;
             page-break-inside: avoid;
             page-break-after: avoid;
         }
@@ -134,8 +135,17 @@
         }
 
         .slip-wrapper {
+            background: #ffffff;
+            width: 210mm;
+            margin: 0 auto 35px auto;
+            padding: 18mm 20mm 12mm 20mm;
+            border: none;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
             page-break-before: always;
             break-before: page;
+            page-break-inside: avoid;
+            break-inside: avoid;
+            box-sizing: border-box;
         }
 
         .slip-header-table {
@@ -225,7 +235,7 @@
 
         @page {
             size: A4 portrait;
-            margin: 15mm 18mm 15mm 18mm;
+            margin: 0;
         }
 
         /* Editable Text Element on Slip */
@@ -252,7 +262,7 @@
         @media print {
             @page {
                 size: A4 portrait;
-                margin: 12mm 15mm 12mm 15mm;
+                margin: 0;
             }
             .no-print { display: none !important; }
             .page-break { display: none !important; }
@@ -266,10 +276,11 @@
             }
             .form-wrapper:not(.slip-wrapper) {
                 border: none !important;
-                width: calc(100% - 8mm) !important;
-                max-width: calc(100% - 8mm) !important;
-                padding: 14px 18px !important;
-                margin: 4mm auto !important;
+                width: 210mm !important;
+                max-width: 210mm !important;
+                box-sizing: border-box !important;
+                padding: 18mm 20mm 12mm 20mm !important;
+                margin: 0 auto !important;
                 box-shadow: none !important;
                 min-height: 0 !important;
                 height: auto !important;
@@ -279,6 +290,8 @@
                 break-after: avoid !important;
             }
             .table-form {
+                width: 100% !important;
+                margin: 0 !important;
                 page-break-inside: avoid !important;
                 break-inside: avoid !important;
             }
@@ -298,9 +311,10 @@
             .slip-wrapper {
                 border: none !important;
                 box-shadow: none !important;
-                width: 100% !important;
-                max-width: 100% !important;
-                padding: 10px 15px !important;
+                width: 210mm !important;
+                max-width: 210mm !important;
+                box-sizing: border-box !important;
+                padding: 18mm 20mm 12mm 20mm !important;
                 margin: 0 auto !important;
                 min-height: 0 !important;
                 height: auto !important;
@@ -309,6 +323,10 @@
                 break-before: page !important;
                 page-break-inside: avoid !important;
                 break-inside: avoid !important;
+            }
+            .table-slip {
+                width: 100% !important;
+                margin: 0 !important;
             }
             .highlight-yellow {
                 background-color: #ffff00 !important;
@@ -322,6 +340,8 @@
                 outline: none !important;
                 border: none !important;
                 padding: 0 !important;
+                min-width: 0 !important;
+                display: inline !important;
             }
         }
     </style>
@@ -367,16 +387,16 @@
                 <td colspan="2" class="no-padding" style="padding: 0;">
                     <table style="width: 100%; border-collapse: collapse; table-layout: fixed;">
                         <tr>
-                            <td style="width: 25%; border-right: 1px solid #000; border-bottom: 1px solid #000; padding: 4px 8px;">No. Tiket</td>
-                            <td style="width: 25%; border-right: 1px solid #000; border-bottom: 1px solid #000; padding: 4px 8px; font-weight: bold;">: {{ $jurnal->no_tiket }}</td>
-                            <td style="width: 25%; border-right: 1px solid #000; border-bottom: 1px solid #000; padding: 4px 8px;">Tanggal Terima</td>
-                            <td style="width: 25%; border-bottom: 1px solid #000; padding: 4px 8px;">: {{ \Carbon\Carbon::parse($jurnal->tgl_terima)->translatedFormat('d F Y') }}</td>
+                            <td style="width: 20%; border-right: 1px solid #000; border-bottom: 1px solid #000; padding: 4px 8px;">No. Tiket</td>
+                            <td style="width: 30%; border-right: 1px solid #000; border-bottom: 1px solid #000; padding: 4px 8px; font-weight: bold;">: {{ $jurnal->no_tiket }}</td>
+                            <td style="width: 20%; border-right: 1px solid #000; border-bottom: 1px solid #000; padding: 4px 8px;">Tanggal Terima</td>
+                            <td style="width: 30%; border-bottom: 1px solid #000; padding: 4px 8px;">: {{ \Carbon\Carbon::parse($jurnal->tgl_terima)->translatedFormat('d F Y') }}</td>
                         </tr>
                         <tr>
-                            <td style="width: 25%; border-right: 1px solid #000; padding: 4px 8px;">Nama Penerima</td>
-                            <td style="width: 25%; border-right: 1px solid #000; padding: 4px 8px;">: <span class="editable-text" contenteditable="true" spellcheck="false" title="Klik untuk mengedit Nama Penerima">MUJADID</span></td>
-                            <td style="width: 25%; border-right: 1px solid #000; padding: 4px 8px;">Status</td>
-                            <td style="width: 25%; font-weight: bold; text-transform: uppercase; padding: 4px 8px;">: {{ $jurnal->status == 'Done' ? 'SELESAI' : strtoupper($jurnal->status) }}</td>
+                            <td style="width: 20%; border-right: 1px solid #000; padding: 4px 8px;">Nama Penerima</td>
+                            <td style="width: 30%; border-right: 1px solid #000; padding: 4px 8px;">: <span class="editable-text" contenteditable="true" spellcheck="false" title="Klik untuk mengedit Nama Penerima">MUJADID</span></td>
+                            <td style="width: 20%; border-right: 1px solid #000; padding: 4px 8px;">Status</td>
+                            <td style="width: 30%; font-weight: bold; text-transform: uppercase; padding: 4px 8px;">: {{ $jurnal->status == 'Done' ? 'SELESAI' : strtoupper($jurnal->status) }}</td>
                         </tr>
                     </table>
                 </td>
@@ -505,23 +525,32 @@
                     @endif
                 </td>
             </tr>
+            <!-- TANGGAL SELESAI -->
+            <tr>
+                <td colspan="2" style="padding: 6px 12px;">
+                    <table style="width: 100%; border-collapse: collapse;">
+                        <tr>
+                            <td style="border: none; padding: 2px 0; width: 175px; font-weight: bold;">Tanggal selesai</td>
+                            <td style="border: none; padding: 2px 8px; text-align: center; font-weight: bold; width: 20px;">:</td>
+                            <td style="border: none; padding: 2px 0; font-weight: bold;">{{ $jurnal->tgl_selesai ? \Carbon\Carbon::parse($jurnal->tgl_selesai)->translatedFormat('d F Y') : '-' }}</td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+
+            <!-- FOOTER BLOCK TANDA TANGAN (4 KOLOM) -->
             <tr>
                 <td colspan="2" class="no-padding" style="padding: 0;">
                     <table style="width: 100%; border-collapse: collapse; table-layout: fixed;">
                         <tr>
-                            <td colspan="4" style="text-align: right; padding: 4px 10px; border-bottom: 1px solid #000;">Palu, {{ \Carbon\Carbon::parse($jurnal->tgl_selesai)->translatedFormat('d F Y') }}</td>
+                            <td colspan="3" class="sig-header" style="width: 74%; border-right: 1px solid #000; border-bottom: 1px solid #000;">Di Selesaikan Oleh,</td>
+                            <td class="sig-header" style="width: 26%; border-bottom: 1px solid #000;">Di ketahui Oleh,</td>
                         </tr>
                         <tr>
-                            <td class="sig-header" style="width: 25%; border-right: 1px solid #000; border-bottom: 1px solid #000;">Dibuat Oleh :</td>
-                            <td class="sig-header" style="width: 25%; border-right: 1px solid #000; border-bottom: 1px solid #000;">Diperiksa Oleh :</td>
-                            <td class="sig-header" style="width: 25%; border-right: 1px solid #000; border-bottom: 1px solid #000;">Disetujui Oleh :</td>
-                            <td class="sig-header" style="width: 25%; border-bottom: 1px solid #000;">Disetujui Oleh :</td>
-                        </tr>
-                        <tr>
-                            <td class="sig-body" style="width: 25%; border-right: 1px solid #000;"><div class="sig-space"></div><div class="sig-name">MUJADID</div><div class="sig-title">Staf Layanan Keluhan dan Monitoring Transaksi Kartu</div></td>
-                            <td class="sig-body" style="width: 25%; border-right: 1px solid #000;"><div class="sig-space"></div><div class="sig-name">AYU FEBRIANTI</div><div class="sig-title">Pemimpin Unit Layanan Keluhan dan Monitoring Transaksi Kartu</div></td>
-                            <td class="sig-body" style="width: 25%; border-right: 1px solid #000;"><div class="sig-space"></div><div class="sig-name">WACHYUNI MADARAYU</div><div class="sig-title">PINBAG E- CHANEL</div></td>
-                            <td class="sig-body" style="width: 25%;"><div class="sig-space"></div><div class="sig-name">DIANA, ST</div><div class="sig-title">Pemimpin Divisi IT</div></td>
+                            <td class="sig-body" style="width: 24%; border-right: 1px solid #000;"><div class="sig-space"></div><div class="sig-name">MUJADID</div><div class="sig-title">Staf Layanan Keluhan dan Monitoring Transaksi Kartu</div></td>
+                            <td class="sig-body" style="width: 26%; border-right: 1px solid #000;"><div class="sig-space"></div><div class="sig-name">AYU FEBRIANTI</div><div class="sig-title">Pemimpin Unit Layanan Keluhan dan Monitoring Transaksi Kartu</div></td>
+                            <td class="sig-body" style="width: 24%; border-right: 1px solid #000;"><div class="sig-space"></div><div class="sig-name">WACHYUNI MADARAYU</div><div class="sig-title">PINBAG E- CHANNEL</div></td>
+                            <td class="sig-body" style="width: 26%;"><div class="sig-space"></div><div class="sig-name">DIANA, ST</div><div class="sig-title">Pemimpin Divisi IT</div></td>
                         </tr>
                     </table>
                 </td>
@@ -529,7 +558,7 @@
         </table>
     </div>
 
-    <div class="form-wrapper slip-wrapper" style="border: none; box-shadow: none; padding: 10px 20px;">
+    <div class="slip-wrapper">
         <table style="width: 100%; border-collapse: collapse; margin-bottom: 6px;">
             <tr>
                 <td style="width: 32%; text-align: left; vertical-align: middle; border: none; padding: 0;"><img src="{{ asset('images/logo_bank_sulteng.png') }}" alt="Bank Sulteng" class="logo-img" style="max-width: 135px; height: auto;" onerror="this.outerHTML='<strong style=\'font-size:16px;color:#0284c7;\'>Bank Sulteng</strong>'"></td>
@@ -605,7 +634,13 @@
                     <td style="border: 1px solid #000; border-bottom: 1.5px solid #000;"></td><td style="border: 1px solid #000; border-bottom: 1.5px solid #000;"></td>
                     <td colspan="2" style="border: 1px solid #000; border-bottom: 1.5px solid #000; padding: 1px 4px; text-align: right; font-weight: bold; white-space: nowrap;"><span class="editable-text" contenteditable="true" spellcheck="false" title="Klik untuk edit">{{ number_format($jurnal->nominal_transaksi, 0, ',', '.') }}</span></td>
                     <td style="border-left: 1px solid #000; border-right: 1.5px solid #000; border-top: 1.5px solid #000; border-bottom: 1.5px solid #000; padding: 2px 6px;">
-                        <table style="width: 100%; border-collapse: collapse; border: none;"><tr><td style="width: 32%; border: none; padding: 0;"></td><td style="width: 4%; border: none; padding: 0;"></td><td style="border: none; padding: 0; font-weight: bold;"><div style="display: flex; justify-content: space-between;"><span>Rp</span><span class="editable-text" contenteditable="true" spellcheck="false" title="Klik untuk edit">{{ number_format($jurnal->nominal_transaksi, 0, ',', '.') }}</span></div></td></tr></table>
+                        <table style="width: 100%; border-collapse: collapse; border: none;">
+                            <tr>
+                                <td style="width: 40%; border: none; padding: 0;"></td>
+                                <td style="width: 12%; border: none; padding: 0; font-weight: bold; text-align: left;">Rp</td>
+                                <td style="width: 48%; border: none; padding: 0; font-weight: bold; text-align: right;"><span class="editable-text" contenteditable="true" spellcheck="false" title="Klik untuk edit">{{ number_format($jurnal->nominal_transaksi, 0, ',', '.') }}</span></td>
+                            </tr>
+                        </table>
                     </td>
                 </tr>
                 <tr>
@@ -710,7 +745,13 @@
                     <td style="border: 1px solid #000; border-bottom: 1.5px solid #000;"></td><td style="border: 1px solid #000; border-bottom: 1.5px solid #000;"></td>
                     <td colspan="2" style="border: 1px solid #000; border-bottom: 1.5px solid #000; padding: 1px 4px; text-align: right; font-weight: bold; white-space: nowrap;"><span class="editable-text" contenteditable="true" spellcheck="false" title="Klik untuk edit">{{ ($jurnal->biaya_admin ?? 0) > 0 ? number_format($jurnal->biaya_admin, 0, ',', '.') : '-' }}</span></td>
                     <td style="border-left: 1px solid #000; border-right: 1.5px solid #000; border-top: 1.5px solid #000; border-bottom: 1.5px solid #000; padding: 1.5px 6px;">
-                        <table style="width: 100%; border-collapse: collapse; border: none;"><tr><td style="width: 32%; border: none; padding: 0;"></td><td style="width: 4%; border: none; padding: 0;"></td><td style="border: none; padding: 0; font-weight: bold;"><div style="display: flex; justify-content: space-between;"><span>Rp</span><span class="editable-text" contenteditable="true" spellcheck="false" title="Klik untuk edit">{{ ($jurnal->biaya_admin ?? 0) > 0 ? number_format($jurnal->biaya_admin, 0, ',', '.') : '-' }}</span></div></td></tr></table>
+                        <table style="width: 100%; border-collapse: collapse; border: none;">
+                            <tr>
+                                <td style="width: 40%; border: none; padding: 0;"></td>
+                                <td style="width: 12%; border: none; padding: 0; font-weight: bold; text-align: left;">Rp</td>
+                                <td style="width: 48%; border: none; padding: 0; font-weight: bold; text-align: right;"><span class="editable-text" contenteditable="true" spellcheck="false" title="Klik untuk edit">{{ ($jurnal->biaya_admin ?? 0) > 0 ? number_format($jurnal->biaya_admin, 0, ',', '.') : '-' }}</span></td>
+                            </tr>
+                        </table>
                     </td>
                 </tr>
 
@@ -788,7 +829,13 @@
                     <td style="border: 1px solid #000; border-bottom: 1.5px solid #000;"></td><td style="border: 1px solid #000; border-bottom: 1.5px solid #000;"></td>
                     <td colspan="2" style="border: 1px solid #000; border-bottom: 1.5px solid #000; padding: 1px 4px; text-align: right; font-weight: bold; white-space: nowrap;"><span class="editable-text" contenteditable="true" spellcheck="false" title="Klik untuk edit">{{ ($jurnal->biaya_admin ?? 0) > 0 ? number_format($jurnal->biaya_admin, 0, ',', '.') : '-' }}</span></td>
                     <td style="border-left: 1px solid #000; border-right: 1.5px solid #000; border-top: 1.5px solid #000; border-bottom: 1.5px solid #000; padding: 1.5px 6px;">
-                        <table style="width: 100%; border-collapse: collapse; border: none;"><tr><td style="width: 32%; border: none; padding: 0;"></td><td style="width: 4%; border: none; padding: 0;"></td><td style="border: none; padding: 0; font-weight: bold;"><div style="display: flex; justify-content: space-between;"><span>Rp</span><span class="editable-text" contenteditable="true" spellcheck="false" title="Klik untuk edit">{{ ($jurnal->biaya_admin ?? 0) > 0 ? number_format($jurnal->biaya_admin, 0, ',', '.') : '-' }}</span></div></td></tr></table>
+                        <table style="width: 100%; border-collapse: collapse; border: none;">
+                            <tr>
+                                <td style="width: 40%; border: none; padding: 0;"></td>
+                                <td style="width: 12%; border: none; padding: 0; font-weight: bold; text-align: left;">Rp</td>
+                                <td style="width: 48%; border: none; padding: 0; font-weight: bold; text-align: right;"><span class="editable-text" contenteditable="true" spellcheck="false" title="Klik untuk edit">{{ ($jurnal->biaya_admin ?? 0) > 0 ? number_format($jurnal->biaya_admin, 0, ',', '.') : '-' }}</span></td>
+                            </tr>
+                        </table>
                     </td>
                 </tr>
                 <!-- Footer Slip 2: Pembukuan & Otorisasi -->

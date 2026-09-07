@@ -29,9 +29,10 @@
             background: #ffffff;
             width: 210mm;
             margin: 0 auto 35px auto;
-            padding: 25px 30px;
+            padding: 18mm 20mm 12mm 20mm;
             border: none;
-            box-shadow: none;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            box-sizing: border-box;
         }
 
         /* Toolbar Aksi Layar Monitor */
@@ -60,7 +61,7 @@
 
         @page {
             size: A4 portrait;
-            margin: 15mm 18mm 15mm 18mm;
+            margin: 0;
         }
 
         /* Editable Text Element on Slip */
@@ -87,7 +88,7 @@
         @media print {
             @page {
                 size: A4 portrait;
-                margin: 15mm 18mm 15mm 18mm;
+                margin: 0;
             }
             .no-print { display: none !important; }
             html, body {
@@ -100,9 +101,10 @@
             }
             .form-wrapper {
                 border: none !important;
-                width: 100% !important;
-                max-width: 100% !important;
-                padding: 10px 15px !important;
+                width: 210mm !important;
+                max-width: 210mm !important;
+                box-sizing: border-box !important;
+                padding: 18mm 20mm 12mm 20mm !important;
                 margin: 0 auto !important;
                 box-shadow: none !important;
             }
@@ -112,6 +114,8 @@
                 outline: none !important;
                 border: none !important;
                 padding: 0 !important;
+                min-width: 0 !important;
+                display: inline !important;
             }
         }
     </style>
@@ -323,13 +327,10 @@
                     <td style="border-left: 1px solid #000; border-right: 1.5px solid #000; border-top: 1px solid #000; border-bottom: 1.5px solid #000; padding: 2px 6px;">
                         <table style="width: 100%; border-collapse: collapse; border: none;">
                             <tr>
-                                <td style="width: 38%; border: none; padding: 0;"></td>
-                                <td style="width: 4%; border: none; padding: 0;"></td>
-                                <td style="border: none; padding: 0; font-weight: bold;">
-                                    <div style="display: flex; justify-content: space-between;">
-                                        <span>Rp</span>
-                                        <span>{{ number_format($jurnal->nominal_transaksi + ($jurnal->biaya_admin ?? $jurnal->masterTransaksi->biaya_admin ?? 0), 0, ',', '.') }}</span>
-                                    </div>
+                                <td style="width: 40%; border: none; padding: 0;"></td>
+                                <td style="width: 12%; border: none; padding: 0; font-weight: bold; text-align: left;">Rp</td>
+                                <td style="width: 48%; border: none; padding: 0; font-weight: bold; text-align: right;">
+                                    <span class="editable-text" contenteditable="true" spellcheck="false" title="Klik untuk mengedit Total Kredit">{{ number_format($jurnal->nominal_transaksi + ($jurnal->biaya_admin ?? $jurnal->masterTransaksi->biaya_admin ?? 0), 0, ',', '.') }}</span>
                                 </td>
                             </tr>
                         </table>
