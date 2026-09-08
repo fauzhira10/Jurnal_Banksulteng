@@ -69,6 +69,14 @@ function buatAdmin(array $atribut = []): User
     ], $atribut));
 }
 
+function buatSuperAdmin(array $atribut = []): User
+{
+    return User::factory()->superadmin()->create(array_merge([
+        'username' => 'admin',
+        'password' => 'admin123',
+    ], $atribut));
+}
+
 function buatCs(MasterCabang $cabang, array $atribut = []): User
 {
     return User::factory()->cs($cabang->id)->create(array_merge([

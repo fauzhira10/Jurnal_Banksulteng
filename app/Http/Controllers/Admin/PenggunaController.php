@@ -7,7 +7,9 @@ use App\Http\Controllers\Controller;
 use App\Models\MasterCabang;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Validation\Rule;
 
 /**
@@ -42,7 +44,20 @@ class PenggunaController extends Controller
             'nonaktif' => User::where('is_active', false)->count(),
         ];
 
-        return view('admin.pengguna_index', compact('users', 'ringkasan'));
+        $timeoutMenit = config('session.concurrent_timeout', 30);
+        $batasWaktu = now()->subMinutes($timeoutMenit)->timestamp;
+        $sesiAktifUserIds = [];
+
+        if (Schema::hasTable('sessions')) {
+            $sesiAktifUserIds = DB::table('sessions')
+                ->whereNotNull('user_id')
+                ->where('last_activity', '>=', $batasWaktu)
+                ->pluck('user_id')
+                ->unique()
+                ->toArray();
+        }
+
+        return view('admin.pengguna_index', compact('users', 'ringkasan', 'sesiAktifUserIds'));
     }
 
     public function create()
@@ -90,6 +105,11 @@ class PenggunaController extends Controller
             return back()->withInput()->withErrors(['role' => 'Anda tidak dapat mengubah peran akun Anda sendiri.']);
         }
 
+        // Peran Admin Utama tidak dapat diubah menjadi CS
+        if ($user->isSuperAdmin() && $data['role'] !== UserRole::Admin->value) {
+            return back()->withInput()->withErrors(['role' => 'Peran Akun Admin Utama tidak dapat diubah.']);
+        }
+
         $user->fill([
             'name' => $data['name'],
             'username' => $data['username'],
@@ -118,6 +138,10 @@ class PenggunaController extends Controller
             return back()->with('error', 'Anda tidak dapat menonaktifkan akun Anda sendiri.');
         }
 
+        if ($user->isSuperAdmin()) {
+            return back()->with('error', 'Akun Admin Utama tidak dapat dinonaktifkan.');
+        }
+
         $user->is_active = ! $user->is_active;
         $user->save();
 
@@ -126,6 +150,20 @@ class PenggunaController extends Controller
             : "Akun {$user->name} telah dinonaktifkan dan tidak dapat login.";
 
         return back()->with('success', $pesan);
+    }
+
+    /**
+     * Memutus/mereset sesi aktif pengguna agar dapat login kembali di perangkat lain.
+     */
+    public function resetSesi(Request $request, User $user)
+    {
+        if (Schema::hasTable('sessions')) {
+            DB::table('sessions')
+                ->where('user_id', $user->id)
+                ->delete();
+        }
+
+        return back()->with('success', "Sesi aktif untuk {$user->name} (@{$user->username}) berhasil direset. Akun kini dapat login kembali di perangkat mana pun.");
     }
 
     protected function validasi(Request $request, ?User $user): array

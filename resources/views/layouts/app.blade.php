@@ -124,7 +124,8 @@
             @endif
         </a>
 
-        <!-- Menu 7: Manajemen Pengguna -->
+        @if(Auth::user()->isSuperAdmin())
+        {{-- Menu 7: Manajemen Pengguna (Khusus Admin Utama / Super Admin) --}}
         <a href="{{ route('admin.pengguna.index') }}" class="{{ $navBase }} {{ request()->routeIs('admin.pengguna.*') ? $navActive : $navIdle }}">
             <svg class="w-5 h-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
@@ -134,6 +135,7 @@
             </svg>
             <span>Manajemen Pengguna</span>
         </a>
+        @endif
         @else
         <div class="text-[0.71875rem] uppercase tracking-wider text-slate-500 font-bold px-3 pt-3 pb-1">Menu Customer Service</div>
 

@@ -24,6 +24,7 @@ class UserSeeder extends Seeder
                 'password' => Hash::make('admin123'),
                 'email_verified_at' => now(),
                 'role' => UserRole::Admin,
+                'is_superadmin' => true,
                 'master_cabang_id' => null,
                 'is_active' => true,
             ]

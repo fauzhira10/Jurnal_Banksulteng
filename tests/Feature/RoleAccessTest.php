@@ -62,12 +62,40 @@ test('dashboard cs dan navigasi cs dapat diakses oleh cs', function () {
     $response->assertDontSee('Rekap Laporan Keluhan');
 });
 
-test('sidebar admin menampilkan menu pengaduan masuk dan manajemen pengguna', function () {
-    $admin = buatAdmin();
+test('sidebar admin utama menampilkan menu manajemen pengguna', function () {
+    $superadmin = buatSuperAdmin();
 
-    $response = $this->actingAs($admin)->get('/jurnal/data');
+    $response = $this->actingAs($superadmin)->get('/jurnal/data');
 
     $response->assertStatus(200);
     $response->assertSee('Pengaduan Masuk');
     $response->assertSee('Manajemen Pengguna');
+});
+
+test('sidebar admin biasa tidak menampilkan menu manajemen pengguna', function () {
+    $adminBiasa = buatAdmin();
+
+    $response = $this->actingAs($adminBiasa)->get('/jurnal/data');
+
+    $response->assertStatus(200);
+    $response->assertSee('Pengaduan Masuk');
+    $response->assertDontSee('Manajemen Pengguna');
+});
+
+test('admin utama dapat mengakses halaman manajemen pengguna', function () {
+    $superadmin = buatSuperAdmin();
+
+    $response = $this->actingAs($superadmin)->get('/pengguna');
+
+    $response->assertStatus(200);
+    $response->assertSee('Daftar Akun Pengguna');
+});
+
+test('admin biasa tidak dapat membuka halaman manajemen pengguna dan dialihkan ke dashboard', function () {
+    $adminBiasa = buatAdmin();
+
+    $response = $this->actingAs($adminBiasa)->get('/pengguna');
+
+    $response->assertRedirect(route('dashboard'));
+    $response->assertSessionHas('error');
 });

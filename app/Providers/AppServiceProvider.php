@@ -17,5 +17,8 @@ class AppServiceProvider extends ServiceProvider
     {
         // Gate umum untuk fitur yang hanya boleh diakses Admin Pusat
         Gate::define('admin-only', fn (User $user) => $user->isAdmin());
+
+        // Gate khusus untuk fitur yang hanya boleh diakses Admin Utama (Super Admin)
+        Gate::define('superadmin-only', fn (User $user) => $user->isSuperAdmin());
     }
 }

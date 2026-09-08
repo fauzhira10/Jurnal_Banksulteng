@@ -59,6 +59,15 @@ class UserFactory extends Factory
         ]);
     }
 
+    public function superadmin(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'role' => UserRole::Admin,
+            'is_superadmin' => true,
+            'master_cabang_id' => null,
+        ]);
+    }
+
     /**
      * Akun Customer Service cabang tertentu.
      */

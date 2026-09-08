@@ -69,7 +69,7 @@
                             <th>Cabang Penempatan</th>
                             <th style="text-align:center;">Pengaduan</th>
                             <th>Status</th>
-                            <th style="text-align:center; width: 200px;">Aksi</th>
+                            <th style="text-align:center; width: 220px;">Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -85,7 +85,11 @@
                                     </div>
                                 </td>
                                 <td>
-                                    <span class="badge {{ $u->isAdmin() ? 'badge-diproses' : 'badge-selesai' }}">{{ $u->labelRole() }}</span>
+                                    @if($u->isSuperAdmin())
+                                        <span class="badge" style="background:#fef3c7; color:#92400e; border:1px solid #fde68a;">Admin Utama</span>
+                                    @else
+                                        <span class="badge {{ $u->isAdmin() ? 'badge-diproses' : 'badge-selesai' }}">{{ $u->labelRole() }}</span>
+                                    @endif
                                 </td>
                                 <td>
                                     @if($u->cabang)
@@ -96,16 +100,38 @@
                                     @endif
                                 </td>
                                 <td style="text-align:center;" class="font-bold text-navy">{{ number_format($u->pengaduans_count, 0, ',', '.') }}</td>
-                                <td>
-                                    @if($u->is_active)
-                                        <span class="badge badge-done">Aktif</span>
-                                    @else
-                                        <span class="badge badge-rejected">Nonaktif</span>
-                                    @endif
+                                <td style="white-space:nowrap;">
+                                    <div class="inline-flex items-center gap-1.5">
+                                        @if($u->is_active)
+                                            <span class="badge badge-done">Aktif</span>
+                                            @if(in_array($u->id, $sesiAktifUserIds ?? []))
+                                                <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[0.6875rem] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200/80 whitespace-nowrap shadow-2xs" title="Akun sedang aktif login di perangkat">
+                                                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse shrink-0"></span> Sesi Aktif
+                                                </span>
+                                            @endif
+                                        @else
+                                            <span class="badge badge-rejected">Nonaktif</span>
+                                        @endif
+                                    </div>
                                 </td>
                                 <td style="text-align:center; white-space:nowrap;">
                                     <a href="{{ route('admin.pengguna.edit', $u) }}" class="btn btn-sm" style="padding:5px 11px; font-size:0.75rem; background:#fef3c7; color:#b45309; border:1px solid #fde68a;">Edit</a>
-                                    @unless($u->is(auth()->user()))
+
+                                    @if(in_array($u->id, $sesiAktifUserIds ?? []) && ! $u->is(auth()->user()))
+                                        <form action="{{ route('admin.pengguna.reset_sesi', $u) }}" method="POST" class="inline"
+                                              data-konfirmasi="Reset Sesi Login Pengguna?"
+                                              data-ikon="🔄"
+                                              data-warna="amber"
+                                              data-aksi="Ya, Putus Sesi"
+                                              data-pesan="Sesi aktif untuk {{ $u->name }} (@{{ $u->username }}) akan diputus. Pengguna tersebut (atau staf di komputer lain) dapat langsung login kembali ke sistem.">
+                                            @csrf
+                                            <button type="submit" class="btn btn-sm cursor-pointer" style="padding:5px 11px; font-size:0.75rem; margin-left:4px; background:#fed7aa; color:#9a3412; border:1px solid #fdba74;" title="Putus sesi aktif jika staf terkunci di perangkat lain">
+                                                Reset Sesi
+                                            </button>
+                                        </form>
+                                    @endif
+
+                                    @unless($u->is(auth()->user()) || $u->isSuperAdmin())
                                         <form action="{{ route('admin.pengguna.toggle_aktif', $u) }}" method="POST" class="inline"
                                               data-konfirmasi="{{ $u->is_active ? 'Nonaktifkan Akun Ini?' : 'Aktifkan Akun Ini?' }}"
                                               data-ikon="{{ $u->is_active ? '🚫' : '✅' }}"

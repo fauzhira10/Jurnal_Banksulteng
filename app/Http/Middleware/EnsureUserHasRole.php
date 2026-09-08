@@ -36,14 +36,31 @@ class EnsureUserHasRole
 
         $roleUser = $user->role instanceof UserRole ? $user->role->value : (string) $user->role;
 
-        if (! in_array($roleUser, $roles, true)) {
+        $hasAccess = false;
+        foreach ($roles as $r) {
+            if ($r === 'superadmin') {
+                if ($user->isSuperAdmin()) {
+                    $hasAccess = true;
+                    break;
+                }
+            } elseif ($roleUser === $r) {
+                $hasAccess = true;
+                break;
+            }
+        }
+
+        if (! $hasAccess) {
             if ($request->expectsJson()) {
                 abort(403, 'Anda tidak memiliki hak akses ke sumber daya ini.');
             }
 
+            $pesan = in_array('superadmin', $roles, true)
+                ? 'Menu Manajemen Pengguna hanya dapat diakses oleh Admin Utama.'
+                : 'Anda tidak memiliki hak akses ke halaman tersebut.';
+
             return redirect()
                 ->route($user->homeRoute())
-                ->with('error', 'Anda tidak memiliki hak akses ke halaman tersebut.');
+                ->with('error', $pesan);
         }
 
         return $next($request);

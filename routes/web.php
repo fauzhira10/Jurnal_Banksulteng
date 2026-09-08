@@ -102,14 +102,15 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
         Route::post('/{pengaduan}/tolak', [PengaduanMasukController::class, 'tolak'])->name('tolak')->whereNumber('pengaduan');
     });
 
-    // ---------- Manajemen Pengguna (Akun Admin & CS Cabang) ----------
-    Route::prefix('pengguna')->name('admin.pengguna.')->group(function () {
+    // ---------- Manajemen Pengguna (Khusus Admin Utama / Super Admin) ----------
+    Route::prefix('pengguna')->name('admin.pengguna.')->middleware('role:superadmin')->group(function () {
         Route::get('/', [PenggunaController::class, 'index'])->name('index');
         Route::get('/tambah', [PenggunaController::class, 'create'])->name('create');
         Route::post('/', [PenggunaController::class, 'store'])->name('store');
         Route::get('/{user}/edit', [PenggunaController::class, 'edit'])->name('edit')->whereNumber('user');
         Route::put('/{user}', [PenggunaController::class, 'update'])->name('update')->whereNumber('user');
         Route::patch('/{user}/toggle-aktif', [PenggunaController::class, 'toggleAktif'])->name('toggle_aktif')->whereNumber('user');
+        Route::post('/{user}/reset-sesi', [PenggunaController::class, 'resetSesi'])->name('reset_sesi')->whereNumber('user');
     });
 });
 

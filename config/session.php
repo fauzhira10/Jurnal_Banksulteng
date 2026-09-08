@@ -38,6 +38,19 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Concurrent Login Inactivity Timeout (Minutes)
+    |--------------------------------------------------------------------------
+    |
+    | Batas toleransi inaktivitas (menit) untuk mendeteksi apakah sebuah sesi
+    | pengguna masih dianggap aktif di perangkat lain. Jika melewati batas ini
+    | tanpa aktivitas, sesi lama dianggap kedaluwarsa dan perangkat baru diizinkan masuk.
+    |
+    */
+
+    'concurrent_timeout' => (int) env('SESSION_CONCURRENT_TIMEOUT', 30),
+
+    /*
+    |--------------------------------------------------------------------------
     | Session Encryption
     |--------------------------------------------------------------------------
     |

@@ -29,7 +29,7 @@ test('seluruh halaman cs dapat dirender', function () {
 test('seluruh halaman admin pengaduan dan pengguna dapat dirender', function () {
     $cabang = buatCabang();
     $cs = buatCs($cabang);
-    $admin = buatAdmin();
+    $admin = buatSuperAdmin();
     $transaksi = buatTransaksi();
     $pengaduan = buatPengaduan($cs, $transaksi);
 
@@ -46,7 +46,7 @@ test('tindakan penting memakai modal konfirmasi sistem, bukan dialog bawaan brow
     Storage::fake('local');
     $cabang = buatCabang();
     $cs = buatCs($cabang);
-    $admin = buatAdmin();
+    $admin = buatSuperAdmin();
     $pengaduan = buatPengaduan($cs, buatTransaksi());
     $lampiran = buatLampiran($pengaduan);
 
@@ -80,7 +80,7 @@ test('halaman tidak menampilkan sintaks blade mentah', function () {
     Storage::fake('local');
     $cabang = buatCabang();
     $cs = buatCs($cabang, ['username' => 'cs.uji']);
-    $admin = buatAdmin();
+    $admin = buatSuperAdmin();
     $pengaduan = buatPengaduan($cs, buatTransaksi());
     buatLampiran($pengaduan);
 

@@ -212,7 +212,7 @@ test('lampiran pengaduan dapat dibuka admin sesuai format aslinya namun tidak ol
 
 test('admin dapat membuat akun cs dan menonaktifkannya', function () {
     $cabang = buatCabang('003', 'CABANG POSO');
-    $admin = buatAdmin();
+    $admin = buatSuperAdmin();
 
     $this->actingAs($admin)->post(route('admin.pengguna.store'), [
         'name' => 'CS Poso',
