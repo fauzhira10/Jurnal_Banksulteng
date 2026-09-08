@@ -2377,8 +2377,30 @@ class JurnalController extends Controller
             return view('cetak.mbanking', compact('jurnal'));
         }
 
-        // 3. EDC / DEBIT / EDC BANK LAIN (Untuk semua jenis EDC)
-        if (str_contains($jenis, 'EDC') || str_contains($channel, 'EDC') || str_contains($permasalahan, 'EDC') || $channel === 'DEBIT' || $channel === 'EDC BANK LAIN') {
+        // 3. EDC (Dua Cabang: EDC Bank Lain vs EDC Bank Sulteng Langsung)
+        $isEdc = str_contains($jenis, 'EDC') ||
+                 str_contains($channel, 'EDC') ||
+                 str_contains($permasalahan, 'EDC') ||
+                 str_contains($jurnalJenis, 'EDC') ||
+                 $channel === 'DEBIT' ||
+                 $channel === 'EDC BANK LAIN';
+
+        if ($isEdc) {
+            $isEdcBankLain = $channel === 'EDC BANK LAIN' ||
+                             str_contains($channel, 'BANK LAIN') ||
+                             str_contains($channel, 'LAIN') ||
+                             str_contains($jenis, 'EDC BANK LAIN') ||
+                             str_contains($jenis, 'BANK LAIN') ||
+                             str_contains($jurnalJenis, 'EDC BANK LAIN') ||
+                             str_contains($jurnalJenis, 'BANK LAIN') ||
+                             (str_contains($permasalahan, 'EDC') && (str_contains($permasalahan, 'BANK LAIN') || str_contains($permasalahan, 'LAIN')));
+
+            if ($isEdcBankLain) {
+                // 3a. EDC Bank Lain: Menggunakan Form Penyelesaian & Slip ATM Bersama
+                return view('cetak.atmb', compact('jurnal'));
+            }
+
+            // 3b. EDC Bank Sulteng Langsung (bukan bank lain): Hanya menggunakan slip EDC biasa yang dikhususkan untuk Bank Sulteng saja
             return view('cetak.edc', compact('jurnal'));
         }
 

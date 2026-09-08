@@ -68,6 +68,7 @@
     function tutup() {
         modal.classList.remove('show');
         formTertunda = null;
+        window.dispatchEvent(new CustomEvent('modal-konfirmasi-ditutup'));
     }
 
     // Pemantauan lewat document (event delegation), bukan diikat satu per satu saat
@@ -94,6 +95,16 @@
         const form = formTertunda;
         tutup();
         form.dataset.konfirmasiLolos = '1';
+        try {
+            ['sessionStorage', 'localStorage'].forEach(storage => {
+                const s = window[storage];
+                if (s) {
+                    Object.keys(s).forEach(key => {
+                        if (key.startsWith('jurnal_input_draft')) s.removeItem(key);
+                    });
+                }
+            });
+        } catch (e) {}
         form.submit();
     });
 

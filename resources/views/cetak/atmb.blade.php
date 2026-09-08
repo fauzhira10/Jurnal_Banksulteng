@@ -3,7 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Form Keluhan & Slip Jurnal ATM Bersama - {{ $jurnal->no_tiket }}</title>
+    @php
+        $isEdcLain = (isset($jurnal->masterTransaksi) && str_contains(strtoupper($jurnal->masterTransaksi->jenis_transaksi ?? ''), 'EDC')) ||
+                     str_contains(strtoupper($jurnal->jenis_transaksi ?? ''), 'EDC') ||
+                     (isset($jurnal->masterTransaksi) && str_contains(strtoupper($jurnal->masterTransaksi->channel ?? ''), 'EDC'));
+        $tipeDokumenLabel = $isEdcLain ? 'EDC Bank Lain' : 'ATM Bersama';
+    @endphp
+    <title>Form Keluhan & Slip Jurnal {{ $tipeDokumenLabel }} - {{ $jurnal->no_tiket }}</title>
     <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}">
     <link rel="shortcut icon" type="image/x-icon" href="{{ asset('favicon.ico') }}">
     <style>
@@ -103,14 +109,14 @@
         }
 
         .sig-body {
-            height: 135px;
+            height: 145px;
             text-align: center;
             vertical-align: bottom !important;
             padding: 10px 6px 12px 6px !important;
         }
 
         .sig-space {
-            height: 80px;
+            height: 90px;
         }
 
         .sig-name {
@@ -303,11 +309,11 @@
                 padding: 0 !important;
             }
             .sig-body {
-                height: 95px !important;
+                height: 125px !important;
                 padding: 6px 4px 8px 4px !important;
             }
             .sig-space {
-                height: 45px !important;
+                height: 72px !important;
             }
             .slip-page {
                 border: none !important;
@@ -353,7 +359,7 @@
     <div class="no-print">
         <button type="button" onclick="handleKembali()" class="btn btn-back">⬅ Kembali</button>
         <div style="text-align: center;">
-            <span style="font-weight: bold; font-size: 13px; color: #1e293b; display: block;">📄 Cetak Keluhan & Slip ATM Bersama &mdash; No. Tiket: {{ $jurnal->no_tiket }}</span>
+            <span style="font-weight: bold; font-size: 13px; color: #1e293b; display: block;">📄 Cetak Keluhan & Slip {{ $tipeDokumenLabel }} &mdash; No. Tiket: {{ $jurnal->no_tiket }}</span>
             <span style="font-size: 11px; color: #0369a1; background: #e0f2fe; padding: 2px 8px; border-radius: 12px; font-weight: 600; display: inline-block; margin-top: 3px;">✏️ Nama akun & no. rekening penampungan pada slip dapat diklik untuk diedit langsung</span>
         </div>
         <button type="button" onclick="window.print()" class="btn btn-print">🖨️ Cetak Form & Slip Jurnal</button>
@@ -420,7 +426,7 @@
             <tr>
                 <td colspan="2" style="padding: 10px 12px 16px 12px;">
                     <div style="font-weight: bold; margin-top: 6px; margin-bottom: 22px; text-transform: uppercase; margin-left: 175px;">
-                        : &nbsp; {{ $jurnal->masterTransaksi->jenis_transaksi ?? 'TARIK TUNAI ATM BERSAMA GAGAL, SALDO TERDEBET' }}
+                        : &nbsp; {{ $jurnal->permasalahan && $jurnal->permasalahan !== '-' ? $jurnal->permasalahan : ($jurnal->masterTransaksi->jenis_transaksi ?? 'TARIK TUNAI ATM BERSAMA GAGAL, SALDO TERDEBET') }}
                     </div>
 
                     <table style="width: auto; margin-left: 195px; border-collapse: collapse;">
@@ -472,7 +478,7 @@
                         <tr>
                             <td style="border: none; padding: 2.5px 0;">Cabang Transaksi</td>
                             <td style="border: none; padding: 2.5px 8px; text-align: center;">:</td>
-                            <td style="border: none; padding: 2.5px 0; font-weight: bold;">{{ $jurnal->masterCabang->kode_cabang ?? '-' }} - {{ $jurnal->masterCabang->nama_cabang ?? '-' }}</td>
+                            <td style="border: none; padding: 2.5px 0; font-weight: bold;">{{ (!empty($jurnal->masterCabang->kode_cabang) && trim($jurnal->masterCabang->kode_cabang) !== '-') ? trim($jurnal->masterCabang->kode_cabang) . ' - ' : '' }}{{ $jurnal->masterCabang->nama_cabang ?? '-' }}</td>
                         </tr>
                         <tr>
                             <td style="border: none; padding: 2.5px 0;">Terminal Lokasi Transaksi</td>

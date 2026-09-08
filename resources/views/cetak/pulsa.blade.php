@@ -103,14 +103,14 @@
         }
 
         .sig-body {
-            height: 120px;
+            height: 145px;
             text-align: center;
             vertical-align: bottom !important;
-            padding: 8px 4px 10px 4px !important;
+            padding: 10px 6px 12px 6px !important;
         }
 
         .sig-space {
-            height: 60px;
+            height: 90px;
         }
 
         .sig-name {
@@ -302,11 +302,11 @@
                 padding: 0 !important;
             }
             .sig-body {
-                height: 95px !important;
+                height: 125px !important;
                 padding: 6px 4px 8px 4px !important;
             }
             .sig-space {
-                height: 45px !important;
+                height: 72px !important;
             }
             .slip-wrapper {
                 border: none !important;
@@ -451,7 +451,7 @@
                         <tr>
                             <td style="border: none; padding: 2px 0;">Cabang Transaksi</td>
                             <td style="border: none; padding: 2px 8px; text-align: center;">:</td>
-                            <td style="border: none; padding: 2px 0; font-weight: bold;">{{ $jurnal->masterCabang->kode_cabang ?? '-' }} - {{ $jurnal->masterCabang->nama_cabang ?? '-' }}</td>
+                            <td style="border: none; padding: 2px 0; font-weight: bold;">{{ (!empty($jurnal->masterCabang->kode_cabang) && trim($jurnal->masterCabang->kode_cabang) !== '-') ? trim($jurnal->masterCabang->kode_cabang) . ' - ' : '' }}{{ $jurnal->masterCabang->nama_cabang ?? '-' }}</td>
                         </tr>
                         <tr>
                             <td style="border: none; padding: 2px 0;">Terminal Lokasi Transaksi</td>

@@ -31,6 +31,7 @@ return [
         'ATM BANK LAIN',
         'SMS BANKING',
         'EDC',
+        'EDC BANK LAIN',
     ],
 
     // Jenis lampiran yang dapat diunggah CS. Kunci dipakai sebagai nilai kolom `jenis`.

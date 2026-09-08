@@ -682,16 +682,199 @@
         }
     });
 
-    // Validasi Form saat submit
+    // ==========================================
+    // AUTO-SAVE & RESTORE DRAFT FORMULIR (SESSIONSTORAGE)
+    // ==========================================
+    const DRAFT_KEY = 'jurnal_input_draft' + (@json($prefill['pengaduan_id'] ?? null) ? '_' + @json($prefill['pengaduan_id'] ?? '') : '');
+    const draftInputs = [
+        'nama_nasabah',
+        'no_rekening',
+        'no_resi',
+        'no_kartu',
+        'no_tiket',
+        'master_cabang_id',
+        'master_transaksi_id',
+        'channel',
+        'nominal_transaksi',
+        'biaya_admin',
+        'terminal_transaksi',
+        'tgl_transaksi',
+        'tgl_terima',
+        'tgl_selesai',
+        'status',
+        'permasalahan',
+        'keterangan_log'
+    ];
+
+    function isPageReload() {
+        try {
+            const navEntries = window.performance && window.performance.getEntriesByType ? window.performance.getEntriesByType('navigation') : null;
+            if (navEntries && navEntries.length > 0) {
+                return navEntries[0].type === 'reload';
+            }
+            if (window.performance && window.performance.navigation) {
+                return window.performance.navigation.type === 1;
+            }
+        } catch (e) {}
+        return false;
+    }
+
+    let saveDraftTimer = null;
+    let isSubmitting = false;
+
+    function scheduleSaveDraft() {
+        if (isSubmitting) return;
+        clearTimeout(saveDraftTimer);
+        saveDraftTimer = setTimeout(saveDraft, 250);
+    }
+
+    function saveDraft() {
+        if (!formEl || isSubmitting) return;
+        const draft = {};
+        let hasAnyData = false;
+
+        draftInputs.forEach(name => {
+            const el = formEl.elements[name];
+            if (el) {
+                const val = (el.value || '').trim();
+                draft[name] = el.value;
+                if (val !== '' && !['status'].includes(name)) {
+                    hasAnyData = true;
+                }
+            }
+        });
+
+        if (hasAnyData) {
+            try {
+                sessionStorage.setItem(DRAFT_KEY, JSON.stringify(draft));
+            } catch (e) {
+                console.warn('Gagal menyimpan draft jurnal:', e);
+            }
+        } else {
+            clearDraft();
+        }
+    }
+
+    function clearDraft() {
+        try {
+            sessionStorage.removeItem(DRAFT_KEY);
+            localStorage.removeItem(DRAFT_KEY);
+            ['sessionStorage', 'localStorage'].forEach(storage => {
+                const s = window[storage];
+                if (s) {
+                    Object.keys(s).forEach(key => {
+                        if (key.startsWith('jurnal_input_draft')) s.removeItem(key);
+                    });
+                }
+            });
+        } catch (e) {}
+    }
+
+    function restoreDraft() {
+        try {
+            // Jika halaman di-refresh (F5 / tombol reload browser), bersihkan draft dan jangan pulihkan
+            if (isPageReload()) {
+                clearDraft();
+                return false;
+            }
+
+            const hasServerErrors = @json($errors->any());
+            if (hasServerErrors) return false;
+
+            const raw = sessionStorage.getItem(DRAFT_KEY) || localStorage.getItem(DRAFT_KEY);
+            if (!raw) return false;
+            const draft = JSON.parse(raw);
+            if (!draft || typeof draft !== 'object') return false;
+
+            let restoredCount = 0;
+
+            draftInputs.forEach(name => {
+                const el = formEl.elements[name];
+                if (el && draft[name] !== undefined && draft[name] !== null) {
+                    if (el.disabled || el.readOnly) return;
+                    const draftVal = draft[name];
+                    if (draftVal !== '') {
+                        el.value = draftVal;
+                        restoredCount++;
+                    }
+                }
+            });
+
+            if (restoredCount > 0) {
+                // Pulihkan format tampilan nominal
+                if (draft.nominal_transaksi !== undefined && draft.nominal_transaksi !== '') {
+                    if (nominalHidden) nominalHidden.value = draft.nominal_transaksi;
+                    if (nominalDisplay) {
+                        const num = Number(draft.nominal_transaksi);
+                        nominalDisplay.value = !isNaN(num) && num > 0 ? fmtNominal.format(num) : draft.nominal_transaksi;
+                    }
+                }
+
+                // Pulihkan biaya admin
+                if (draft.biaya_admin !== undefined && draft.biaya_admin !== '') {
+                    setAdminFeeValue(draft.biaya_admin, true);
+                }
+
+                // Pulihkan terminal transaksi
+                if (draft.terminal_transaksi) {
+                    populateAtmDropdown(draft.terminal_transaksi);
+                }
+
+                // Picu pengecekan duplikat jika nama atau no resi terisi
+                const elNama = document.getElementById('nama_nasabah');
+                if (elNama && elNama.value) {
+                    elNama.dispatchEvent(new Event('input', { bubbles: true }));
+                }
+
+                return true;
+            }
+        } catch (e) {
+            console.warn('Gagal memulihkan draft:', e);
+        }
+        return false;
+    }
+
+    // Validasi Form saat submit & Auto-Save
     const formEl = document.querySelector('form');
     if (formEl) {
+        formEl.addEventListener('input', scheduleSaveDraft);
+        formEl.addEventListener('change', scheduleSaveDraft);
+
+        const btnSimpan = document.getElementById('btnSimpanJurnal') || formEl.querySelector('button[type="submit"]');
+        if (btnSimpan) {
+            btnSimpan.addEventListener('click', function() {
+                clearTimeout(saveDraftTimer);
+            });
+        }
+
         formEl.addEventListener('submit', function(e) {
             if (adminHiddenInput && (adminHiddenInput.value === '' || isNaN(adminHiddenInput.value) || Number(adminHiddenInput.value) < 0)) {
                 e.preventDefault();
                 showAdminError('* Biaya admin wajib diisi (minimal Rp 0).');
                 if (adminDisplayInput) adminDisplayInput.focus();
+                return;
             }
+            clearTimeout(saveDraftTimer);
+            isSubmitting = true;
+            clearDraft();
         });
+
+        // Tombol Reset Form di bagian bawah
+        const btnReset = formEl.querySelector('button[type="reset"]');
+        if (btnReset) {
+            btnReset.addEventListener('click', function() {
+                clearTimeout(saveDraftTimer);
+                clearDraft();
+                setTimeout(() => {
+                    setAdminFeeValue(0, true);
+                    if (nominalHidden) nominalHidden.value = '';
+                    if (nominalDisplay) nominalDisplay.value = '';
+                    populateAtmDropdown('');
+                    const elNama = document.getElementById('nama_nasabah');
+                    if (elNama) elNama.dispatchEvent(new Event('input', { bubbles: true }));
+                }, 50);
+            });
+        }
     }
 
     function loadDetailTransaksi(id) {
@@ -749,7 +932,7 @@
         // Channel non-ATM
         const generalGroup = document.createElement('optgroup');
         generalGroup.label = 'Channel Non-ATM';
-        ['MOBILE BANKING', 'ATM BANK LAIN', 'SMS BANKING', 'EDC'].forEach(ch => {
+        ['MOBILE BANKING', 'ATM BANK LAIN', 'SMS BANKING', 'EDC', 'EDC BANK LAIN'].forEach(ch => {
             const opt = document.createElement('option');
             opt.value = ch;
             opt.textContent = ch;
@@ -794,6 +977,26 @@
         if (transaksiEl && transaksiEl.value && channelSelect && !channelSelect.value) {
             loadDetailTransaksi(transaksiEl.value);
         }
+        // Pulihkan draft jika ada data yang tersimpan sebelumnya
+        restoreDraft();
+    });
+
+    window.addEventListener('pageshow', function(e) {
+        isSubmitting = false;
+        const raw = sessionStorage.getItem(DRAFT_KEY) || localStorage.getItem(DRAFT_KEY);
+        const hasServerErrors = @json($errors->any());
+        // Jika kembali dari cache navigasi (bfcache) dan tidak ada draft, pastikan isian bersih
+        if (!raw && !hasServerErrors && e.persisted) {
+            if (formEl) formEl.reset();
+            setAdminFeeValue(0, true);
+            if (nominalHidden) nominalHidden.value = '';
+            if (nominalDisplay) nominalDisplay.value = '';
+            populateAtmDropdown('');
+        }
+    });
+
+    window.addEventListener('modal-konfirmasi-ditutup', function() {
+        isSubmitting = false;
     });
 </script>
 @endpush

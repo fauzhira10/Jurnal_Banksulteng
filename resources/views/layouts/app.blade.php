@@ -228,6 +228,15 @@
     <main class="p-4 sm:p-6 lg:p-7.5 grow">
         <!-- Flash Alert Success -->
         @if(session('success'))
+            <script>
+                try {
+                    Object.keys(localStorage).forEach(function(key) {
+                        if (key.indexOf('jurnal_input_draft') === 0) {
+                            localStorage.removeItem(key);
+                        }
+                    });
+                } catch (e) {}
+            </script>
             <div class="bg-emerald-50 border border-emerald-200 text-emerald-900 rounded-xl p-4 mb-5 text-[0.84375rem] flex items-start gap-3 shadow-xs">
                 <svg class="w-5 h-5 text-emerald-600 shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
@@ -391,6 +400,22 @@
 </script>
 
 @stack('scripts')
+@if(session('success'))
+<script>
+    try {
+        ['sessionStorage', 'localStorage'].forEach(function(storage) {
+            var s = window[storage];
+            if (s) {
+                Object.keys(s).forEach(function(key) {
+                    if (key.indexOf('jurnal_input_draft') === 0) {
+                        s.removeItem(key);
+                    }
+                });
+            }
+        });
+    } catch (e) {}
+</script>
+@endif
 </body>
 </html>
 

@@ -103,14 +103,14 @@
         }
 
         .sig-body {
-            height: 135px;
+            height: 145px;
             text-align: center;
             vertical-align: bottom !important;
             padding: 10px 6px 12px 6px !important;
         }
 
         .sig-space {
-            height: 80px;
+            height: 90px;
         }
 
         .sig-name {
@@ -214,6 +214,13 @@
             .table-form td.no-padding {
                 padding: 0 !important;
             }
+            .sig-body {
+                height: 125px !important;
+                padding: 6px 4px 8px 4px !important;
+            }
+            .sig-space {
+                height: 72px !important;
+            }
             .highlight-yellow {
                 background-color: #ffff00 !important;
                 -webkit-print-color-adjust: exact !important;
@@ -301,7 +308,7 @@
             <tr>
                 <td colspan="2" style="padding: 10px 12px 16px 12px;">
                     <div style="font-weight: bold; margin-top: 6px; margin-bottom: 22px; text-transform: uppercase; margin-left: 175px;">
-                        : &nbsp; {{ $jurnal->masterTransaksi->jenis_transaksi ?? 'TARIK TUNAI ATM LOKAL GAGAL, SALDO TERDEBET' }}
+                        : &nbsp; {{ $jurnal->permasalahan && $jurnal->permasalahan !== '-' ? $jurnal->permasalahan : ($jurnal->masterTransaksi->jenis_transaksi ?? 'TARIK TUNAI ATM LOKAL GAGAL, SALDO TERDEBET') }}
                     </div>
 
                     <table style="width: auto; margin-left: 195px; border-collapse: collapse;">
@@ -353,7 +360,7 @@
                         <tr>
                             <td style="border: none; padding: 2.5px 0;">Cabang Transaksi</td>
                             <td style="border: none; padding: 2.5px 8px; text-align: center;">:</td>
-                            <td style="border: none; padding: 2.5px 0; font-weight: bold;">{{ $jurnal->masterCabang->kode_cabang ?? '-' }} - {{ $jurnal->masterCabang->nama_cabang ?? '-' }}</td>
+                            <td style="border: none; padding: 2.5px 0; font-weight: bold;">{{ (!empty($jurnal->masterCabang->kode_cabang) && trim($jurnal->masterCabang->kode_cabang) !== '-') ? trim($jurnal->masterCabang->kode_cabang) . ' - ' : '' }}{{ $jurnal->masterCabang->nama_cabang ?? '-' }}</td>
                         </tr>
                         <tr>
                             <td style="border: none; padding: 2.5px 0;">Terminal Lokasi Transaksi</td>

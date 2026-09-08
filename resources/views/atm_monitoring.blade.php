@@ -651,7 +651,7 @@
 
             const generalGroup = document.createElement('optgroup');
             generalGroup.label = 'Channel Non-ATM';
-            ['BANK LAIN', 'MOBILE BANKING', 'SMS BANKING'].forEach(ch => {
+            ['BANK LAIN', 'ATM BANK LAIN', 'MOBILE BANKING', 'SMS BANKING', 'EDC', 'EDC BANK LAIN'].forEach(ch => {
                 const opt = document.createElement('option');
                 opt.value = ch;
                 opt.textContent = ch;
