@@ -99,15 +99,36 @@
             font-size: 11px;
         }
 
+        .sig-space-cell {
+            height: 105px;
+            padding: 0 !important;
+            border-bottom: none !important;
+        }
+
+        .sig-name-cell {
+            text-align: center;
+            vertical-align: bottom !important;
+            padding: 4px 4px 0 4px !important;
+            border-top: none !important;
+            border-bottom: none !important;
+        }
+
+        .sig-title-cell {
+            text-align: center;
+            vertical-align: top !important;
+            padding: 2px 4px 10px 4px !important;
+            border-top: none !important;
+        }
+
         .sig-body {
-            height: 145px;
+            height: 165px;
             text-align: center;
             vertical-align: bottom !important;
             padding: 10px 6px 12px 6px !important;
         }
 
         .sig-space {
-            height: 90px;
+            height: 105px;
         }
 
         .sig-name {
@@ -115,15 +136,25 @@
             text-decoration: underline;
             text-transform: uppercase;
             font-size: 11px;
-            margin-bottom: 4px;
+            margin-bottom: 3px;
             letter-spacing: 0.3px;
+            text-align: center;
+            display: inline-block;
         }
 
         .sig-title {
-            font-size: 8.5px;
+            font-size: 9px;
             color: #000;
             line-height: 1.35;
             padding: 0 2px;
+            text-align: center;
+            display: inline-block;
+        }
+
+        .sig-name.editable-text,
+        .sig-title.editable-text {
+            min-width: 0;
+            cursor: text;
         }
 
         /* Tombol Aksi */
@@ -211,12 +242,22 @@
             .table-form td.no-padding {
                 padding: 0 !important;
             }
+            .sig-space-cell {
+                height: 96px !important;
+                padding: 0 !important;
+            }
+            .sig-name-cell {
+                padding: 3px 4px 0 4px !important;
+            }
+            .sig-title-cell {
+                padding: 2px 4px 8px 4px !important;
+            }
             .sig-body {
-                height: 125px !important;
+                height: 155px !important;
                 padding: 6px 4px 8px 4px !important;
             }
             .sig-space {
-                height: 72px !important;
+                height: 96px !important;
             }
             .highlight-yellow {
                 background-color: #ffff00 !important;
@@ -240,6 +281,10 @@
     <!-- Tombol Navigasi Layar -->
     <div class="no-print">
         <button type="button" onclick="handleKembali()" class="btn btn-back">⬅ Kembali</button>
+        <div style="text-align: center;">
+            <span style="font-weight: bold; font-size: 13px; color: #1e293b; display: block;">📄 Cetak Formulir Permohonan Rekaman CCTV &mdash; No. Tiket: {{ $jurnal->no_tiket }}</span>
+            <span style="font-size: 11px; color: #0369a1; background: #e0f2fe; padding: 2px 8px; border-radius: 12px; font-weight: 600; display: inline-block; margin-top: 3px;">✏️ Nama & jabatan penanda tangan dapat diklik untuk diedit</span>
+        </div>
         <button onclick="window.print()" class="btn btn-print">🖨️ Cetak Form CCTV</button>
     </div>
 
@@ -390,22 +435,41 @@
                             <td colspan="3" class="sig-header" style="width: 74%; border-right: 1px solid #000; border-bottom: 1px solid #000;">Di Selesaikan Oleh,</td>
                             <td class="sig-header" style="width: 26%; border-bottom: 1px solid #000;">Di ketahui Oleh,</td>
                         </tr>
+                        <!-- Ruang Kotak Tanda Tangan (Diperbesar ke Bawah) -->
                         <tr>
-                            <td class="sig-body" style="width: 24%; border-right: 1px solid #000;">
-                                <div class="sig-name">MUJADID</div>
-                                <div class="sig-title">Staf Layanan Keluhan dan Monitoring Transaksi Kartu</div>
+                            <td class="sig-space-cell" style="width: 24%; border-right: 1px solid #000;"></td>
+                            <td class="sig-space-cell" style="width: 26%; border-right: 1px solid #000;"></td>
+                            <td class="sig-space-cell" style="width: 24%; border-right: 1px solid #000;"></td>
+                            <td class="sig-space-cell" style="width: 26%;"></td>
+                        </tr>
+                        <!-- Baris Nama Pejabat (Rata Sejajar Horizontal & Editable) -->
+                        <tr>
+                            <td class="sig-name-cell" style="width: 24%; border-right: 1px solid #000;">
+                                <div class="sig-name editable-text" contenteditable="true" spellcheck="false" title="Klik untuk mengedit Nama">MUJADID</div>
                             </td>
-                            <td class="sig-body" style="width: 26%; border-right: 1px solid #000;">
-                                <div class="sig-name">AYU FEBRIANTI</div>
-                                <div class="sig-title">Pemimpin Unit Layanan Keluhan dan Monitoring Transaksi Kartu</div>
+                            <td class="sig-name-cell" style="width: 26%; border-right: 1px solid #000;">
+                                <div class="sig-name editable-text" contenteditable="true" spellcheck="false" title="Klik untuk mengedit Nama">AYU FEBRIANTI</div>
                             </td>
-                            <td class="sig-body" style="width: 24%; border-right: 1px solid #000;">
-                                <div class="sig-name">WACHYUNI MADARAYU</div>
-                                <div class="sig-title">PINBAG E- CHANEL</div>
+                            <td class="sig-name-cell" style="width: 24%; border-right: 1px solid #000;">
+                                <div class="sig-name editable-text" contenteditable="true" spellcheck="false" title="Klik untuk mengedit Nama">WACHYUNI MADARAYU</div>
                             </td>
-                            <td class="sig-body" style="width: 26%;">
-                                <div class="sig-name">DIANA, ST</div>
-                                <div class="sig-title">Pemimpin Divisi IT</div>
+                            <td class="sig-name-cell" style="width: 26%;">
+                                <div class="sig-name editable-text" contenteditable="true" spellcheck="false" title="Klik untuk mengedit Nama">DIANA, ST</div>
+                            </td>
+                        </tr>
+                        <!-- Baris Jabatan Pejabat (Editable) -->
+                        <tr>
+                            <td class="sig-title-cell" style="width: 24%; border-right: 1px solid #000;">
+                                <div class="sig-title editable-text" contenteditable="true" spellcheck="false" title="Klik untuk mengedit Jabatan">Staf Layanan Keluhan dan Monitoring Transaksi Kartu</div>
+                            </td>
+                            <td class="sig-title-cell" style="width: 26%; border-right: 1px solid #000;">
+                                <div class="sig-title editable-text" contenteditable="true" spellcheck="false" title="Klik untuk mengedit Jabatan">Pemimpin Unit Layanan Keluhan dan Monitoring Transaksi Kartu</div>
+                            </td>
+                            <td class="sig-title-cell" style="width: 24%; border-right: 1px solid #000;">
+                                <div class="sig-title editable-text" contenteditable="true" spellcheck="false" title="Klik untuk mengedit Jabatan">PINBAG E- CHANEL</div>
+                            </td>
+                            <td class="sig-title-cell" style="width: 26%;">
+                                <div class="sig-title editable-text" contenteditable="true" spellcheck="false" title="Klik untuk mengedit Jabatan">Pemimpin Divisi IT</div>
                             </td>
                         </tr>
                     </table>
