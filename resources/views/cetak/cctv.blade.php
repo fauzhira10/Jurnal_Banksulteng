@@ -100,7 +100,7 @@
         }
 
         .sig-space-cell {
-            height: 105px;
+            height: 140px;
             padding: 0 !important;
             border-bottom: none !important;
         }
@@ -121,14 +121,14 @@
         }
 
         .sig-body {
-            height: 165px;
+            height: 200px;
             text-align: center;
             vertical-align: bottom !important;
             padding: 10px 6px 12px 6px !important;
         }
 
         .sig-space {
-            height: 105px;
+            height: 140px;
         }
 
         .sig-name {
@@ -243,7 +243,7 @@
                 padding: 0 !important;
             }
             .sig-space-cell {
-                height: 96px !important;
+                height: 130px !important;
                 padding: 0 !important;
             }
             .sig-name-cell {
@@ -253,11 +253,11 @@
                 padding: 2px 4px 8px 4px !important;
             }
             .sig-body {
-                height: 155px !important;
+                height: 190px !important;
                 padding: 6px 4px 8px 4px !important;
             }
             .sig-space {
-                height: 96px !important;
+                height: 130px !important;
             }
             .highlight-yellow {
                 background-color: #ffff00 !important;
