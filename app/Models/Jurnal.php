@@ -60,6 +60,42 @@ class Jurnal extends Model
         return NomorTiketService::formatValid($nomor);
     }
 
+    /**
+     * Bekal secukupnya untuk tombol-tombol aksi pada tabel Data Keluhan.
+     *
+     * Sengaja BUKAN seluruh baris. Markup tabel menanam bekal ini di dalam
+     * atribut `onclick` setiap tombol, sehingga apa pun yang ikut di sini
+     * tercetak di sumber halaman untuk seluruh baris sekaligus — dan itu
+     * membatalkan penyamaran nomor rekening di kolom nasabah.
+     *
+     * `no_rekening` dan `no_kartu` karena itu tidak dibawa: modal rincian
+     * mengambilnya lewat `GET /api/jurnal/{id}`, hanya untuk baris yang
+     * benar-benar dibuka petugas. Kalau menambah kolom di sini, pastikan
+     * kolom itu memang tidak apa-apa terbaca pada seluruh baris.
+     *
+     * @return array<string, mixed>
+     */
+    public function bekalTombol(): array
+    {
+        return [
+            'id' => $this->id,
+            'nama_nasabah' => $this->nama_nasabah,
+            'no_resi' => $this->no_resi,
+            'no_tiket' => $this->no_tiket,
+            'nominal_transaksi' => $this->nominal_transaksi,
+            'biaya_admin' => $this->biaya_admin,
+            'status' => $this->status,
+            'terminal_transaksi' => $this->terminal_transaksi,
+            'keterangan_log' => $this->keterangan_log,
+            'master_transaksi' => $this->masterTransaksi ? [
+                'id' => $this->masterTransaksi->id,
+                'jenis_transaksi' => $this->masterTransaksi->jenis_transaksi,
+                'channel' => $this->masterTransaksi->channel,
+                'biaya_admin' => $this->masterTransaksi->biaya_admin,
+            ] : null,
+        ];
+    }
+
     public function masterCabang()
     {
         return $this->belongsTo(MasterCabang::class, 'master_cabang_id');

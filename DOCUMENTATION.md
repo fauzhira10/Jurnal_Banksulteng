@@ -513,11 +513,53 @@ Peringatan lintas cabang tetap muncul bagi CS (nasabah yang sama bisa mengadu
 lewat cabang lain), tetapi rinciannya hanya ada pada Admin Pusat yang memang
 berwenang melihat lintas cabang.
 
-### 8.9 Yang belum dikerjakan
+### 8.9 Penyamaran Nomor pada Layar Daftar
+
+Nomor rekening kini tampil sebagai `••••1234` pada seluruh **layar daftar** —
+Data Keluhan, Pengaduan Masuk, Daftar Pengaduan CS, dan Beranda CS. Jumlah titiknya
+tetap empat, tidak mengikuti panjang aslinya, supaya panjang nomor pun tidak terbaca.
+Aturannya hanya ditulis sekali di `App\Support\Penyamaran`.
+
+| Tempat | Yang tampil |
+|:---|:---|
+| Layar daftar | `••••1234` |
+| Panel rincian satu kasus | nomor utuh |
+| Dokumen cetak (`resources/views/cetak/*`) | nomor utuh |
+
+Alasannya: satu layar daftar memuat puluhan nasabah sekaligus, sehingga nomor yang
+tercetak penuh ikut terbawa setiap kali layar difoto, dibagikan lewat berbagi layar,
+atau sekadar terlihat orang yang lewat. Di panel rincian, petugas memang sedang
+menangani satu kasus tertentu.
+
+**Dua perubahan pendukung, dan tanpa keduanya penyamaran ini hanya menghibur mata:**
+
+1. Atribut `data-search` pada setiap baris tabel Data Keluhan tidak lagi memuat
+   nomor rekening dan nomor kartu. Atribut itu tercetak di sumber halaman, jadi
+   nomor lengkap di sana membatalkan penyamaran di kolom sebelahnya. Pencarian
+   nomor rekening/kartu tetap bekerja lewat sisi server — cukup tekan Enter,
+   yang hilang hanya penyaringan seketika saat mengetik.
+2. Tombol aksi pada tabel dulu menanam **seluruh baris** jurnal di dalam atribut
+   `onclick`-nya. Sekarang tombol rincian hanya membawa `id` dan modalnya
+   mengambil data lewat `GET /api/jurnal/{id}` untuk baris yang benar-benar
+   dibuka; tombol lain memakai `Jurnal::bekalTombol()` yang tidak membawa nomor
+   rekening maupun nomor kartu.
+
+> Ini tindakan **tampilan**, bukan kendali akses. Petugas yang melihat daftar tetap
+> berwenang membuka rinciannya; yang dikurangi adalah paparan yang tidak disengaja.
+
+NIK dan nomor HP **tidak** disamarkan: keduanya hanya muncul di panel rincian
+pengaduan, tempat petugas justru perlu mencocokkannya dengan lampiran KTP nasabah.
+
+### 8.10 Yang belum dikerjakan
 
 Butir berikut sudah teridentifikasi namun **belum** ada di dalam kode:
 
-- Penyamaran (masking) NIK dan nomor kartu pada tampilan.
+- Penyamaran NIK pada panel rincian pengaduan. Perlu disertai tombol "tampilkan
+  penuh" dan pencatatan jejak audit seperti `lampiran.dibuka`, agar tidak
+  menghalangi pencocokan dengan lampiran KTP.
+- `partials/panel_duplikat.blade.php` masih menanam seluruh baris jurnal pada
+  atribut `data-jurnal` tombol rinciannya (maksimal 5 baris, hanya tampil untuk
+  Admin Pusat). Perlakuannya sama dengan tabel Data Keluhan bila hendak ditutup.
 - Enkripsi kolom data pribadi di basis data. Perlu dibatasi pada `pengaduans.no_ktp`
   dan `no_hp` saja: `nama_nasabah`, `no_resi`, `no_rekening`, dan `no_kartu` dipakai
   indeks unik, deteksi keluhan berulang, dan pencarian `LIKE`, yang semuanya patah

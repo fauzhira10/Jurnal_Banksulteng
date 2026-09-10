@@ -462,7 +462,11 @@
                     </thead>
                     <tbody id="jurnalTbody">
                         @foreach($jurnals as $index => $jurnal)
-                            <tr class="jurnal-row" data-search="{{ strtolower($jurnal->nama_nasabah . ' ' . $jurnal->no_resi . ' ' . $jurnal->no_rekening . ' ' . $jurnal->no_kartu . ' ' . $jurnal->no_tiket . ' ' . ($jurnal->masterCabang->nama_cabang ?? '') . ' ' . ($jurnal->masterCabang->kode_cabang ?? '') . ' ' . ($jurnal->masterTransaksi->jenis_transaksi ?? '') . ' ' . ($jurnal->masterTransaksi->channel ?? '') . ' ' . $jurnal->status . ' ' . $jurnal->terminal_transaksi) }}">
+                            {{-- data-search sengaja TANPA no_rekening dan no_kartu: atribut ini tercetak
+                                 di sumber halaman untuk setiap baris, jadi menaruh nomor lengkap di sini
+                                 membatalkan penyamaran di kolom sebelah. Pencarian nomor rekening/kartu
+                                 tetap bekerja lewat sisi server (JurnalController::index), cukup tekan Enter. --}}
+                            <tr class="jurnal-row" data-search="{{ strtolower($jurnal->nama_nasabah . ' ' . $jurnal->no_resi . ' ' . $jurnal->no_tiket . ' ' . ($jurnal->masterCabang->nama_cabang ?? '') . ' ' . ($jurnal->masterCabang->kode_cabang ?? '') . ' ' . ($jurnal->masterTransaksi->jenis_transaksi ?? '') . ' ' . ($jurnal->masterTransaksi->channel ?? '') . ' ' . $jurnal->status . ' ' . $jurnal->terminal_transaksi) }}">
                                 <td style="text-align: center; font-weight: 600; color: var(--bs-gray-500);">
                                     {{ ($jurnals->currentPage() - 1) * $jurnals->perPage() + $loop->iteration }}
                                 </td>
@@ -477,7 +481,10 @@
                                 <td>
                                     <div class="nasabah-title highlightable">{{ $jurnal->nama_nasabah }}</div>
                                     <div class="nasabah-sub">
-                                        <span>Rek: <strong class="highlightable">{{ $jurnal->no_rekening }}</strong></span>
+                                        {{-- Disamarkan: satu layar daftar memuat puluhan nomor rekening sekaligus.
+                                             Nomor utuhnya ada di modal rincian, yang mengambilnya lewat AJAX per baris.
+                                             Tanpa kelas "highlightable" karena nilai tersamar tidak lagi cocok dicari. --}}
+                                        <span>Rek: <strong title="Nomor lengkap ada pada rincian">{{ \App\Support\Penyamaran::nomor($jurnal->no_rekening) }}</strong></span>
                                         <span>•</span>
                                         <span>Resi: <strong class="highlightable">{{ $jurnal->no_resi }}</strong></span>
                                     </div>
@@ -570,7 +577,7 @@
                                         $isMenunggu = strtolower(trim($jurnal->status ?? '')) === 'menunggu';
                                         $hasLog = !empty($jurnal->keterangan_log) && trim($jurnal->keterangan_log) !== '-' && trim($jurnal->keterangan_log) !== '' && trim(strtolower($jurnal->keterangan_log)) !== 'tidak ada keterangan tambahan.';
                                     @endphp
-                                    <button type="button" class="btn btn-secondary btn-sm" onclick="showDetailModal({{ json_encode($jurnal) }})" title="Lihat Rincian & Aksi" style="padding: 6px 12px; font-size: 0.78125rem; font-weight: 600; display: inline-flex; align-items: center; gap: 5px;">
+                                    <button type="button" class="btn btn-secondary btn-sm" onclick="showDetailModal({{ $jurnal->id }})" title="Lihat Rincian & Aksi" style="padding: 6px 12px; font-size: 0.78125rem; font-weight: 600; display: inline-flex; align-items: center; gap: 5px;">
                                         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                             <circle cx="12" cy="12" r="10"></circle>
                                             <line x1="12" y1="16" x2="12" y2="12"></line>
@@ -579,7 +586,7 @@
                                         <span>Detail</span>
                                     </button>
                                     @if($isMenunggu)
-                                        <button type="button" onclick="showMenungguWarning({{ json_encode($jurnal) }})" class="btn btn-sm btn-cetak-action" data-jurnal-id="{{ $jurnal->id }}" style="background-color: #fef3c7; color: #92400e; padding: 6px 11px; font-size: 0.75rem; font-weight: 600; display: inline-flex; align-items: center; gap: 4px; border-radius: 4px; margin-left: 5px; border: 1px solid #fde68a; cursor: pointer;" title="Status keluhan masih Menunggu. Ubah status penanganan terlebih dahulu untuk dapat mencetak.">
+                                        <button type="button" onclick="showMenungguWarning({{ json_encode($jurnal->bekalTombol()) }})" class="btn btn-sm btn-cetak-action" data-jurnal-id="{{ $jurnal->id }}" style="background-color: #fef3c7; color: #92400e; padding: 6px 11px; font-size: 0.75rem; font-weight: 600; display: inline-flex; align-items: center; gap: 4px; border-radius: 4px; margin-left: 5px; border: 1px solid #fde68a; cursor: pointer;" title="Status keluhan masih Menunggu. Ubah status penanganan terlebih dahulu untuk dapat mencetak.">
                                             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                                                 <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
                                                 <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
@@ -587,7 +594,7 @@
                                             <span>Menunggu 🔒</span>
                                         </button>
                                     @elseif($hasLog)
-                                        <button type="button" onclick="openPrintChoiceModal({{ json_encode($jurnal) }})" class="btn btn-sm btn-cetak-action" data-jurnal-id="{{ $jurnal->id }}" style="background-color: #0284c7; color: white; padding: 6px 12px; font-size: 0.78125rem; font-weight: 600; display: inline-flex; align-items: center; gap: 5px; text-decoration: none; border-radius: 4px; margin-left: 5px; border: 1px solid #0369a1; cursor: pointer;" title="Pilih Format Cetak Dokumen">
+                                        <button type="button" onclick="openPrintChoiceModal({{ json_encode($jurnal->bekalTombol()) }})" class="btn btn-sm btn-cetak-action" data-jurnal-id="{{ $jurnal->id }}" style="background-color: #0284c7; color: white; padding: 6px 12px; font-size: 0.78125rem; font-weight: 600; display: inline-flex; align-items: center; gap: 5px; text-decoration: none; border-radius: 4px; margin-left: 5px; border: 1px solid #0369a1; cursor: pointer;" title="Pilih Format Cetak Dokumen">
                                             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                                 <polyline points="6 9 6 2 18 2 18 9"></polyline>
                                                 <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
@@ -596,7 +603,7 @@
                                             <span>Cetak ▾</span>
                                         </button>
                                     @else
-                                        <button type="button" onclick="openQuickLogModal({{ json_encode($jurnal) }}, true)" class="btn btn-sm btn-cetak-action" data-jurnal-id="{{ $jurnal->id }}" style="background-color: #fff7ed; color: #c2410c; padding: 6px 11px; font-size: 0.75rem; font-weight: 600; display: inline-flex; align-items: center; gap: 4px; border-radius: 4px; margin-left: 5px; border: 1px dashed #ea580c; cursor: pointer;" title="Keterangan log masih kosong. Klik untuk mengisi log & mencetak.">
+                                        <button type="button" onclick="openQuickLogModal({{ json_encode($jurnal->bekalTombol()) }}, true)" class="btn btn-sm btn-cetak-action" data-jurnal-id="{{ $jurnal->id }}" style="background-color: #fff7ed; color: #c2410c; padding: 6px 11px; font-size: 0.75rem; font-weight: 600; display: inline-flex; align-items: center; gap: 4px; border-radius: 4px; margin-left: 5px; border: 1px dashed #ea580c; cursor: pointer;" title="Keterangan log masih kosong. Klik untuk mengisi log & mencetak.">
                                             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                                                 <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
                                                 <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
@@ -1962,6 +1969,21 @@
     }
 
     function showDetailModal(jurnal) {
+        // Tombol pada tabel hanya membawa id-nya. Nomor rekening dan nomor kartu
+        // tidak lagi ditanam di sumber halaman untuk seluruh baris sekaligus,
+        // melainkan diambil hanya untuk baris yang benar-benar dibuka petugas.
+        if (typeof jurnal !== 'object' || jurnal === null) {
+            fetch('{{ url('/api/jurnal') }}/' + jurnal, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+                .then(r => r.ok ? r.json() : Promise.reject(new Error('Gagal memuat rincian')))
+                .then(data => {
+                    if (data && data.id) {
+                        showDetailModal(data);
+                    }
+                })
+                .catch(err => console.error('Gagal memuat rincian jurnal:', err));
+            return;
+        }
+
         currentDetailJurnal = jurnal;
         document.getElementById('modal_nama_nasabah').textContent = jurnal.nama_nasabah || '-';
         document.getElementById('modal_no_rekening').textContent = jurnal.no_rekening || '-';
