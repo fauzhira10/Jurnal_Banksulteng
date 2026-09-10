@@ -8,6 +8,7 @@ use App\Http\Controllers\Cs\DashboardController as CsDashboardController;
 use App\Http\Controllers\Cs\PengaduanController as CsPengaduanController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\JurnalController;
+use App\Http\Controllers\KeamananAkunController;
 use App\Http\Controllers\LaporanController;
 use App\Http\Controllers\PengaduanLampiranController;
 use Illuminate\Support\Facades\Route;
@@ -20,6 +21,13 @@ Route::middleware('guest')->group(function () {
     Route::post('/login', [AuthController::class, 'login'])
         ->middleware('throttle:20,1')
         ->name('login.post');
+
+    // Langkah kedua (dua faktor). Masih dalam grup guest: sesinya belum
+    // berstatus masuk sampai kodenya terbukti benar.
+    Route::get('/login/verifikasi', [AuthController::class, 'showMfaForm'])->name('login.mfa');
+    Route::post('/login/verifikasi', [AuthController::class, 'mfa'])
+        ->middleware('throttle:20,1')
+        ->name('login.mfa.post');
 });
 
 // ============================================================
@@ -27,6 +35,14 @@ Route::middleware('guest')->group(function () {
 // ============================================================
 Route::middleware('auth')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+
+    // Keamanan akun sendiri (dua faktor). Terbuka untuk kedua peran: setiap
+    // petugas hanya dapat mengurus akunnya sendiri.
+    Route::get('/keamanan-akun', [KeamananAkunController::class, 'index'])->name('keamanan.index');
+    Route::post('/keamanan-akun/mfa', [KeamananAkunController::class, 'mulai'])->name('keamanan.mfa.mulai');
+    Route::post('/keamanan-akun/mfa/konfirmasi', [KeamananAkunController::class, 'konfirmasi'])->name('keamanan.mfa.konfirmasi');
+    Route::post('/keamanan-akun/mfa/kode-pemulihan', [KeamananAkunController::class, 'kodePemulihan'])->name('keamanan.mfa.kode');
+    Route::delete('/keamanan-akun/mfa', [KeamananAkunController::class, 'matikan'])->name('keamanan.mfa.matikan');
 
     // API AJAX Auto-Fill Biaya Admin & Channel (dipakai form jurnal admin & form pengaduan CS)
     Route::get('/api/transaksi/{id}', [JurnalController::class, 'getDetailTransaksi'])->name('api.transaksi.detail');

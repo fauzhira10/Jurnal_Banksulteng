@@ -556,7 +556,62 @@ menangani satu kasus tertentu.
 NIK dan nomor HP **tidak** disamarkan: keduanya hanya muncul di panel rincian
 pengaduan, tempat petugas justru perlu mencocokkannya dengan lampiran KTP nasabah.
 
-### 8.10 Yang belum dikerjakan
+### 8.10 Autentikasi Dua Faktor (2FA)
+
+Setiap petugas dapat menyalakan dua faktor untuk akunnya sendiri lewat ikon perisai
+di pojok kiri bawah (**Keamanan Akun**). Setelah aktif, kata sandi yang benar hanya
+membawa petugas ke satu layar lagi: enam angka dari aplikasi autentikator di ponselnya.
+
+| Hal | Nilai |
+|:---|:---|
+| Algoritma | TOTP, RFC 6238 — SHA1, 6 digit, 30 detik |
+| Aplikasi | Google Authenticator, Microsoft Authenticator, Authy |
+| Toleransi jam | satu langkah sebelum & sesudah (rentang 90 detik) |
+| Kode pemulihan | 8 kode sekali pakai |
+| Salah kode | 5 kali → verifikasi dikunci, petugas harus masuk ulang |
+
+**Pemasangannya memakai kunci teks, bukan pemindaian QR.** Tidak ada pustaka QR yang
+dipasang, dan menariknya dari internet akan gagal di server yang tidak punya jalur
+keluar. Petugas memilih "masukkan kunci setelan" (manual entry) di aplikasinya, lalu
+menyalin kunci yang tampil di halaman Keamanan Akun.
+
+**Tiga pengaman yang penting dipahami:**
+
+1. **Dua faktor baru berlaku setelah satu kode terbukti benar.** Rahasianya sudah
+   tersimpan sejak tombol "Aktifkan" ditekan, tetapi statusnya masih *Menunggu
+   Konfirmasi*. Tanpa pemisahan ini, petugas yang salah menyalin kunci akan langsung
+   terkunci dari akunnya sendiri.
+2. **Satu kode hanya berlaku sekali.** Langkah waktu yang sudah dipakai disimpan di
+   `users.mfa_langkah_terakhir`, sehingga kode yang sempat terlihat orang lain di layar
+   tidak dapat dipakai ulang selama sisa 30 detiknya.
+3. **Sesi belum berstatus masuk selama menunggu kode.** Yang disimpan hanya penanda
+   siapa yang sedang diverifikasi, berumur 5 menit.
+
+**Bila petugas kehilangan ponselnya:** pakai salah satu kode pemulihan. Bila kode
+pemulihan juga habis, satu-satunya jalan adalah perintah di server:
+
+```powershell
+php artisan admin:mfa-reset <username>
+```
+
+Perintah ini sengaja tidak disediakan sebagai tombol di web — siapa pun yang dapat
+melucuti dua faktor akun lain lewat web membuat dua faktor itu sendiri tidak berarti.
+Tindakannya tercatat pada jejak audit sebagai `mfa.direset`.
+
+`users.mfa_rahasia` dan `users.mfa_kode_pemulihan` disimpan **terenkripsi**, jadi
+salinan basis data yang bocor tidak cukup untuk membuat kode. Konsekuensinya: bila
+`APP_KEY` hilang, dua faktor seluruh akun harus disetel ulang dengan perintah di atas —
+data lain tidak terpengaruh.
+
+Kejadian yang masuk jejak audit: `mfa.diaktifkan`, `mfa.dinonaktifkan`,
+`mfa.kode_pemulihan_dibuat`, `mfa.direset`, `login.mfa_gagal`, `login.mfa_terkunci`,
+dan `login.mfa_pemulihan`.
+
+> Dua faktor inilah penutup celah yang disebut pada bagian 8.3: serangan tebak kata
+> sandi yang tersebar dari banyak alamat IP tidak tertahan oleh pembatas per akun,
+> tetapi tetap berhenti di langkah kedua.
+
+### 8.11 Yang belum dikerjakan
 
 Butir berikut sudah teridentifikasi namun **belum** ada di dalam kode:
 
@@ -567,6 +622,7 @@ Butir berikut sudah teridentifikasi namun **belum** ada di dalam kode:
   dan `no_hp` saja: `nama_nasabah`, `no_resi`, `no_rekening`, dan `no_kartu` dipakai
   indeks unik, deteksi keluhan berulang, dan pencarian `LIKE`, yang semuanya patah
   bila nilainya terenkripsi.
-- Autentikasi dua faktor untuk akun Admin Pusat. Ini juga satu-satunya penutup
-  serangan tebak kata sandi yang tersebar dari banyak alamat IP.
+- Mewajibkan dua faktor bagi seluruh akun Admin Pusat. Saat ini sifatnya sukarela
+  per akun (lihat bagian 8.10) supaya tidak ada petugas yang terkunci mendadak;
+  mewajibkannya perlu tenggat dan pendampingan pemasangan lebih dulu.
 - Menghapus `'unsafe-inline'` dari CSP; menuntut nonce pada setiap blok skrip.
