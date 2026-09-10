@@ -567,6 +567,9 @@ Butir berikut sudah teridentifikasi namun **belum** ada di dalam kode:
   dan `no_hp` saja: `nama_nasabah`, `no_resi`, `no_rekening`, dan `no_kartu` dipakai
   indeks unik, deteksi keluhan berulang, dan pencarian `LIKE`, yang semuanya patah
   bila nilainya terenkripsi.
-- Autentikasi dua faktor untuk akun Admin Pusat. Ini juga satu-satunya penutup
-  serangan tebak kata sandi yang tersebar dari banyak alamat IP.
+- Serangan tebak kata sandi yang tersebar dari banyak alamat IP belum tertutup.
+  Pembatas login mengunci per kombinasi username + alamat IP (bagian 8.3), jadi
+  percobaan yang datang dari banyak alamat berbeda tidak terkena batasnya.
+  Autentikasi dua faktor sempat dibangun lengkap untuk menutup celah ini, lalu
+  **dihapus atas permintaan pengguna** dan tidak akan dipasang kembali.
 - Menghapus `'unsafe-inline'` dari CSP; menuntut nonce pada setiap blok skrip.

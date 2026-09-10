@@ -133,7 +133,8 @@ class AuthController extends Controller
      * Sengaja tidak memakai username saja, sebab kunci per-username murni
      * memungkinkan penyerang mengunci akun Admin Pusat dari luar (denial of
      * service) pada sistem yang hanya punya satu akun admin. Serangan tersebar
-     * dari banyak IP ditutup belakangan lewat MFA, bukan lewat pembatas ini.
+     * dari banyak IP karena itu tidak tertahan di sini, dan memang belum ada
+     * penutupnya — lihat DOCUMENTATION.md bagian "Yang belum dikerjakan".
      */
     protected function kunciPembatas(Request $request): string
     {
