@@ -166,7 +166,8 @@ test('perubahan status jurnal disinkronkan ke status pengaduan cs', function () 
 test('reset seluruh data jurnal mengembalikan pengaduan tertaut ke status diterima', function () {
     $cabang = buatCabang();
     $cs = buatCs($cabang);
-    $admin = buatAdmin();
+    // Reset massal kini dibatasi Admin Utama dan meminta konfirmasi kata sandi
+    $admin = buatSuperAdmin();
     $transaksi = buatTransaksi();
     $pengaduan = buatPengaduan($cs, $transaksi);
 
@@ -179,8 +180,10 @@ test('reset seluruh data jurnal mengembalikan pengaduan tertaut ke status diteri
     ]);
     $pengaduan->update(['jurnal_id' => $jurnal->id, 'status' => PengaduanStatus::Selesai, 'diproses_at' => now(), 'selesai_at' => now()]);
 
-    $this->actingAs($admin)->delete(route('jurnal.reset_all'), ['delete_template' => false])
-        ->assertRedirect(route('jurnal.index'));
+    $this->actingAs($admin)->delete(route('jurnal.reset_all'), [
+        'delete_template' => false,
+        'password' => 'admin123',
+    ])->assertRedirect(route('jurnal.index'));
 
     $pengaduan->refresh();
     expect(Jurnal::count())->toBe(0)

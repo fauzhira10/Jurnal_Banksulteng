@@ -2,7 +2,148 @@
 
 @section('title', 'Data Keluhan Nasabah')
 @section('page_title', 'Data Jurnal Keluhan')
-@section('page_subtitle', 'Rekapitulasi dan pencarian data keluhan transaksi nasabah Bank Sulteng')
+@push('styles')
+<style>
+    /* Container Relative untuk Tombol Melayang */
+    .table-relative-wrapper {
+        position: relative;
+        width: 100%;
+    }
+
+    /* Tombol Panah Melayang (Floating Chevrons) yang Mengikuti Layar User */
+    .floating-scroll-arrow {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        z-index: 25;
+        width: 46px;
+        height: 46px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.96);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        border: 1.5px solid rgba(2, 132, 199, 0.35);
+        color: #0284c7;
+        box-shadow: 0 4px 18px rgba(0, 51, 102, 0.18), 0 1px 3px rgba(0, 0, 0, 0.08);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.25s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.2s ease, box-shadow 0.2s ease;
+        outline: none;
+        will-change: top, transform, opacity;
+    }
+
+    .floating-scroll-arrow.floating-left {
+        left: 12px;
+    }
+
+    .floating-scroll-arrow.floating-right {
+        right: 12px;
+    }
+
+    .floating-scroll-arrow:hover {
+        background: #0284c7;
+        color: #ffffff;
+        border-color: #0284c7;
+        transform: translateY(-50%) scale(1.1);
+        box-shadow: 0 6px 22px rgba(2, 132, 199, 0.45), 0 2px 6px rgba(0, 0, 0, 0.12);
+    }
+
+    .floating-scroll-arrow:active {
+        transform: translateY(-50%) scale(0.96);
+    }
+
+    .floating-scroll-arrow.is-hidden {
+        opacity: 0 !important;
+        pointer-events: none !important;
+        transform: translateY(-50%) scale(0.75) !important;
+    }
+
+    .floating-scroll-arrow.viewport-hidden {
+        opacity: 0 !important;
+        pointer-events: none !important;
+        transform: translateY(-50%) scale(0.75) !important;
+    }
+
+    /* Sembunyikan tombol saat user sedang aktif scrolling up/down */
+    .floating-scroll-arrow.scrolling-hidden {
+        opacity: 0 !important;
+        pointer-events: none !important;
+        transform: translateY(-50%) scale(0.75) !important;
+        transition: opacity 0.15s ease, transform 0.15s ease !important;
+    }
+
+    /* Tooltip Floating Panah */
+    .floating-scroll-tooltip {
+        position: absolute;
+        top: 50%;
+        background: #0f172a;
+        color: #ffffff;
+        padding: 5px 11px;
+        border-radius: 6px;
+        font-size: 0.71875rem;
+        font-weight: 700;
+        white-space: nowrap;
+        pointer-events: none;
+        opacity: 0;
+        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+        transition: all 0.2s ease;
+        z-index: 30;
+    }
+
+    .floating-scroll-arrow.floating-right .floating-scroll-tooltip {
+        right: 54px;
+        transform: translateY(-50%) translateX(6px);
+    }
+
+    .floating-scroll-arrow.floating-right .floating-scroll-tooltip::after {
+        content: '';
+        position: absolute;
+        right: -4px;
+        top: 50%;
+        transform: translateY(-50%);
+        border-width: 4px 0 4px 4px;
+        border-style: solid;
+        border-color: transparent transparent transparent #0f172a;
+    }
+
+    .floating-scroll-arrow.floating-left .floating-scroll-tooltip {
+        left: 54px;
+        transform: translateY(-50%) translateX(-6px);
+    }
+
+    .floating-scroll-arrow.floating-left .floating-scroll-tooltip::after {
+        content: '';
+        position: absolute;
+        left: -4px;
+        top: 50%;
+        transform: translateY(-50%);
+        border-width: 4px 4px 4px 0;
+        border-style: solid;
+        border-color: transparent #0f172a transparent transparent;
+    }
+
+    .floating-scroll-arrow:hover .floating-scroll-tooltip {
+        opacity: 1;
+        transform: translateY(-50%) translateX(0);
+    }
+
+    /* Animasi denyut halus pada tombol kanan saat halaman baru dibuka */
+    @keyframes pulseGlow {
+        0%, 100% {
+            box-shadow: 0 4px 18px rgba(2, 132, 199, 0.25), 0 0 0 0 rgba(2, 132, 199, 0.4);
+        }
+        50% {
+            box-shadow: 0 6px 24px rgba(2, 132, 199, 0.45), 0 0 0 6px rgba(2, 132, 199, 0.15);
+        }
+    }
+
+    .floating-scroll-arrow.floating-right:not(.is-hidden):not(.viewport-hidden):not(.scrolling-hidden):not(:hover) {
+        animation: pulseGlow 2.5s infinite;
+    }
+</style>
+@endpush
 
 @section('content')
 
@@ -257,6 +398,7 @@
                 </svg>
                 <span>Export Excel (.xlsx)</span>
             </button>
+            @if(auth()->user()?->isSuperAdmin())
             <button type="button" class="btn btn-reset-all" onclick="openResetAllModal()" title="Kosongkan / Reset Seluruh Data Jurnal & Master Template">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                     <polyline points="3 6 5 6 21 6"></polyline>
@@ -264,6 +406,7 @@
                 </svg>
                 <span>Hapus Semua Data</span>
             </button>
+            @endif
         </div>
     </div>
 
@@ -285,7 +428,24 @@
                 </div>
             </div>
 
-            <div class="table-container" id="tableContainer" style="overflow-x: auto; width: 100%; -webkit-overflow-scrolling: touch;">
+            <div class="table-relative-wrapper" style="position: relative; width: 100%;">
+                <!-- Tombol Panah Melayang Kiri -->
+                <button type="button" id="floatingScrollLeft" onclick="scrollJurnalTable('left')" ondblclick="scrollJurnalTable('left', true)" class="floating-scroll-arrow floating-left is-hidden" title="Geser ke kiri (Klik 2x untuk kembali ke awal)" aria-label="Geser ke Kiri">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="15 18 9 12 15 6"></polyline>
+                    </svg>
+                    <span class="floating-scroll-tooltip">Kembali ke Awal ↵</span>
+                </button>
+
+                <!-- Tombol Panah Melayang Kanan -->
+                <button type="button" id="floatingScrollRight" onclick="scrollJurnalTable('right')" ondblclick="scrollJurnalTable('right', true)" class="floating-scroll-arrow floating-right" title="Geser ke tombol Detail & Cetak (Klik 2x untuk langsung ke ujung)" aria-label="Geser ke Kanan">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="9 18 15 12 9 6"></polyline>
+                    </svg>
+                    <span class="floating-scroll-tooltip">Detail & Cetak ➔</span>
+                </button>
+
+                <div class="table-container" id="tableContainer" onscroll="updateTableScrollIndicators()" style="overflow-x: auto; width: 100%; -webkit-overflow-scrolling: touch; scroll-behavior: smooth;">
                 <table class="custom-table" id="jurnalTable" style="min-width: 1100px; width: 100%;">
                     <thead>
                         <tr>
@@ -450,8 +610,9 @@
                     </tbody>
                 </table>
             </div>
+        </div>
 
-            <!-- Custom Pagination Navigation Footer -->
+        <!-- Custom Pagination Navigation Footer -->
             <div id="paginationWrapper" style="padding: 16px 24px; border-top: 1px solid var(--bs-gray-200); background: #ffffff;">
                 <div class="custom-pagination-container">
                     <div class="pagination-info">
@@ -1196,6 +1357,7 @@
 </div>
 
 <!-- Modal Konfirmasi Reset Semua Data -->
+@if(auth()->user()?->isSuperAdmin())
 <div class="modal-backdrop" id="resetAllModal">
     <div class="modal-content" style="max-width: 500px; border-top: 4px solid #dc2626; animation: modalFadeIn 0.25s ease-out;">
         <div class="modal-header" style="background-color: #fff1f2; border-bottom: 1px solid #fecdd3;">
@@ -1229,8 +1391,18 @@
                         <line x1="12" y1="8" x2="12" y2="12"></line>
                         <line x1="12" y1="16" x2="12.01" y2="16"></line>
                     </svg>
-                    <span><strong>Peringatan Kritis:</strong> Seluruh baris transaksi yang telah terdaftar saat ini akan dihapus secara permanen. Anda dapat mengimpor kembali berkas Master Excel yang baru setelah proses ini selesai.</span>
+                    <span><strong>Peringatan Kritis:</strong> Seluruh baris transaksi yang telah terdaftar saat ini akan dihapus secara permanen. Sistem membuat cadangan Excel otomatis sebelum menghapus, dan tindakan ini dicatat pada jejak audit.</span>
                 </div>
+
+                <label for="resetAllPassword" style="display: block; font-size: 0.8125rem; font-weight: 700; color: var(--bs-gray-800); margin-bottom: 6px;">
+                    Kata sandi akun Anda <span style="color: #dc2626;">*</span>
+                </label>
+                <input type="password" name="password" id="resetAllPassword" required autocomplete="current-password"
+                       placeholder="Masukkan kata sandi untuk melanjutkan"
+                       style="width: 100%; padding: 0.625rem 0.75rem; border: 1px solid var(--bs-gray-300); border-radius: var(--radius-md); font-size: 0.875rem;">
+                <p style="font-size: 0.71875rem; color: var(--bs-gray-500); margin-top: 6px; line-height: 1.45;">
+                    Diminta ulang agar layar yang tertinggal terbuka tidak dapat dipakai orang lain untuk mengosongkan data.
+                </p>
             </div>
 
             <div class="modal-footer" style="background-color: #fafafa; border-top: 1px solid var(--bs-gray-200); padding: 16px 24px; display: flex; justify-content: flex-end; gap: 10px;">
@@ -1248,6 +1420,7 @@
         </form>
     </div>
 </div>
+@endif
 
 <!-- Modal Proses Export Excel (Live Real-Time UI Progress) -->
 <div class="modal-backdrop" id="exportProgressModal">
@@ -1539,6 +1712,15 @@
                 applyYellowHighlights(document.getElementById('searchInput').value);
                 bindPaginationEvents();
                 updateActiveFilterChips();
+                if (typeof window.bindTableScrollEvents === 'function') {
+                    window.bindTableScrollEvents();
+                }
+                if (typeof window.updateTableScrollIndicators === 'function') {
+                    window.updateTableScrollIndicators();
+                }
+                if (typeof window.updateFloatingArrowPosition === 'function') {
+                    window.updateFloatingArrowPosition();
+                }
             })
             .catch(err => console.error('Gagal mengambil data pencarian:', err));
     }
@@ -1850,7 +2032,7 @@
         else if (rawSt === 'success') statusBadgeClass = 'badge-success';
         else if (rawSt === 'done') statusBadgeClass = 'badge-done';
         else if (rawSt === 'rejected') statusBadgeClass = 'badge-rejected';
-        document.getElementById('modal_status').innerHTML = '<span class="badge ' + statusBadgeClass + '">' + (jurnal.status || '-') + '</span>';
+        document.getElementById('modal_status').innerHTML = '<span class="badge ' + statusBadgeClass + '">' + escapeHtml(jurnal.status || '-') + '</span>';
         
         document.getElementById('modal_tgl_transaksi').textContent = formatDateIndo(jurnal.tgl_transaksi);
         document.getElementById('modal_tgl_terima').textContent = formatDateIndo(jurnal.tgl_terima);
@@ -2847,6 +3029,207 @@
             const kode = selectedOpt ? selectedOpt.getAttribute('data-kode') : '';
             populateFilterTerminalData(kode, initialFilterTerminal);
         }
+
+        // Inisialisasi indikator navigasi panah scroll tabel
+        setTimeout(function() {
+            if (typeof window.updateTableScrollIndicators === 'function') {
+                window.updateTableScrollIndicators();
+            }
+        }, 250);
     });
+
+    // =========================================================================
+    // NAVIGASI PANAH GESER TABEL HORIZONTAL (HORIZONTAL SCROLL ARROWS)
+    // =========================================================================
+    let horizontalScrollInterval = null;
+
+    window.scrollJurnalTable = function(direction, isFull = false) {
+        const container = document.getElementById('tableContainer');
+        if (!container) return;
+
+        // Hilangkan fokus tombol agar tooltip / status aktif tidak tertahan
+        if (document.activeElement && typeof document.activeElement.blur === 'function') {
+            document.activeElement.blur();
+        }
+
+        if (isFull) {
+            if (direction === 'left') {
+                container.scrollTo({ left: 0, behavior: 'smooth' });
+            } else {
+                container.scrollTo({ left: container.scrollWidth, behavior: 'smooth' });
+            }
+        } else {
+            // Geser proporsional ~45% lebar container atau min 340px
+            const scrollAmount = Math.max(340, Math.floor(container.clientWidth * 0.45));
+            if (direction === 'left') {
+                container.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
+            } else {
+                container.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+            }
+        }
+
+        // Jalankan sinkronisasi intensif selama animasi smooth scroll berlangsung
+        if (horizontalScrollInterval) {
+            clearInterval(horizontalScrollInterval);
+        }
+
+        // Cek langsung pada frame pertama
+        window.updateTableScrollIndicators();
+
+        let tick = 0;
+        horizontalScrollInterval = setInterval(function() {
+            tick++;
+            window.updateTableScrollIndicators();
+            if (tick >= 16) { // 16 * 40ms = 640ms
+                clearInterval(horizontalScrollInterval);
+                horizontalScrollInterval = null;
+                window.updateTableScrollIndicators();
+            }
+        }, 40);
+    };
+
+    // Sinkronisasi status tersembunyi / aktif tombol panah (horizontal)
+    window.updateTableScrollIndicators = function() {
+        const container = document.getElementById('tableContainer');
+        if (!container) return;
+
+        const scrollLeft = Math.round(container.scrollLeft);
+        const scrollWidth = container.scrollWidth;
+        const clientWidth = container.clientWidth;
+        const maxScroll = Math.max(0, scrollWidth - clientWidth);
+
+        const floatLeft = document.getElementById('floatingScrollLeft');
+        const floatRight = document.getElementById('floatingScrollRight');
+
+        // Jika tabel muat penuh (tidak memerlukan scroll horizontal)
+        if (maxScroll <= 8) {
+            if (floatLeft) floatLeft.classList.add('is-hidden');
+            if (floatRight) floatRight.classList.add('is-hidden');
+            return;
+        }
+
+        // Toleransi 8px untuk layar High-DPI / pembulatan subpixel Windows
+        const canScrollLeft = scrollLeft > 8;
+        const canScrollRight = (maxScroll - scrollLeft) > 8;
+
+        if (floatLeft) {
+            if (canScrollLeft) {
+                floatLeft.classList.remove('is-hidden');
+            } else {
+                floatLeft.classList.add('is-hidden');
+            }
+        }
+        if (floatRight) {
+            if (canScrollRight) {
+                floatRight.classList.remove('is-hidden');
+            } else {
+                floatRight.classList.add('is-hidden');
+            }
+        }
+    };
+
+    // Binding event listener scroll horizontal pada tableContainer
+    window.bindTableScrollEvents = function() {
+        const tblContainer = document.getElementById('tableContainer');
+        if (tblContainer) {
+            tblContainer.removeEventListener('scroll', window.updateTableScrollIndicators);
+            tblContainer.addEventListener('scroll', window.updateTableScrollIndicators, { passive: true });
+        }
+    };
+
+    // Mengikuti posisi vertikal layar user secara dinamis (Viewport Tracking)
+    window.updateFloatingArrowPosition = function() {
+        const wrapper = document.querySelector('.table-relative-wrapper');
+        const floatLeft = document.getElementById('floatingScrollLeft');
+        const floatRight = document.getElementById('floatingScrollRight');
+
+        if (!wrapper || (!floatLeft && !floatRight)) return;
+
+        const rect = wrapper.getBoundingClientRect();
+        const windowHeight = window.innerHeight;
+
+        // Cek apakah area tabel sedang terlihat di layar user
+        const isVisibleVertically = rect.bottom > 80 && rect.top < windowHeight - 80;
+
+        if (!isVisibleVertically) {
+            if (floatLeft) floatLeft.classList.add('viewport-hidden');
+            if (floatRight) floatRight.classList.add('viewport-hidden');
+            return;
+        }
+
+        if (floatLeft) floatLeft.classList.remove('viewport-hidden');
+        if (floatRight) floatRight.classList.remove('viewport-hidden');
+
+        // Titik tengah layar user yang memotong area tabel
+        const topBound = Math.max(rect.top, 70);
+        const bottomBound = Math.min(rect.bottom, windowHeight - 70);
+
+        const centerViewportY = (topBound + bottomBound) / 2;
+        // Konversi ke koordinat vertikal lokal di dalam wrapper tabel
+        let relativeY = centerViewportY - rect.top;
+
+        // Batasi agar tombol tidak keluar dari batas atas dan bawah tabel
+        const minTop = 32;
+        const maxTop = Math.max(minTop, rect.height - 32);
+        relativeY = Math.max(minTop, Math.min(maxTop, relativeY));
+
+        const targetYStr = relativeY + 'px';
+        if (floatLeft) floatLeft.style.top = targetYStr;
+        if (floatRight) floatRight.style.top = targetYStr;
+    };
+
+    // Kontrol Scroll Vertikal: Sembunyikan panah saat scroll (up/down), munculkan kembali saat berhenti scroll
+    let verticalScrollTimeout = null;
+    let isCurrentlyScrollingVertically = false;
+
+    function handleVerticalScroll() {
+        const floatLeft = document.getElementById('floatingScrollLeft');
+        const floatRight = document.getElementById('floatingScrollRight');
+
+        // Sembunyikan tombol seketika saat user mulai scrolling ke atas / ke bawah
+        if (!isCurrentlyScrollingVertically) {
+            isCurrentlyScrollingVertically = true;
+            if (floatLeft) floatLeft.classList.add('scrolling-hidden');
+            if (floatRight) floatRight.classList.add('scrolling-hidden');
+        }
+
+        // Reset timer deteksi berhenti scroll
+        if (verticalScrollTimeout) {
+            clearTimeout(verticalScrollTimeout);
+        }
+
+        // Ketika user BERHENTI scroll vertikal (180ms tanpa pergerakan baru)
+        verticalScrollTimeout = setTimeout(function() {
+            isCurrentlyScrollingVertically = false;
+
+            // Hitung dan tempatkan posisi tombol tepat sejajar pandangan layar saat ini
+            window.updateFloatingArrowPosition();
+
+            // Munculkan kembali tombol secara halus
+            if (floatLeft) floatLeft.classList.remove('scrolling-hidden');
+            if (floatRight) floatRight.classList.remove('scrolling-hidden');
+
+            // Pastikan status indikator batas kiri/kanan tetap sinkron
+            window.updateTableScrollIndicators();
+        }, 180);
+    }
+
+    // Pasang Event Listener untuk Sinkronisasi Horizontal & Vertikal
+    window.bindTableScrollEvents();
+
+    // Event listener scroll vertikal: sembunyikan saat scroll, munculkan saat berhenti
+    window.addEventListener('scroll', handleVerticalScroll, { passive: true });
+    window.addEventListener('resize', function() {
+        window.bindTableScrollEvents();
+        window.updateTableScrollIndicators();
+        handleVerticalScroll();
+    });
+
+    // Inisialisasi posisi awal setelah dokumen siap
+    setTimeout(function() {
+        window.bindTableScrollEvents();
+        window.updateTableScrollIndicators();
+        window.updateFloatingArrowPosition();
+    }, 200);
 </script>
 @endpush

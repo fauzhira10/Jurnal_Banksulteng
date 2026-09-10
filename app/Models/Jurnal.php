@@ -11,7 +11,34 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 #[ObservedBy([JurnalObserver::class])]
 class Jurnal extends Model
 {
-    protected $guarded = ['id'];
+    /**
+     * Kolom yang boleh diisi massal.
+     *
+     * Disebut satu per satu, bukan lewat $guarded, agar tidak ada kolom yang
+     * ikut terisi hanya karena namanya kebetulan sama dengan nama input. Yang
+     * paling penting: created_at dan updated_at kini tidak dapat dikirim dari
+     * request, sehingga stempel waktu pencatatan keluhan tidak bisa dipalsukan.
+     *
+     * @var list<string>
+     */
+    protected $fillable = [
+        'nama_nasabah',
+        'no_resi',
+        'no_rekening',
+        'no_kartu',
+        'no_tiket',
+        'master_cabang_id',
+        'master_transaksi_id',
+        'terminal_transaksi',
+        'nominal_transaksi',
+        'biaya_admin',
+        'tgl_transaksi',
+        'tgl_terima',
+        'tgl_selesai',
+        'status',
+        'permasalahan',
+        'keterangan_log',
+    ];
 
     /**
      * Membuat nomor tiket baru. Dipakai oleh alur pengaduan CS cabang.

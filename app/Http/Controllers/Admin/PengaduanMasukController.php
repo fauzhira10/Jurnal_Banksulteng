@@ -6,6 +6,7 @@ use App\Enums\PengaduanStatus;
 use App\Http\Controllers\Controller;
 use App\Models\MasterCabang;
 use App\Models\Pengaduan;
+use App\Services\AuditTrailService;
 use App\Services\DeteksiDuplikatService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
@@ -101,6 +102,12 @@ class PengaduanMasukController extends Controller
             'catatan_pusat' => $request->filled('catatan_pusat') ? trim($request->catatan_pusat) : $pengaduan->catatan_pusat,
         ]);
 
+        AuditTrailService::catat('pengaduan.diterima', [
+            'objek' => $pengaduan,
+            'baru' => ['status' => PengaduanStatus::Diterima->value],
+            'keterangan' => "Pengaduan {$pengaduan->nomor_tiket} dari {$pengaduan->labelCabang()} diterima Admin Pusat.",
+        ]);
+
         return redirect()
             ->route('admin.pengaduan.show', $pengaduan)
             ->with('success', "Pengaduan {$pengaduan->nomor_tiket} telah diterima. Silakan lanjutkan dengan memasukkannya ke Jurnal Keluhan.");
@@ -126,6 +133,12 @@ class PengaduanMasukController extends Controller
             'diterima_at' => $pengaduan->diterima_at ?? now(),
             'ditolak_at' => now(),
             'catatan_pusat' => trim($request->catatan_pusat),
+        ]);
+
+        AuditTrailService::catat('pengaduan.ditolak', [
+            'objek' => $pengaduan,
+            'baru' => ['status' => PengaduanStatus::Ditolak->value],
+            'keterangan' => "Pengaduan {$pengaduan->nomor_tiket} ditolak. Alasan: ".trim($request->catatan_pusat),
         ]);
 
         return redirect()

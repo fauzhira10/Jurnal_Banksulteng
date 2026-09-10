@@ -14,7 +14,42 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  */
 class Pengaduan extends Model
 {
-    protected $guarded = ['id'];
+    /**
+     * Kolom yang boleh diisi massal.
+     *
+     * `nomor_tiket` sengaja TIDAK termasuk: nomornya dibuat sistem pada hook
+     * creating dan tidak boleh berasal dari kiriman formulir.
+     *
+     * @var list<string>
+     */
+    protected $fillable = [
+        'user_id',
+        'nama_pelapor',
+        'master_cabang_id',
+        'kategori',
+        'sub_kategori',
+        'sub_kategori_2',
+        'nama_nasabah',
+        'no_hp',
+        'no_ktp',
+        'no_rekening',
+        'no_kartu',
+        'master_transaksi_id',
+        'no_resi',
+        'terminal_transaksi',
+        'channel',
+        'nominal_transaksi',
+        'tgl_transaksi',
+        'kronologi',
+        'status',
+        'catatan_pusat',
+        'jurnal_id',
+        'diterima_oleh',
+        'diterima_at',
+        'diproses_at',
+        'selesai_at',
+        'ditolak_at',
+    ];
 
     protected function casts(): array
     {
