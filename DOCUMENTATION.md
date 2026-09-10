@@ -563,10 +563,12 @@ Butir berikut sudah teridentifikasi namun **belum** ada di dalam kode:
 - Penyamaran NIK pada panel rincian pengaduan. Perlu disertai tombol "tampilkan
   penuh" dan pencatatan jejak audit seperti `lampiran.dibuka`, agar tidak
   menghalangi pencocokan dengan lampiran KTP.
-- Enkripsi kolom data pribadi di basis data. Perlu dibatasi pada `pengaduans.no_ktp`
-  dan `no_hp` saja: `nama_nasabah`, `no_resi`, `no_rekening`, dan `no_kartu` dipakai
-  indeks unik, deteksi keluhan berulang, dan pencarian `LIKE`, yang semuanya patah
-  bila nilainya terenkripsi.
+- Enkripsi kolom data pribadi di basis data. Hanya `pengaduans.no_ktp` yang aman
+  dienkripsi. `nama_nasabah`, `no_resi`, `no_rekening`, dan `no_kartu` dipakai indeks
+  unik, deteksi keluhan berulang, dan pencarian `LIKE`; `no_hp` juga ikut dicari di
+  `Pengaduan::scopeCari`, sehingga mengenkripsinya akan mematikan penelusuran
+  pengaduan lewat nomor HP nasabah — jalur yang dipakai saat nasabah menelepon
+  menyusul laporannya.
 - Serangan tebak kata sandi yang tersebar dari banyak alamat IP belum tertutup.
   Pembatas login mengunci per kombinasi username + alamat IP (bagian 8.3), jadi
   percobaan yang datang dari banyak alamat berbeda tidak terkena batasnya.
