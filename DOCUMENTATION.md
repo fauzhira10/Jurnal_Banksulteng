@@ -543,6 +543,12 @@ menangani satu kasus tertentu.
    mengambil data lewat `GET /api/jurnal/{id}` untuk baris yang benar-benar
    dibuka; tombol lain memakai `Jurnal::bekalTombol()` yang tidak membawa nomor
    rekening maupun nomor kartu.
+3. Panel keluhan berulang (`partials/panel_duplikat.blade.php`) dulu menanam
+   seluruh baris jurnal **dan** seluruh baris pengaduan — termasuk NIK dan nomor
+   HP — untuk sampai lima nasabah setiap kali panelnya muncul. Tombolnya kini
+   hanya membawa `data-jurnal-id` / `data-pengaduan-id`, dan modalnya mengambil
+   rincian lewat `GET /api/jurnal/{id}` atau `GET /api/pengaduan/{id}`. Endpoint
+   pengaduan berada di dalam grup `role:admin` dan tetap melewati `PengaduanPolicy`.
 
 > Ini tindakan **tampilan**, bukan kendali akses. Petugas yang melihat daftar tetap
 > berwenang membuka rinciannya; yang dikurangi adalah paparan yang tidak disengaja.
@@ -557,9 +563,6 @@ Butir berikut sudah teridentifikasi namun **belum** ada di dalam kode:
 - Penyamaran NIK pada panel rincian pengaduan. Perlu disertai tombol "tampilkan
   penuh" dan pencatatan jejak audit seperti `lampiran.dibuka`, agar tidak
   menghalangi pencocokan dengan lampiran KTP.
-- `partials/panel_duplikat.blade.php` masih menanam seluruh baris jurnal pada
-  atribut `data-jurnal` tombol rinciannya (maksimal 5 baris, hanya tampil untuk
-  Admin Pusat). Perlakuannya sama dengan tabel Data Keluhan bila hendak ditutup.
 - Enkripsi kolom data pribadi di basis data. Perlu dibatasi pada `pengaduans.no_ktp`
   dan `no_hp` saja: `nama_nasabah`, `no_resi`, `no_rekening`, dan `no_kartu` dipakai
   indeks unik, deteksi keluhan berulang, dan pencarian `LIKE`, yang semuanya patah

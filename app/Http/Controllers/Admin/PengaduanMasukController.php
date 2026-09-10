@@ -65,6 +65,28 @@ class PengaduanMasukController extends Controller
     /**
      * Detail pengaduan + panel tindak lanjut
      */
+    /**
+     * Rincian satu pengaduan dalam bentuk JSON, untuk modal riwayat pada panel
+     * keluhan berulang.
+     *
+     * Panel itu dulu menanam seluruh baris pengaduan di dalam atribut
+     * `data-pengaduan` setiap tombolnya, sehingga nomor rekening, nomor kartu,
+     * NIK, dan nomor HP hingga lima nasabah sekaligus tercetak di sumber halaman
+     * setiap kali panelnya muncul. Sekarang datanya diambil hanya untuk baris
+     * yang benar-benar dibuka petugas.
+     *
+     * Bentuk balasannya sengaja sama persis dengan `json_encode($pengaduan)`
+     * yang dulu tertanam, supaya skrip modalnya tidak perlu berubah.
+     */
+    public function detailJson(Pengaduan $pengaduan)
+    {
+        Gate::authorize('view', $pengaduan);
+
+        return response()->json(
+            $pengaduan->load('cabang:id,kode_cabang,nama_cabang')
+        );
+    }
+
     public function show(Pengaduan $pengaduan)
     {
         Gate::authorize('view', $pengaduan);

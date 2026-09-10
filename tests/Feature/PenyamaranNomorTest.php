@@ -116,3 +116,64 @@ test('rincian pengaduan tetap menampilkan nomor lengkap', function () {
         ->assertOk()
         ->assertSee('00900001234');
 });
+
+test('panel keluhan berulang hanya menanam id, bukan seluruh baris', function () {
+    $cabang = buatCabang();
+    $admin = buatAdmin();
+    $cs = buatCs($cabang);
+    $transaksi = buatTransaksi();
+
+    $jurnal = Jurnal::create(dataJurnalDb($cabang, $transaksi, [
+        'nama_nasabah' => 'BUDI SANTOSO',
+        'no_resi' => '778899',
+        'tgl_transaksi' => '2026-09-01',
+        'no_rekening' => '00900001234',
+        'no_kartu' => '4213556677889900',
+    ]));
+
+    $pengaduan = buatPengaduan($cs, $transaksi, [
+        'nama_nasabah' => 'BUDI SANTOSO',
+        'no_resi' => '778899',
+        'tgl_transaksi' => '2026-10-05',
+        'no_rekening' => '001099887766',
+        'no_ktp' => '7271012345670001',
+    ]);
+
+    $html = $this->actingAs($admin)->getJson(route('api.duplikat.periksa', [
+        'nama' => 'budi santoso', 'resi' => '778899', 'tgl' => '2026-11-01',
+    ]))->assertOk()->json('html');
+
+    expect($html)->toContain('data-jurnal-id="'.$jurnal->id.'"')
+        ->and($html)->toContain('data-pengaduan-id="'.$pengaduan->id.'"')
+        ->and($html)->not->toContain('00900001234')
+        ->and($html)->not->toContain('4213556677889900')
+        ->and($html)->not->toContain('001099887766')
+        ->and($html)->not->toContain('7271012345670001');
+});
+
+test('rincian pengaduan tersedia lewat api bagi admin', function () {
+    $cabang = buatCabang();
+    $admin = buatAdmin();
+    $cs = buatCs($cabang);
+    $transaksi = buatTransaksi();
+
+    $pengaduan = buatPengaduan($cs, $transaksi, ['no_rekening' => '001099887766']);
+
+    $this->actingAs($admin)->getJson(route('api.pengaduan.detail', $pengaduan))
+        ->assertOk()
+        ->assertJsonPath('no_rekening', '001099887766')
+        ->assertJsonPath('cabang.kode_cabang', $cabang->kode_cabang);
+});
+
+test('cs tidak dapat memakai endpoint rincian pengaduan milik admin', function () {
+    $cabang = buatCabang();
+    $cs = buatCs($cabang);
+    $transaksi = buatTransaksi();
+
+    $pengaduan = buatPengaduan($cs, $transaksi);
+
+    // Endpoint ini berada di dalam grup role:admin — CS diarahkan ke berandanya
+    // sendiri, bukan diberi datanya.
+    $this->actingAs($cs)->get(route('api.pengaduan.detail', $pengaduan))
+        ->assertRedirect(route('cs.dashboard'));
+});

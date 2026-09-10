@@ -102,6 +102,12 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     // Route API AJAX Rincian Jurnal Keluhan
     Route::get('/api/jurnal/{id}', [JurnalController::class, 'getDetailJurnal'])->name('api.jurnal.detail');
 
+    // Rincian satu pengaduan untuk modal riwayat pada panel keluhan berulang.
+    // Dipisah dari halaman /pengaduan-masuk/{id} karena hanya mengembalikan JSON.
+    Route::get('/api/pengaduan/{pengaduan}', [PengaduanMasukController::class, 'detailJson'])
+        ->name('api.pengaduan.detail')
+        ->whereNumber('pengaduan');
+
     // ---------- Pengaduan Masuk dari CS Cabang ----------
     Route::prefix('pengaduan-masuk')->name('admin.pengaduan.')->group(function () {
         Route::get('/', [PengaduanMasukController::class, 'index'])->name('index');

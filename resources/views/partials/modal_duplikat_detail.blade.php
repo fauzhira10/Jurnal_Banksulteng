@@ -163,13 +163,30 @@
         return 'Rp ' + val.toLocaleString('id-ID');
     }
 
+    /**
+     * Ambil rincian satu baris lewat AJAX, lalu buka modalnya.
+     *
+     * Tombol pada panel keluhan berulang hanya membawa id. Rinciannya —
+     * termasuk nomor rekening, nomor kartu, NIK, dan nomor HP — tidak lagi
+     * tercetak di sumber halaman untuk seluruh baris sekaligus.
+     */
+    function ambilLaluBuka(url, lanjut) {
+        fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+            .then(r => r.ok ? r.json() : Promise.reject(new Error('Gagal memuat rincian')))
+            .then(data => {
+                if (data && data.id) lanjut(data);
+            })
+            .catch(err => console.error('Gagal memuat rincian:', err));
+    }
+
     window.bukaModalJurnalDuplikat = function(el) {
         let jurnal = null;
         try {
             if (typeof el === 'string') {
                 jurnal = JSON.parse(el);
-            } else if (el && el.dataset && el.dataset.jurnal) {
-                jurnal = JSON.parse(el.dataset.jurnal);
+            } else if (el && el.dataset && el.dataset.jurnalId) {
+                ambilLaluBuka('{{ url('/api/jurnal') }}/' + el.dataset.jurnalId, window.bukaModalJurnalDuplikat);
+                return;
             } else if (typeof el === 'object') {
                 jurnal = el;
             }
@@ -245,8 +262,9 @@
         try {
             if (typeof el === 'string') {
                 adu = JSON.parse(el);
-            } else if (el && el.dataset && el.dataset.pengaduan) {
-                adu = JSON.parse(el.dataset.pengaduan);
+            } else if (el && el.dataset && el.dataset.pengaduanId) {
+                ambilLaluBuka('{{ url('/api/pengaduan') }}/' + el.dataset.pengaduanId, window.bukaModalPengaduanDuplikat);
+                return;
             } else if (typeof el === 'object') {
                 adu = el;
             }
