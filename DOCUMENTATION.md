@@ -425,10 +425,36 @@ php artisan audit:periksa
 ```
 
 Perintah ini menyebutkan baris mana yang bermasalah dan keluar dengan kode gagal
-bila rantainya putus, sehingga dapat dipasang sebagai tugas terjadwal.
+bila rantainya putus.
+
+**Pemeriksaannya sudah dijadwalkan harian** (`routes/console.php`, pukul 01.00),
+dengan keluaran ditulis ke `storage/logs/audit-periksa.log`. Penjadwal Laravel
+hanya berjalan bila ada satu tugas sistem yang memanggilnya setiap menit. Di
+server Windows, buat satu tugas di **Task Scheduler** yang berulang tiap 1 menit:
+
+```powershell
+php artisan schedule:run
+```
+
+Tanpa tugas itu, jadwalnya tercatat tetapi tidak pernah dijalankan — periksa
+dengan `php artisan schedule:list`.
 
 > Catatan privasi: jejak audit ikut memuat nilai kolom seperti nomor rekening dan
 > nomor kartu. Aksesnya harus dibatasi seketat data aslinya.
+
+**Dua hal yang sengaja tidak ikut disegel hash**, keduanya ditemukan saat menguji
+rantai di MySQL (bukan di SQLite yang dipakai test):
+
+1. **Urutan kunci JSON.** Kolom `nilai_lama`/`nilai_baru` bertipe `json`, dan MySQL
+   menyimpannya dalam bentuk biner miliknya sendiri sambil **mengurutkan ulang kunci
+   objek**. Karena itu kuncinya diurutkan dulu sebelum dihash — kalau tidak, setiap
+   baris yang memuat lebih dari satu kolom akan dilaporkan "diubah" padahal tidak ada
+   yang menyentuhnya, dan alarm yang selalu berbunyi sama saja dengan tidak ada alarm.
+2. **Kolom `jurnal_id`.** Foreign key-nya memakai `nullOnDelete`, jadi basis data
+   sendiri yang mengosongkannya begitu jurnal terkait dihapus. Menyegelnya berarti
+   setiap penghapusan jurnal memutus rantai — tepat pada kejadian yang paling perlu
+   dipercaya. Tautan ke jurnalnya tetap tersegel lewat `auditable_type` +
+   `auditable_id`, yang tidak punya foreign key.
 
 ### 8.5 Header Keamanan HTTP
 
@@ -452,12 +478,50 @@ Tombol **Hapus Semua Data** kini hanya tampil dan hanya dapat dijalankan oleh
 dan menulis **cadangan Excel otomatis** ke `storage/app/private/cadangan/`.
 Tindakannya dicatat pada jejak audit lengkap dengan jumlah baris dan nama cadangan.
 
-### 8.7 Yang belum dikerjakan
+### 8.7 Kebijakan Kata Sandi
+
+Satu aturan berlaku di kedua pintu pembuatan akun — form **Manajemen Pengguna**
+dan perintah `admin:buat` — dan hanya ditulis sekali di `App\Rules\KataSandi`:
+
+| Aturan | Nilai |
+|:---|:---|
+| Panjang minimum | 12 karakter |
+| Isi | wajib memuat sedikitnya satu huruf dan satu angka |
+
+Sebelumnya form web menerima 6 karakter sementara perintah server menuntut 12,
+sehingga akun Admin Pusat yang dibuat lewat web bisa jauh lebih lemah daripada
+yang dibuat di server, padahal keduanya membuka pintu yang sama.
+
+Pemeriksaan terhadap daftar kata sandi bocor (HaveIBeenPwned) sengaja tidak
+dipakai: aturan itu memanggil API lewat internet, dan bila server bank tidak
+punya jalur keluar, pembuatan akun ikut gagal.
+
+### 8.8 Lingkup Data Lintas Cabang
+
+Endpoint `GET /api/duplikat/periksa` menerima nama nasabah dan nomor resi apa pun,
+sehingga jawaban yang rinci membuatnya dapat dipakai satu akun cabang untuk
+memetakan keluhan cabang lain hanya dengan mencoba banyak kombinasi.
+
+Karena itu jawabannya dibedakan menurut peran:
+
+| Peran | Yang diterima |
+|:---|:---|
+| **Admin Pusat** | Panel lengkap: nomor tiket, cabang asal, tanggal, nominal, status, tautan rincian, jumlah catatan. |
+| **CS Cabang** | Hanya **ada** atau **tidak ada** — tanpa jumlah, tanpa kartu rincian, dan tanpa membedakan tanggal transaksi yang sama persis dari yang berbeda. |
+
+Peringatan lintas cabang tetap muncul bagi CS (nasabah yang sama bisa mengadu
+lewat cabang lain), tetapi rinciannya hanya ada pada Admin Pusat yang memang
+berwenang melihat lintas cabang.
+
+### 8.9 Yang belum dikerjakan
 
 Butir berikut sudah teridentifikasi namun **belum** ada di dalam kode:
 
 - Penyamaran (masking) NIK dan nomor kartu pada tampilan.
-- Enkripsi kolom data pribadi di basis data.
-- Pembatasan endpoint `/api/duplikat/periksa` bagi CS lintas cabang.
-- Kebijakan kata sandi pada form web masih minimal 6 karakter.
-- Autentikasi dua faktor untuk akun Admin Pusat.
+- Enkripsi kolom data pribadi di basis data. Perlu dibatasi pada `pengaduans.no_ktp`
+  dan `no_hp` saja: `nama_nasabah`, `no_resi`, `no_rekening`, dan `no_kartu` dipakai
+  indeks unik, deteksi keluhan berulang, dan pencarian `LIKE`, yang semuanya patah
+  bila nilainya terenkripsi.
+- Autentikasi dua faktor untuk akun Admin Pusat. Ini juga satu-satunya penutup
+  serangan tebak kata sandi yang tersebar dari banyak alamat IP.
+- Menghapus `'unsafe-inline'` dari CSP; menuntut nonce pada setiap blok skrip.

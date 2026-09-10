@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Enums\UserRole;
 use App\Models\User;
+use App\Rules\KataSandi;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
@@ -36,7 +37,7 @@ class BuatAkunAdmin extends Command
         $name = $this->option('name') ?: $this->ask('Nama lengkap petugas');
         $email = $this->option('email') ?: $this->ask('Alamat email petugas');
 
-        $password = $this->secret('Kata sandi (minimal 12 karakter, tidak ditampilkan)');
+        $password = $this->secret('Kata sandi ('.lcfirst(KataSandi::keterangan()).', tidak ditampilkan)');
         $konfirmasi = $this->secret('Ulangi kata sandi');
 
         $validator = Validator::make([
@@ -49,19 +50,17 @@ class BuatAkunAdmin extends Command
             'username' => ['required', 'string', 'min:3', 'max:50', 'regex:/^[a-zA-Z0-9._-]+$/', Rule::unique('users', 'username')],
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'email', 'max:255', Rule::unique('users', 'email')],
-            // Batas 12 karakter di sini sengaja lebih ketat daripada form web
-            // (yang masih 6). Penyeragaman kebijakan kata sandi menyusul.
-            'password' => ['required', 'string', 'min:12', 'confirmed'],
-        ], [
+            // Kebijakannya sama persis dengan form Manajemen Pengguna; lihat
+            // App\Rules\KataSandi.
+            'password' => KataSandi::aturan(),
+        ], array_merge([
             'required' => ':attribute wajib diisi.',
             'username.unique' => 'Username tersebut sudah dipakai akun lain.',
             'username.regex' => 'Username hanya boleh berisi huruf, angka, titik, garis bawah, atau strip.',
             'username.min' => 'Username minimal :min karakter.',
             'email.email' => 'Format email tidak valid.',
             'email.unique' => 'Email tersebut sudah dipakai akun lain.',
-            'password.min' => 'Kata sandi minimal :min karakter.',
-            'password.confirmed' => 'Konfirmasi kata sandi tidak sama.',
-        ], [
+        ], KataSandi::pesan()), [
             'username' => 'Username',
             'name' => 'Nama lengkap',
             'email' => 'Alamat email',

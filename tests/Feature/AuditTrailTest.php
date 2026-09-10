@@ -3,6 +3,7 @@
 use App\Models\AuditTrail;
 use App\Models\Jurnal;
 use App\Services\AuditTrailService;
+use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -195,4 +196,66 @@ test('penghapusan baris audit di tengah rantai terdeteksi', function () {
 
     expect($hasil['utuh'])->toBeFalse()
         ->and($hasil['masalah'][0]['sebab'])->toContain('Rantai terputus');
+});
+
+test('pemeriksaan rantai audit terpasang sebagai tugas harian', function () {
+    // Rantai hash tidak menghentikan siapa pun; nilainya baru muncul saat
+    // diperiksa. Jadwalnya karena itu ikut diuji seperti kode lain.
+    $jadwal = app(Schedule::class);
+
+    $tugas = collect($jadwal->events())->first(
+        fn ($acara) => str_contains((string) $acara->command, 'audit:periksa')
+    );
+
+    expect($tugas)->not->toBeNull()
+        ->and($tugas->expression)->toBe('0 1 * * *');
+});
+
+test('rantai tetap utuh walau basis data mengurutkan ulang kunci json', function () {
+    // MySQL menyimpan kolom bertipe JSON dalam bentuk binernya sendiri dan
+    // mengurutkan ulang kunci objek, sehingga array yang dibaca kembali tidak
+    // pernah persis sama urutannya dengan yang ditulis. SQLite menyimpannya apa
+    // adanya sebagai teks, jadi perilaku itu ditiru di sini dengan menulis ulang
+    // JSON-nya secara langsung — isinya sama, hanya urutan kuncinya dibalik.
+    $admin = buatAdmin();
+    $cabang = buatCabang();
+    $transaksi = buatTransaksi();
+
+    $this->actingAs($admin)->post(route('jurnal.store'), dataJurnal($cabang, $transaksi));
+
+    $jejak = AuditTrail::where('aksi', 'jurnal.dibuat')->firstOrFail();
+
+    $terbalik = array_reverse($jejak->nilai_baru, true);
+
+    expect(array_keys($terbalik))->not->toBe(array_keys($jejak->nilai_baru));
+
+    DB::table('audit_trails')->where('id', $jejak->id)->update([
+        'nilai_baru' => json_encode($terbalik),
+    ]);
+
+    expect(AuditTrail::find($jejak->id)->hashCocok())->toBeTrue()
+        ->and(AuditTrailService::periksaRantai()['utuh'])->toBeTrue();
+});
+
+test('rantai tetap utuh setelah jurnalnya dihapus', function () {
+    // audit_trails.jurnal_id memakai nullOnDelete, jadi basis data sendiri yang
+    // mengosongkan kolom itu pada baris jurnal.dibuat begitu jurnalnya dihapus.
+    // Kalau kolom itu ikut disegel hash, setiap penghapusan jurnal langsung
+    // memutus rantai — tepat pada kejadian yang paling perlu dipercaya.
+    $admin = buatAdmin();
+    $cabang = buatCabang();
+    $transaksi = buatTransaksi();
+
+    $this->actingAs($admin)->post(route('jurnal.store'), dataJurnal($cabang, $transaksi));
+
+    $jurnal = Jurnal::firstOrFail();
+    $dibuat = AuditTrail::where('aksi', 'jurnal.dibuat')->firstOrFail();
+
+    expect($dibuat->jurnal_id)->toBe($jurnal->id);
+
+    $this->actingAs($admin)->delete(route('jurnal.destroy', $jurnal->id));
+
+    // Basis data benar-benar mengosongkan kolomnya; tanpa ini pengujiannya tumpul.
+    expect(AuditTrail::find($dibuat->id)->jurnal_id)->toBeNull()
+        ->and(AuditTrailService::periksaRantai()['utuh'])->toBeTrue();
 });

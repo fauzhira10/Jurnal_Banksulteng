@@ -223,8 +223,8 @@ test('admin dapat membuat akun cs dan menonaktifkannya', function () {
         'email' => 'cs.poso@banksulteng.co.id',
         'role' => 'cs',
         'master_cabang_id' => $cabang->id,
-        'password' => 'rahasia123',
-        'password_confirmation' => 'rahasia123',
+        'password' => 'rahasiaPoso2026',
+        'password_confirmation' => 'rahasiaPoso2026',
     ])->assertRedirect(route('admin.pengguna.index'));
 
     $this->assertDatabaseHas('users', ['username' => 'cs.poso', 'role' => 'cs', 'master_cabang_id' => $cabang->id, 'is_active' => true]);
@@ -241,6 +241,6 @@ test('admin dapat membuat akun cs dan menonaktifkannya', function () {
     // Akun CS tanpa cabang ditolak
     $this->actingAs($admin)->from(route('admin.pengguna.create'))->post(route('admin.pengguna.store'), [
         'name' => 'CS Tanpa Cabang', 'username' => 'cs.tanpa', 'email' => 'cs.tanpa@banksulteng.co.id',
-        'role' => 'cs', 'master_cabang_id' => '', 'password' => 'rahasia123', 'password_confirmation' => 'rahasia123',
+        'role' => 'cs', 'master_cabang_id' => '', 'password' => 'rahasiaPoso2026', 'password_confirmation' => 'rahasiaPoso2026',
     ])->assertSessionHasErrors('master_cabang_id');
 });

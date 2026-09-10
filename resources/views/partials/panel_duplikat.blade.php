@@ -5,8 +5,11 @@
      @include('partials.panel_duplikat', ['duplikat' => $cek, 'ringkas' => true])   (versi CS cabang)
 
      $duplikat berisi hasil App\Services\DeteksiDuplikatService::periksa().
-     Mode ringkas menyembunyikan nomor rekening/kartu dan tautan ke jurnal,
-     sebab CS cabang tidak punya akses ke modul jurnal pusat.
+
+     Mode ringkas (CS cabang) hanya memberi tahu BAHWA keluhannya sudah pernah
+     ditangani: tanpa jumlah catatan, tanpa kartu rincian, dan tanpa membedakan
+     KEMBAR dari BERULANG. Nomor tiket, cabang asal, tanggal, dan nominal adalah
+     data cabang lain — lihat alasan lengkapnya di JurnalController::cekDuplikat.
 --}}
 @php
     use App\Services\DeteksiDuplikatService;
@@ -18,7 +21,9 @@
 
 @if($duplikat && $tingkat !== DeteksiDuplikatService::AMAN)
     @php
-        $kembar = $tingkat === DeteksiDuplikatService::KEMBAR;
+        // Mode ringkas tidak pernah menampilkan tingkat KEMBAR: membedakannya
+        // sama saja dengan membenarkan tanggal transaksi yang sedang diketik.
+        $kembar = ! $ringkas && $tingkat === DeteksiDuplikatService::KEMBAR;
         $gaya = $kembar
             ? ['kotak' => 'bg-rose-50 border-rose-200 text-rose-900', 'ikon' => 'text-rose-600', 'kartu' => 'border-rose-200', 'jejak' => 'text-rose-800']
             : ['kotak' => 'bg-amber-50 border-amber-200 text-amber-900', 'ikon' => 'text-amber-600', 'kartu' => 'border-amber-200', 'jejak' => 'text-amber-800'];
@@ -32,7 +37,8 @@
     @endphp
 
     <div class="{{ $gaya['kotak'] }} border rounded-xl p-4 text-[0.8125rem] flex items-start gap-3 shadow-xs"
-         data-tingkat="{{ $tingkat }}" data-jumlah="{{ $duplikat['jumlah'] ?? 0 }}">
+         data-tingkat="{{ $ringkas ? DeteksiDuplikatService::BERULANG : $tingkat }}"
+         @unless($ringkas) data-jumlah="{{ $duplikat['jumlah'] ?? 0 }}" @endunless>
         <svg class="w-5 h-5 {{ $gaya['ikon'] }} shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
             <line x1="12" y1="9" x2="12" y2="13"></line>
@@ -42,11 +48,18 @@
         <div class="grow min-w-0">
             <div class="font-bold">{{ $judul }}</div>
             <div class="text-[0.75rem] {{ $gaya['jejak'] }} mt-0.5">
-                Ditemukan {{ $duplikat['jumlah'] ?? 0 }} catatan atas nama
-                <strong>{{ $duplikat['nama'] ?? '-' }}</strong> dengan No. Resi
-                <strong class="font-mono">{{ $duplikat['resi'] ?? '-' }}</strong>.
+                @if($ringkas)
+                    Keluhan atas nama <strong>{{ $duplikat['nama'] ?? '-' }}</strong> dengan No. Resi
+                    <strong class="font-mono">{{ $duplikat['resi'] ?? '-' }}</strong> sudah pernah
+                    dicatat di Kantor Pusat.
+                @else
+                    Ditemukan {{ $duplikat['jumlah'] ?? 0 }} catatan atas nama
+                    <strong>{{ $duplikat['nama'] ?? '-' }}</strong> dengan No. Resi
+                    <strong class="font-mono">{{ $duplikat['resi'] ?? '-' }}</strong>.
+                @endif
             </div>
 
+            @unless($ringkas)
             <div class="flex flex-col gap-2 mt-2.5">
                 @foreach($jurnals as $lama)
                     @php
@@ -68,20 +81,16 @@
                             Transaksi {{ \Carbon\Carbon::parse($lama->tgl_transaksi)->translatedFormat('d M Y') }}
                             &bull; {{ $lama->masterCabang->nama_cabang ?? '-' }}
                             &bull; Rp {{ number_format((float) $lama->nominal_transaksi, 0, ',', '.') }}
-                            @unless($ringkas)
-                                <br>
-                                {{ $lama->masterTransaksi->jenis_transaksi ?? '-' }}
-                                &bull; Diterima {{ \Carbon\Carbon::parse($lama->tgl_terima)->translatedFormat('d M Y') }}
-                                @if(!empty($lama->tgl_selesai))
-                                    &bull; Selesai {{ \Carbon\Carbon::parse($lama->tgl_selesai)->translatedFormat('d M Y') }}
-                                @endif
-                            @endunless
+                            <br>
+                            {{ $lama->masterTransaksi->jenis_transaksi ?? '-' }}
+                            &bull; Diterima {{ \Carbon\Carbon::parse($lama->tgl_terima)->translatedFormat('d M Y') }}
+                            @if(!empty($lama->tgl_selesai))
+                                &bull; Selesai {{ \Carbon\Carbon::parse($lama->tgl_selesai)->translatedFormat('d M Y') }}
+                            @endif
                         </div>
-                        @unless($ringkas)
-                            <button type="button" onclick="bukaModalJurnalDuplikat(this)" data-jurnal="{{ json_encode($lama) }}" class="inline-flex items-center gap-1 mt-1.5 text-[0.75rem] font-bold text-brand-blue hover:text-blue-700 hover:underline cursor-pointer bg-transparent border-0 p-0 text-left">
-                                Lihat jurnal ini &rarr;
-                            </button>
-                        @endunless
+                        <button type="button" onclick="bukaModalJurnalDuplikat(this)" data-jurnal="{{ json_encode($lama) }}" class="inline-flex items-center gap-1 mt-1.5 text-[0.75rem] font-bold text-brand-blue hover:text-blue-700 hover:underline cursor-pointer bg-transparent border-0 p-0 text-left">
+                            Lihat jurnal ini &rarr;
+                        </button>
                     </div>
                 @endforeach
 
@@ -96,14 +105,13 @@
                             &bull; {{ $adu->labelCabang() }}
                             &bull; Rp {{ number_format((float) $adu->nominal_transaksi, 0, ',', '.') }}
                         </div>
-                        @unless($ringkas)
-                            <button type="button" onclick="bukaModalPengaduanDuplikat(this)" data-pengaduan="{{ json_encode($adu) }}" class="inline-flex items-center gap-1 mt-1.5 text-[0.75rem] font-bold text-brand-blue hover:text-blue-700 hover:underline cursor-pointer bg-transparent border-0 p-0 text-left">
-                                Lihat pengaduan ini &rarr;
-                            </button>
-                        @endunless
+                        <button type="button" onclick="bukaModalPengaduanDuplikat(this)" data-pengaduan="{{ json_encode($adu) }}" class="inline-flex items-center gap-1 mt-1.5 text-[0.75rem] font-bold text-brand-blue hover:text-blue-700 hover:underline cursor-pointer bg-transparent border-0 p-0 text-left">
+                            Lihat pengaduan ini &rarr;
+                        </button>
                     </div>
                 @endforeach
             </div>
+            @endunless
 
             <div class="text-[0.75rem] {{ $gaya['jejak'] }} mt-2.5 leading-relaxed">
                 @if($ringkas)

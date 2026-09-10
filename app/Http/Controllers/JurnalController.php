@@ -303,6 +303,14 @@ class JurnalController extends Controller
      *
      * Panel peringatannya dirender di sini sebagai HTML jadi, supaya tampilannya
      * hanya ditulis sekali di partials/panel_duplikat.blade.php.
+     *
+     * Jawaban untuk CS cabang sengaja dipangkas menjadi ADA atau TIDAK ADA.
+     * Endpoint ini menerima nama nasabah dan nomor resi apa pun, jadi jawaban
+     * yang rinci membuatnya dapat dipakai satu akun cabang untuk memetakan
+     * keluhan cabang lain — nomor tiket, cabang asal, tanggal, dan nominalnya —
+     * cukup dengan mencoba banyak kombinasi. Yang benar-benar dibutuhkan CS
+     * hanyalah tahu bahwa keluhan itu sudah tercatat di pusat; rinciannya ada
+     * pada Admin Pusat yang memang berwenang melihat lintas cabang.
      */
     public function cekDuplikat(Request $request)
     {
@@ -314,15 +322,26 @@ class JurnalController extends Controller
             $request->filled('abaikan_pengaduan') ? (int) $request->input('abaikan_pengaduan') : null
         );
 
-        // CS cabang tidak punya akses ke modul jurnal pusat, jadi panelnya ringkas:
-        // tanpa nomor rekening/kartu dan tanpa tautan ke data jurnal.
-        $ringkas = ! ($request->user()?->isAdmin() ?? false);
+        if (! ($request->user()?->isAdmin() ?? false)) {
+            $ada = $cek['tingkat'] !== DeteksiDuplikatService::AMAN;
+
+            // Tingkat KEMBAR ikut diratakan menjadi BERULANG: membedakannya sama
+            // saja dengan memberi tahu bahwa ada catatan bertanggal transaksi
+            // persis seperti yang sedang diketik. Jumlah dan token juga tidak
+            // dikirim — form CS memakai mode informatif yang tidak memerlukannya.
+            return response()->json([
+                'tingkat' => $ada ? DeteksiDuplikatService::BERULANG : DeteksiDuplikatService::AMAN,
+                'html' => $ada
+                    ? view('partials.panel_duplikat', ['duplikat' => $cek, 'ringkas' => true])->render()
+                    : '',
+            ]);
+        }
 
         return response()->json([
             'tingkat' => $cek['tingkat'],
             'jumlah' => $cek['jumlah'],
             'token' => $cek['token'],
-            'html' => view('partials.panel_duplikat', ['duplikat' => $cek, 'ringkas' => $ringkas])->render(),
+            'html' => view('partials.panel_duplikat', ['duplikat' => $cek])->render(),
         ]);
     }
 

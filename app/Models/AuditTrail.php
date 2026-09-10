@@ -53,6 +53,24 @@ class AuditTrail extends Model
      * `user_agent` sengaja tidak ikut disegel: nilainya panjang, dipotong kolom
      * database, dan tidak menentukan makna kejadian. Kolom yang menentukan siapa
      * melakukan apa terhadap data apa semuanya ikut.
+     *
+     * `jurnal_id` juga tidak disegel, dan ini penting: foreign key-nya memakai
+     * nullOnDelete, jadi basis data SENDIRI yang mengosongkan kolom itu pada
+     * baris jurnal.dibuat/jurnal.diubah begitu jurnalnya dihapus. Menyegelnya
+     * berarti setiap penghapusan jurnal langsung memutus rantai — tepat pada
+     * kejadian yang paling perlu dipercaya. Tautan ke jurnalnya tetap tersegel
+     * lewat `auditable_type` + `auditable_id`, yang tidak punya foreign key dan
+     * karena itu tidak pernah ikut diubah basis data; `jurnal_id` hanya jalan
+     * pintas untuk menelusuri riwayat satu jurnal.
+     *
+     * `nilai_lama` dan `nilai_baru` diurutkan kuncinya lebih dulu. MySQL menyimpan
+     * kolom bertipe JSON dalam bentuk binernya sendiri dan MENGURUTKAN ULANG kunci
+     * objek (menurut panjang, lalu abjad), sehingga array yang dibaca kembali tidak
+     * pernah persis sama urutannya dengan yang ditulis. Tanpa pengurutan ini seluruh
+     * baris yang memuat lebih dari satu kolom akan dilaporkan "diubah" oleh
+     * `audit:periksa` padahal tidak ada yang menyentuhnya — dan alarm palsu yang
+     * selalu berbunyi sama saja dengan tidak ada alarm. SQLite menyimpan JSON apa
+     * adanya sebagai teks, jadi masalah ini tidak muncul di test.
      */
     public function sidikJari(): string
     {
@@ -62,13 +80,34 @@ class AuditTrail extends Model
             'aksi' => $this->aksi,
             'auditable_type' => $this->auditable_type,
             'auditable_id' => $this->auditable_id !== null ? (int) $this->auditable_id : null,
-            'jurnal_id' => $this->jurnal_id !== null ? (int) $this->jurnal_id : null,
-            'nilai_lama' => $this->nilai_lama,
-            'nilai_baru' => $this->nilai_baru,
+            'nilai_lama' => self::urutkanKunci($this->nilai_lama),
+            'nilai_baru' => self::urutkanKunci($this->nilai_baru),
             'keterangan' => $this->keterangan,
             'ip' => $this->ip,
             'created_at' => $this->created_at?->format('Y-m-d H:i:s'),
         ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+    }
+
+    /**
+     * Urutkan kunci array secara rekursif agar sidik jarinya tidak bergantung
+     * pada urutan penyimpanan basis data.
+     *
+     * Array berindeks angka dibiarkan apa adanya: urutannya adalah bagian dari
+     * isinya, bukan kebetulan penyimpanan.
+     */
+    protected static function urutkanKunci(mixed $nilai): mixed
+    {
+        if (! is_array($nilai)) {
+            return $nilai;
+        }
+
+        $nilai = array_map(static fn ($isi) => self::urutkanKunci($isi), $nilai);
+
+        if (! array_is_list($nilai)) {
+            ksort($nilai);
+        }
+
+        return $nilai;
     }
 
     /**

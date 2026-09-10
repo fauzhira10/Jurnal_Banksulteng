@@ -263,3 +263,70 @@ test('filter hanya data berulang menyaring baris yang punya kembaran', function 
     $semua = $this->actingAs($admin)->get(route('jurnal.index'));
     $semua->assertStatus(200)->assertSee('BUDI SANTOSO')->assertSee('SITI AMINAH');
 });
+
+test('cs cabang hanya diberi tahu ada atau tidak ada, tanpa rincian cabang lain', function () {
+    $cabangCs = buatCabang('001', 'CABANG UTAMA');
+    $cabangLain = buatCabang('009', 'CABANG LUWUK');
+    $cs = buatCs($cabangCs);
+    $transaksi = buatTransaksi();
+
+    Jurnal::create(dataJurnalDb($cabangLain, $transaksi, [
+        'nama_nasabah' => 'BUDI SANTOSO',
+        'no_resi' => '778899',
+        'tgl_transaksi' => '2026-09-01',
+        'no_tiket' => 'BS-2026090112345',
+        'nominal_transaksi' => 750000,
+    ]));
+
+    $jawaban = $this->actingAs($cs)->getJson(route('api.duplikat.periksa', [
+        'nama' => 'budi santoso', 'resi' => '778899', 'tgl' => '2026-09-01',
+    ]));
+
+    // Tanggal transaksinya sama persis, tetapi CS tidak boleh tahu itu: KEMBAR
+    // diratakan menjadi BERULANG.
+    $jawaban->assertOk()
+        ->assertJsonPath('tingkat', DeteksiDuplikatService::BERULANG)
+        ->assertJsonMissingPath('jumlah')
+        ->assertJsonMissingPath('token');
+
+    $html = $jawaban->json('html');
+
+    expect($html)->toContain('dicatat di Kantor Pusat')
+        ->and($html)->not->toContain('BS-2026090112345')
+        ->and($html)->not->toContain('CABANG LUWUK')
+        ->and($html)->not->toContain('750.000')
+        ->and($html)->not->toContain('data-jumlah');
+});
+
+test('cs tidak menerima panel apa pun bila keluhannya memang belum pernah ada', function () {
+    $cabangCs = buatCabang('001', 'CABANG UTAMA');
+    $cs = buatCs($cabangCs);
+
+    $this->actingAs($cs)->getJson(route('api.duplikat.periksa', [
+        'nama' => 'SITI AMINAH', 'resi' => '000111', 'tgl' => '2026-09-01',
+    ]))
+        ->assertOk()
+        ->assertJsonPath('tingkat', DeteksiDuplikatService::AMAN)
+        ->assertJsonPath('html', '');
+});
+
+test('admin pusat tetap menerima rincian lengkap pada panel yang sama', function () {
+    $admin = buatAdmin();
+    $cabang = buatCabang('009', 'CABANG LUWUK');
+    $transaksi = buatTransaksi();
+
+    Jurnal::create(dataJurnalDb($cabang, $transaksi, [
+        'nama_nasabah' => 'BUDI SANTOSO',
+        'no_resi' => '778899',
+        'tgl_transaksi' => '2026-09-01',
+        'no_tiket' => 'BS-2026090112345',
+    ]));
+
+    $html = $this->actingAs($admin)->getJson(route('api.duplikat.periksa', [
+        'nama' => 'budi santoso', 'resi' => '778899', 'tgl' => '2026-10-05',
+    ]))->assertOk()->json('html');
+
+    expect($html)->toContain('BS-2026090112345')
+        ->and($html)->toContain('CABANG LUWUK')
+        ->and($html)->toContain('Lihat jurnal ini');
+});
