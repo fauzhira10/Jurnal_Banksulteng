@@ -92,7 +92,7 @@
                              nomor kartu, NIK, dan nomor HP sampai lima nasabah tercetak di
                              sumber halaman tiap kali panelnya muncul. Modalnya mengambil
                              rincian lewat AJAX untuk baris yang benar-benar dibuka. --}}
-                        <button type="button" onclick="bukaModalJurnalDuplikat(this)" data-jurnal-id="{{ $lama->id }}" class="inline-flex items-center gap-1 mt-1.5 text-[0.75rem] font-bold text-brand-blue hover:text-blue-700 hover:underline cursor-pointer bg-transparent border-0 p-0 text-left">
+                        <button type="button" onclick="bukaModalJurnalDuplikat(this)" data-jurnal-id="{{ $lama->id }}" class="js-rincian-duplikat inline-flex items-center gap-1 mt-1.5 text-[0.75rem] font-bold text-brand-blue hover:text-blue-700 hover:underline cursor-pointer bg-transparent border-0 p-0 text-left">
                             Lihat jurnal ini &rarr;
                         </button>
                     </div>
@@ -109,7 +109,7 @@
                             &bull; {{ $adu->labelCabang() }}
                             &bull; Rp {{ number_format((float) $adu->nominal_transaksi, 0, ',', '.') }}
                         </div>
-                        <button type="button" onclick="bukaModalPengaduanDuplikat(this)" data-pengaduan-id="{{ $adu->id }}" class="inline-flex items-center gap-1 mt-1.5 text-[0.75rem] font-bold text-brand-blue hover:text-blue-700 hover:underline cursor-pointer bg-transparent border-0 p-0 text-left">
+                        <button type="button" onclick="bukaModalPengaduanDuplikat(this)" data-pengaduan-id="{{ $adu->id }}" class="js-rincian-duplikat inline-flex items-center gap-1 mt-1.5 text-[0.75rem] font-bold text-brand-blue hover:text-blue-700 hover:underline cursor-pointer bg-transparent border-0 p-0 text-left">
                             Lihat pengaduan ini &rarr;
                         </button>
                     </div>

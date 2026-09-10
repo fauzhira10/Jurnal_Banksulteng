@@ -170,14 +170,69 @@
      * termasuk nomor rekening, nomor kartu, NIK, dan nomor HP — tidak lagi
      * tercetak di sumber halaman untuk seluruh baris sekaligus.
      */
-    function ambilLaluBuka(url, lanjut) {
-        fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+    // Hasilnya disimpan per alamat, dan permintaannya dimulai sejak kursor
+    // menyentuh tombol, supaya modalnya tidak terasa menunggu saat diklik.
+    const simpananRincian = new Map();
+    const rincianDimuat = new Map();
+
+    function ambilRincian(url) {
+        if (simpananRincian.has(url)) {
+            return Promise.resolve(simpananRincian.get(url));
+        }
+
+        if (rincianDimuat.has(url)) {
+            return rincianDimuat.get(url);
+        }
+
+        const permintaan = fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
             .then(r => r.ok ? r.json() : Promise.reject(new Error('Gagal memuat rincian')))
+            .then(data => {
+                if (data && data.id) simpananRincian.set(url, data);
+                rincianDimuat.delete(url);
+
+                return data;
+            })
+            .catch(err => {
+                rincianDimuat.delete(url);
+                throw err;
+            });
+
+        rincianDimuat.set(url, permintaan);
+
+        return permintaan;
+    }
+
+    function alamatRincian(el) {
+        if (el.dataset.jurnalId) {
+            return '{{ url('/api/jurnal') }}/' + el.dataset.jurnalId;
+        }
+
+        if (el.dataset.pengaduanId) {
+            return '{{ url('/api/pengaduan') }}/' + el.dataset.pengaduanId;
+        }
+
+        return null;
+    }
+
+    function ambilLaluBuka(url, lanjut) {
+        ambilRincian(url)
             .then(data => {
                 if (data && data.id) lanjut(data);
             })
             .catch(err => console.error('Gagal memuat rincian:', err));
     }
+
+    // Pramuat. Panel keluhan berulang dirender ulang lewat AJAX sambil petugas
+    // mengetik, jadi pendengarnya dipasang dengan delegasi pada document.
+    ['mouseover', 'focusin', 'touchstart'].forEach(function (peristiwa) {
+        document.addEventListener(peristiwa, function (e) {
+            const tombol = e.target.closest ? e.target.closest('.js-rincian-duplikat') : null;
+            if (!tombol) return;
+
+            const url = alamatRincian(tombol);
+            if (url) ambilRincian(url).catch(() => {});
+        }, { passive: true });
+    });
 
     window.bukaModalJurnalDuplikat = function(el) {
         let jurnal = null;

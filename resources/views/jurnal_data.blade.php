@@ -577,7 +577,9 @@
                                         $isMenunggu = strtolower(trim($jurnal->status ?? '')) === 'menunggu';
                                         $hasLog = !empty($jurnal->keterangan_log) && trim($jurnal->keterangan_log) !== '-' && trim($jurnal->keterangan_log) !== '' && trim(strtolower($jurnal->keterangan_log)) !== 'tidak ada keterangan tambahan.';
                                     @endphp
-                                    <button type="button" class="btn btn-secondary btn-sm" onclick="showDetailModal({{ $jurnal->id }})" title="Lihat Rincian & Aksi" style="padding: 6px 12px; font-size: 0.78125rem; font-weight: 600; display: inline-flex; align-items: center; gap: 5px;">
+                                    {{-- data-detail-id dipakai pramuat: rinciannya mulai diambil begitu
+                                         kursor menyentuh tombol, jadi modalnya terasa langsung terbuka. --}}
+                                    <button type="button" class="btn btn-secondary btn-sm" data-detail-id="{{ $jurnal->id }}" onclick="showDetailModal({{ $jurnal->id }})" title="Lihat Rincian & Aksi" style="padding: 6px 12px; font-size: 0.78125rem; font-weight: 600; display: inline-flex; align-items: center; gap: 5px;">
                                         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                             <circle cx="12" cy="12" r="10"></circle>
                                             <line x1="12" y1="16" x2="12" y2="12"></line>
@@ -1941,7 +1943,25 @@
 
         bindPaginationEvents();
         updateActiveFilterChips();
+        bindPramuatDetail();
     });
+
+    /**
+     * Mulai mengambil rincian begitu kursor menyentuh tombolnya, bukan menunggu
+     * kliknya. Dipasang dengan delegasi pada tbody supaya baris yang dirender
+     * ulang setelah menyimpan log ikut terpakai tanpa dipasangi ulang.
+     */
+    function bindPramuatDetail() {
+        const tabel = document.getElementById('jurnalTbody');
+        if (!tabel) return;
+
+        ['mouseover', 'focusin', 'touchstart'].forEach(function (peristiwa) {
+            tabel.addEventListener(peristiwa, function (e) {
+                const tombol = e.target.closest ? e.target.closest('[data-detail-id]') : null;
+                if (tombol) pramuatJurnal(tombol.dataset.detailId);
+            }, { passive: true });
+        });
+    }
 
     // State Manajemen Modal
     let currentDetailJurnal = null;
@@ -1968,22 +1988,122 @@
         return d.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
     }
 
+    // ---------- Pemuatan rincian jurnal ----------
+    // Tombol pada tabel hanya membawa id-nya: nomor rekening dan nomor kartu tidak
+    // ditanam di sumber halaman untuk seluruh baris sekaligus. Supaya modalnya
+    // tetap terasa seketika, ada tiga lapis di sini — hasilnya disimpan (baris yang
+    // sama dibuka lagi tanpa permintaan baru), permintaannya dimulai sejak kursor
+    // menyentuh tombol, dan modalnya tetap terbuka langsung sambil menunggu.
+    const simpananJurnal = new Map();
+    const sedangDimuat = new Map();
+
+    // Baris yang rinciannya sedang ditunggu modal detail.
+    let detailDiminta = null;
+
+    function muatJurnal(id) {
+        id = String(id);
+
+        if (simpananJurnal.has(id)) {
+            return Promise.resolve(simpananJurnal.get(id));
+        }
+
+        // Satu baris hanya diminta sekali walau disentuh berkali-kali.
+        if (sedangDimuat.has(id)) {
+            return sedangDimuat.get(id);
+        }
+
+        const permintaan = fetch('{{ url('/api/jurnal') }}/' + id, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+            .then(r => r.ok ? r.json() : Promise.reject(new Error('Gagal memuat rincian')))
+            .then(data => {
+                if (data && data.id) simpananJurnal.set(id, data);
+                sedangDimuat.delete(id);
+
+                return data;
+            })
+            .catch(err => {
+                sedangDimuat.delete(id);
+                throw err;
+            });
+
+        sedangDimuat.set(id, permintaan);
+
+        return permintaan;
+    }
+
+    function pramuatJurnal(id) {
+        if (id) muatJurnal(id).catch(() => {});
+    }
+
+    /**
+     * Isi modal dengan tanda tunggu supaya kerangkanya tampil seketika saat
+     * diklik, alih-alih diam dulu menunggu jawaban server.
+     */
+    function tandaiDetailMemuat() {
+        [
+            'modal_nama_nasabah', 'modal_no_rekening', 'modal_no_resi', 'modal_no_kartu',
+            'modal_no_tiket', 'modal_cabang', 'modal_jenis_transaksi', 'modal_channel',
+            'modal_nominal_transaksi', 'modal_biaya_admin', 'modal_terminal_transaksi',
+            'modal_status', 'modal_tgl_transaksi', 'modal_tgl_terima', 'modal_tgl_selesai',
+            'modal_created_at', 'modal_permasalahan', 'modal_keterangan_log',
+        ].forEach(function (id) {
+            const el = document.getElementById(id);
+            if (el) el.innerHTML = '<span style="color: #cbd5e1; letter-spacing: 2px;">&bull;&bull;&bull;</span>';
+        });
+
+        const pengaduanWrap = document.getElementById('modal_pengaduan_wrap');
+        if (pengaduanWrap) pengaduanWrap.style.display = 'none';
+
+        // Tombol aksi disembunyikan sampai datanya tiba. Tanpa ini, Edit dan Hapus
+        // sesaat masih menunjuk jurnal yang dibuka sebelumnya.
+        setTampilTombolDetail(false);
+    }
+
+    function setTampilTombolDetail(tampil) {
+        ['modalBtnEdit', 'modalBtnDelete'].forEach(function (id) {
+            const el = document.getElementById(id);
+            if (el) el.style.visibility = tampil ? '' : 'hidden';
+        });
+    }
+
     function showDetailModal(jurnal) {
-        // Tombol pada tabel hanya membawa id-nya. Nomor rekening dan nomor kartu
-        // tidak lagi ditanam di sumber halaman untuk seluruh baris sekaligus,
-        // melainkan diambil hanya untuk baris yang benar-benar dibuka petugas.
         if (typeof jurnal !== 'object' || jurnal === null) {
-            fetch('{{ url('/api/jurnal') }}/' + jurnal, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
-                .then(r => r.ok ? r.json() : Promise.reject(new Error('Gagal memuat rincian')))
+            const id = String(jurnal);
+            const tersimpan = simpananJurnal.get(id);
+
+            // Sudah pernah dibuka, atau pramuat sudah selesai: tanpa jeda sama sekali.
+            if (tersimpan) {
+                showDetailModal(tersimpan);
+
+                return;
+            }
+
+            currentDetailJurnal = null;
+            detailDiminta = id;
+            tandaiDetailMemuat();
+            document.getElementById('detailModal').classList.add('show');
+
+            muatJurnal(id)
                 .then(data => {
-                    if (data && data.id) {
-                        showDetailModal(data);
-                    }
+                    // Petugas bisa saja sudah menutup modalnya atau berpindah ke
+                    // baris lain sementara permintaan ini masih berjalan; jawaban
+                    // yang datang terlambat tidak boleh menimpa baris yang sedang
+                    // dilihat sekarang.
+                    if (!data || !data.id) return;
+                    if (detailDiminta !== id) return;
+
+                    showDetailModal(data);
                 })
-                .catch(err => console.error('Gagal memuat rincian jurnal:', err));
+                .catch(err => {
+                    console.error('Gagal memuat rincian jurnal:', err);
+                    const el = document.getElementById('modal_permasalahan');
+                    if (el) el.textContent = 'Gagal memuat rincian. Periksa koneksi lalu coba lagi.';
+                });
+
             return;
         }
 
+        setTampilTombolDetail(true);
+        detailDiminta = String(jurnal.id);
         currentDetailJurnal = jurnal;
         document.getElementById('modal_nama_nasabah').textContent = jurnal.nama_nasabah || '-';
         document.getElementById('modal_no_rekening').textContent = jurnal.no_rekening || '-';
@@ -2163,6 +2283,11 @@
 
     function closeDetailModal() {
         document.getElementById('detailModal').classList.remove('show');
+
+        // Jawaban yang masih dalam perjalanan tidak boleh membuka modal kembali.
+        // currentDetailJurnal sengaja dibiarkan: alur simpan log memakainya untuk
+        // menyegarkan modal detail yang tadi sempat ditutup.
+        detailDiminta = null;
     }
 
     // Handlers Modal Pilihan Format Cetak Dokumen
@@ -2316,6 +2441,10 @@
 
             if (data.status === 'success') {
                 currentQuickLogJurnal.keterangan_log = val;
+
+                // Rincian yang tersimpan sudah usang: baris ini diambil ulang
+                // saat modalnya dibuka lagi.
+                simpananJurnal.delete(String(currentQuickLogJurnal.id));
 
                 // Perbarui tombol aksi di baris tabel yang bersangkutan jika ada di DOM
                 const tableRowBtn = document.querySelector(`.btn-cetak-action[data-jurnal-id="${currentQuickLogJurnal.id}"]`);
