@@ -185,17 +185,6 @@
             </div>
         </div>
 
-        {{-- Keamanan akun (dua faktor). Terbuka untuk kedua peran: tiap petugas
-             mengurus akunnya sendiri. Diberi tanda kuning selama dua faktornya
-             belum aktif, supaya tidak terlupakan. --}}
-        <a href="{{ route('keamanan.index') }}"
-           class="relative border p-2 rounded-lg transition-colors cursor-pointer shrink-0 {{ Auth::check() && Auth::user()->mfaAktif() ? 'bg-white/10 border-white/20 text-slate-300 hover:bg-white/20 hover:text-white' : 'bg-amber-400/15 border-amber-400/40 text-amber-300 hover:bg-amber-400/30 hover:text-white' }}"
-           title="Keamanan Akun{{ Auth::check() && Auth::user()->mfaAktif() ? ' (dua faktor aktif)' : ' — dua faktor belum aktif' }}">
-            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
-            </svg>
-        </a>
-
         <button type="button" class="bg-rose-500/15 border border-rose-500/30 text-rose-300 p-2 rounded-lg hover:bg-rose-500/30 hover:text-white transition-colors cursor-pointer shrink-0" onclick="openLogoutModal()" title="Keluar / Logout">
             <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
