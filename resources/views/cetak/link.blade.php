@@ -390,15 +390,8 @@
 </head>
 <body>
 
-    <!-- Toolbar Aksi Layar -->
-    <div class="no-print">
-        <button type="button" onclick="handleKembali()" class="btn btn-back">⬅ Kembali</button>
-        <div style="text-align: center;">
-            <span style="font-weight: bold; font-size: 13px; color: #1e293b; display: block;">📄 Cetak Keluhan & Slip ATM LINK &mdash; No. Tiket: {{ $jurnal->no_tiket }}</span>
-            <span style="font-size: 11px; color: #0369a1; background: #e0f2fe; padding: 2px 8px; border-radius: 12px; font-weight: 600; display: inline-block; margin-top: 3px;">✏️ Nama penanda tangan, jabatan, serta rekening penampungan pada slip dapat diklik untuk diedit langsung</span>
-        </div>
-        <button type="button" onclick="window.print()" class="btn btn-print">🖨️ Cetak Form & Slip Jurnal</button>
-    </div>
+    <!-- Toolbar Aksi Layar & Studio TTD -->
+    @include('cetak.partials.ttd_toolbar_and_modal', ['judulForm' => 'Cetak Keluhan & Slip ATM LINK'])
 
     <!-- ================= HALAMAN 1: FORM PENYELESAIAN KELUHAN NASABAH ================= -->
     <div class="form-wrapper">
@@ -577,53 +570,7 @@
             </tr>
 
             <!-- FOOTER BLOCK TANDA TANGAN (4 KOLOM) -->
-            <tr>
-                <td colspan="2" class="no-padding" style="padding: 0;">
-                    <table style="width: 100%; border-collapse: collapse; table-layout: fixed;">
-                        <tr>
-                            <td colspan="3" class="sig-header" style="width: 74%; border-right: 1px solid #000; border-bottom: 1px solid #000;">Di Selesaikan Oleh,</td>
-                            <td class="sig-header" style="width: 26%; border-bottom: 1px solid #000;">Di ketahui Oleh,</td>
-                        </tr>
-                        <!-- Ruang Kotak Tanda Tangan (Diperbesar ke Bawah) -->
-                        <tr>
-                            <td class="sig-space-cell" style="width: 24%; border-right: 1px solid #000;"></td>
-                            <td class="sig-space-cell" style="width: 26%; border-right: 1px solid #000;"></td>
-                            <td class="sig-space-cell" style="width: 24%; border-right: 1px solid #000;"></td>
-                            <td class="sig-space-cell" style="width: 26%;"></td>
-                        </tr>
-                        <!-- Baris Nama Pejabat (Rata Sejajar Horizontal & Editable) -->
-                        <tr>
-                            <td class="sig-name-cell" style="width: 24%; border-right: 1px solid #000;">
-                                <div class="sig-name editable-text" contenteditable="true" spellcheck="false" title="Klik untuk mengedit Nama">MUJADID</div>
-                            </td>
-                            <td class="sig-name-cell" style="width: 26%; border-right: 1px solid #000;">
-                                <div class="sig-name editable-text" contenteditable="true" spellcheck="false" title="Klik untuk mengedit Nama">AYU FEBRIANTI</div>
-                            </td>
-                            <td class="sig-name-cell" style="width: 24%; border-right: 1px solid #000;">
-                                <div class="sig-name editable-text" contenteditable="true" spellcheck="false" title="Klik untuk mengedit Nama">WACHYUNI MADARAYU</div>
-                            </td>
-                            <td class="sig-name-cell" style="width: 26%;">
-                                <div class="sig-name editable-text" contenteditable="true" spellcheck="false" title="Klik untuk mengedit Nama">DIANA, ST</div>
-                            </td>
-                        </tr>
-                        <!-- Baris Jabatan Pejabat (Editable) -->
-                        <tr>
-                            <td class="sig-title-cell" style="width: 24%; border-right: 1px solid #000;">
-                                <div class="sig-title editable-text" contenteditable="true" spellcheck="false" title="Klik untuk mengedit Jabatan">Staf layanan keluhan dan Monitoring Kartu</div>
-                            </td>
-                            <td class="sig-title-cell" style="width: 26%; border-right: 1px solid #000;">
-                                <div class="sig-title editable-text" contenteditable="true" spellcheck="false" title="Klik untuk mengedit Jabatan">Pemimpin Unit Layanan Keluhan dan Monitoring Transaksi Kartu</div>
-                            </td>
-                            <td class="sig-title-cell" style="width: 24%; border-right: 1px solid #000;">
-                                <div class="sig-title editable-text" contenteditable="true" spellcheck="false" title="Klik untuk mengedit Jabatan">PINBAG E- CHANEL</div>
-                            </td>
-                            <td class="sig-title-cell" style="width: 26%;">
-                                <div class="sig-title editable-text" contenteditable="true" spellcheck="false" title="Klik untuk mengedit Jabatan">Pemimpin Divisi IT</div>
-                            </td>
-                        </tr>
-                    </table>
-                </td>
-            </tr>
+            @include('cetak.partials.ttd_block')
         </table>
     </div>
 
@@ -938,19 +885,35 @@
                             </tr>
                             <tr style="height: 25px;">
                                 <td style="border-right: 1px solid #000; border-bottom: 1px solid #000; padding: 2px 6px;">pemimpin Divisi</td>
-                                <td style="border-bottom: 1px solid #000;"></td>
+                                <td style="border-bottom: 1px solid #000; text-align: center; vertical-align: middle; padding: 1px 2px;" class="slip-ttd-slot-4" data-max-h="20px">
+                                    @if(!empty($ttdConfig['slots'][4]) && empty($ttdConfig['slots'][4]['is_kosong']) && !empty($ttdConfig['slots'][4]['ttd_image']))
+                                        <img src="{{ $ttdConfig['slots'][4]['ttd_image'] }}" alt="TTD {{ $ttdConfig['slots'][4]['nama'] }}" style="max-height: 20px; max-width: 95%; width: auto; height: auto; object-fit: contain; display: block; margin: auto; pointer-events: none;">
+                                    @endif
+                                </td>
                             </tr>
                             <tr style="height: 25px;">
                                 <td style="border-right: 1px solid #000; border-bottom: 1px solid #000; padding: 2px 6px;">Pemimpin Bagian</td>
-                                <td style="border-bottom: 1px solid #000;"></td>
+                                <td style="border-bottom: 1px solid #000; text-align: center; vertical-align: middle; padding: 1px 2px;" class="slip-ttd-slot-3" data-max-h="20px">
+                                    @if(!empty($ttdConfig['slots'][3]) && empty($ttdConfig['slots'][3]['is_kosong']) && !empty($ttdConfig['slots'][3]['ttd_image']))
+                                        <img src="{{ $ttdConfig['slots'][3]['ttd_image'] }}" alt="TTD {{ $ttdConfig['slots'][3]['nama'] }}" style="max-height: 20px; max-width: 95%; width: auto; height: auto; object-fit: contain; display: block; margin: auto; pointer-events: none;">
+                                    @endif
+                                </td>
                             </tr>
                             <tr style="height: 25px;">
                                 <td style="border-right: 1px solid #000; border-bottom: 1px solid #000; padding: 2px 6px;">Pemimpin Unit</td>
-                                <td style="border-bottom: 1px solid #000;"></td>
+                                <td style="border-bottom: 1px solid #000; text-align: center; vertical-align: middle; padding: 1px 2px;" class="slip-ttd-slot-2" data-max-h="20px">
+                                    @if(!empty($ttdConfig['slots'][2]) && empty($ttdConfig['slots'][2]['is_kosong']) && !empty($ttdConfig['slots'][2]['ttd_image']))
+                                        <img src="{{ $ttdConfig['slots'][2]['ttd_image'] }}" alt="TTD {{ $ttdConfig['slots'][2]['nama'] }}" style="max-height: 20px; max-width: 95%; width: auto; height: auto; object-fit: contain; display: block; margin: auto; pointer-events: none;">
+                                    @endif
+                                </td>
                             </tr>
                             <tr style="height: 25px;">
                                 <td style="border-right: 1px solid #000; padding: 2px 6px; vertical-align: middle;">Staf</td>
-                                <td style="vertical-align: middle;"></td>
+                                <td style="text-align: center; vertical-align: middle; padding: 1px 2px;" class="slip-ttd-slot-1" data-max-h="20px">
+                                    @if(!empty($ttdConfig['slots'][1]) && empty($ttdConfig['slots'][1]['is_kosong']) && !empty($ttdConfig['slots'][1]['ttd_image']))
+                                        <img src="{{ $ttdConfig['slots'][1]['ttd_image'] }}" alt="TTD {{ $ttdConfig['slots'][1]['nama'] }}" style="max-height: 20px; max-width: 95%; width: auto; height: auto; object-fit: contain; display: block; margin: auto; pointer-events: none;">
+                                    @endif
+                                </td>
                             </tr>
                         </table>
                     </td>

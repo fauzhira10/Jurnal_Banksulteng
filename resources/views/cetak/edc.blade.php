@@ -1,3 +1,6 @@
+@php
+    $ttdConfig = $jurnal->getTtdConfig();
+@endphp
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -122,15 +125,7 @@
 </head>
 <body>
 
-    <!-- Toolbar Aksi Layar -->
-    <div class="no-print">
-        <button type="button" onclick="handleKembali()" class="btn btn-back">⬅ Kembali</button>
-        <div style="text-align: center;">
-            <span style="font-weight: bold; font-size: 13px; color: #1e293b; display: block;">📄 Cetak Slip Jurnal EDC (Nota Debet) &mdash; No. Tiket: {{ $jurnal->no_tiket }}</span>
-            <span style="font-size: 11px; color: #0369a1; background: #e0f2fe; padding: 2px 8px; border-radius: 12px; font-weight: 600; display: inline-block; margin-top: 3px;">✏️ Nama akun & no. rekening penampungan pada slip dapat diklik untuk diedit langsung</span>
-        </div>
-        <button type="button" onclick="window.print()" class="btn btn-print">🖨️ Cetak Slip Jurnal</button>
-    </div>
+    @include('cetak.partials.ttd_toolbar_and_modal', ['judulForm' => 'Cetak Slip Jurnal EDC (Nota Debet)'])
 
     <!-- ================= SLIP JURNAL / NOTA DEBET DIVISI IT (EDC) ================= -->
     <div class="form-wrapper">
@@ -424,19 +419,35 @@
                             </tr>
                             <tr style="height: 25px;">
                                 <td style="border-right: 1px solid #000; border-bottom: 1px solid #000; padding: 2px 6px;">pemimpin Divisi</td>
-                                <td style="border-bottom: 1px solid #000;"></td>
+                                <td style="border-bottom: 1px solid #000; text-align: center; vertical-align: middle; padding: 1px 2px;" class="slip-ttd-slot-4" data-max-h="20px">
+                                    @if(!empty($ttdConfig['slots'][4]) && empty($ttdConfig['slots'][4]['is_kosong']) && !empty($ttdConfig['slots'][4]['ttd_image']))
+                                        <img src="{{ $ttdConfig['slots'][4]['ttd_image'] }}" alt="TTD {{ $ttdConfig['slots'][4]['nama'] }}" style="max-height: 20px; max-width: 95%; width: auto; height: auto; object-fit: contain; display: block; margin: auto; pointer-events: none;">
+                                    @endif
+                                </td>
                             </tr>
                             <tr style="height: 25px;">
                                 <td style="border-right: 1px solid #000; border-bottom: 1px solid #000; padding: 2px 6px;">Pemimpin Bagian</td>
-                                <td style="border-bottom: 1px solid #000;"></td>
+                                <td style="border-bottom: 1px solid #000; text-align: center; vertical-align: middle; padding: 1px 2px;" class="slip-ttd-slot-3" data-max-h="20px">
+                                    @if(!empty($ttdConfig['slots'][3]) && empty($ttdConfig['slots'][3]['is_kosong']) && !empty($ttdConfig['slots'][3]['ttd_image']))
+                                        <img src="{{ $ttdConfig['slots'][3]['ttd_image'] }}" alt="TTD {{ $ttdConfig['slots'][3]['nama'] }}" style="max-height: 20px; max-width: 95%; width: auto; height: auto; object-fit: contain; display: block; margin: auto; pointer-events: none;">
+                                    @endif
+                                </td>
                             </tr>
                             <tr style="height: 25px;">
                                 <td style="border-right: 1px solid #000; border-bottom: 1px solid #000; padding: 2px 6px;">Pemimpin Unit</td>
-                                <td style="border-bottom: 1px solid #000;"></td>
+                                <td style="border-bottom: 1px solid #000; text-align: center; vertical-align: middle; padding: 1px 2px;" class="slip-ttd-slot-2" data-max-h="20px">
+                                    @if(!empty($ttdConfig['slots'][2]) && empty($ttdConfig['slots'][2]['is_kosong']) && !empty($ttdConfig['slots'][2]['ttd_image']))
+                                        <img src="{{ $ttdConfig['slots'][2]['ttd_image'] }}" alt="TTD {{ $ttdConfig['slots'][2]['nama'] }}" style="max-height: 20px; max-width: 95%; width: auto; height: auto; object-fit: contain; display: block; margin: auto; pointer-events: none;">
+                                    @endif
+                                </td>
                             </tr>
                             <tr style="height: 25px;">
                                 <td style="border-right: 1px solid #000; padding: 2px 6px; vertical-align: middle;">Staf</td>
-                                <td style="vertical-align: middle;"></td>
+                                <td style="text-align: center; vertical-align: middle; padding: 1px 2px;" class="slip-ttd-slot-1" data-max-h="20px">
+                                    @if(!empty($ttdConfig['slots'][1]) && empty($ttdConfig['slots'][1]['is_kosong']) && !empty($ttdConfig['slots'][1]['ttd_image']))
+                                        <img src="{{ $ttdConfig['slots'][1]['ttd_image'] }}" alt="TTD {{ $ttdConfig['slots'][1]['nama'] }}" style="max-height: 20px; max-width: 95%; width: auto; height: auto; object-fit: contain; display: block; margin: auto; pointer-events: none;">
+                                    @endif
+                                </td>
                             </tr>
                         </table>
                     </td>

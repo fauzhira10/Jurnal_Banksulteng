@@ -38,6 +38,14 @@ class Jurnal extends Model
         'status',
         'permasalahan',
         'keterangan_log',
+        'ttd_data',
+    ];
+
+    /**
+     * @var array<string, string>
+     */
+    protected $casts = [
+        'ttd_data' => 'array',
     ];
 
     /**
@@ -117,5 +125,40 @@ class Jurnal extends Model
     public function pengaduan(): HasOne
     {
         return $this->hasOne(Pengaduan::class, 'jurnal_id');
+    }
+
+    /**
+     * Mengambil snapshot konfigurasi TTD untuk tiket ini.
+     * Jika belum tersimpan di database, gunakan pejabat default dari MasterPejabatTtd.
+     *
+     * @return array{mode: string, slots: array<int, array{pejabat_id: ?int, nama: string, jabatan: string, nip: string, ttd_image: string, is_kosong: bool}>}
+     */
+    public function getTtdConfig(): array
+    {
+        if (!empty($this->ttd_data) && is_array($this->ttd_data) && isset($this->ttd_data['slots'])) {
+            return $this->ttd_data;
+        }
+
+        $defaults = MasterPejabatTtd::getAllDefault();
+        $slots = [];
+
+        for ($s = 1; $s <= 4; $s++) {
+            $def = MasterPejabatTtd::DAFTAR_SLOT[$s];
+            $pejabat = $defaults[$s] ?? null;
+
+            $slots[$s] = [
+                'pejabat_id' => $pejabat?->id,
+                'nama' => $pejabat?->nama ?? $def['default_nama'],
+                'jabatan' => $pejabat?->jabatan ?? $def['default_jabatan'],
+                'nip' => $pejabat?->nip ?? '',
+                'ttd_image' => $pejabat?->ttd_image ?? '',
+                'is_kosong' => true, // Default saat cetak: kosong dulu untuk mode TTD basah
+            ];
+        }
+
+        return [
+            'mode' => 'manual',
+            'slots' => $slots,
+        ];
     }
 }

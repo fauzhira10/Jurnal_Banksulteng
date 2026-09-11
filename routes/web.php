@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\PejabatTtdController;
 use App\Http\Controllers\Admin\PengaduanMasukController;
 use App\Http\Controllers\Admin\PenggunaController;
 use App\Http\Controllers\AtmMonitoringController;
@@ -115,6 +116,19 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
         Route::post('/{pengaduan}/terima', [PengaduanMasukController::class, 'terima'])->name('terima')->whereNumber('pengaduan');
         Route::post('/{pengaduan}/tolak', [PengaduanMasukController::class, 'tolak'])->name('tolak')->whereNumber('pengaduan');
     });
+
+    // ---------- Master Pejabat & Tanda Tangan Digital ----------
+    Route::prefix('pejabat-ttd')->name('admin.pejabat-ttd.')->group(function () {
+        Route::get('/', [PejabatTtdController::class, 'index'])->name('index');
+        Route::post('/', [PejabatTtdController::class, 'store'])->name('store');
+        Route::put('/{id}', [PejabatTtdController::class, 'update'])->name('update')->whereNumber('id');
+        Route::delete('/{id}', [PejabatTtdController::class, 'destroy'])->name('destroy')->whereNumber('id');
+        Route::post('/{id}/set-default', [PejabatTtdController::class, 'setDefault'])->name('set_default')->whereNumber('id');
+    });
+
+    // API AJAX Pejabat & Snapshot TTD Jurnal
+    Route::get('/api/pejabat-ttd/slot/{slot}', [PejabatTtdController::class, 'apiBySlot'])->name('api.pejabat_ttd.slot')->whereNumber('slot');
+    Route::post('/api/jurnal/{id}/ttd', [PejabatTtdController::class, 'simpanTtdJurnal'])->name('api.jurnal.simpan_ttd')->whereNumber('id');
 
     // ---------- Manajemen Pengguna (Khusus Admin Utama / Super Admin) ----------
     Route::prefix('pengguna')->name('admin.pengguna.')->middleware('role:superadmin')->group(function () {
