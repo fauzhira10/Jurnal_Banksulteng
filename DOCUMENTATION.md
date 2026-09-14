@@ -19,7 +19,7 @@ Projek **Jurnal_Banksulteng** adalah aplikasi web berbasis **Laravel 12/13** yan
 - **Sidebar Navigasi Modern**: Memudahkan transisi antar menu "Input Jurnal Keluhan" dan "Data Keluhan", lengkap dengan info username aktif dan tombol logout.
 - **Deteksi Keluhan Berulang (Anti-Duplikat Bertingkat)**: Mencegah klaim ganda atas transaksi keluhan nasabah yang sama. Kombinasi **Nama Nasabah + No. Resi + Tanggal Transaksi** yang sama persis ditolak, sedangkan **Nama Nasabah + No. Resi** yang sama dengan tanggal berbeda hanya diperingatkan dan dapat dilanjutkan setelah petugas menyetujui. Peringatannya muncul sejak petugas mengetik, lengkap dengan rincian keluhan lama.
 - **Otomatisasi Channel & Biaya Admin**: Mempercepat pengisian form dengan mekanisme *auto-fill* berbasis AJAX saat jenis transaksi dipilih.
-- **Keamanan & Kepatuhan**: Menyiapkan rekam jejak audit (*audit trail*) berbasis hash chaining untuk integritas data perbankan.
+- **Keamanan & Kepatuhan**: Rekam jejak audit (*audit trail*) berantai hash yang mencatat pembuatan, perubahan, dan penghapusan jurnal, keputusan atas pengaduan, pembukaan berkas KTP, serta percobaan login yang gagal. Keutuhannya dapat diperiksa dengan `php artisan audit:periksa`. Lihat bagian 8.4.
 
 ---
 
@@ -60,10 +60,25 @@ Projek **Jurnal_Banksulteng** adalah aplikasi web berbasis **Laravel 12/13** yan
 
 ## 🔑 3. Kredensial & Peran Pengguna
 
-| Peran | Username | Password | Hak Akses |
-|:---|:---|:---|:---|
-| **Admin Pusat** (Divisi IT) | `admin` | `admin123` | Kelola Jurnal Keluhan, verifikasi pengaduan cabang, laporan, monitoring ATM, manajemen pengguna. |
-| **CS Cabang** (contoh, Cabang Utama `001`) | `cs.palu` | `cs12345` | Kirim pengaduan nasabah + lampiran, pantau status pengaduan cabangnya sendiri. |
+| Peran | Hak Akses |
+|:---|:---|
+| **Admin Pusat** (Divisi IT) | Kelola Jurnal Keluhan, verifikasi pengaduan cabang, laporan, monitoring ATM, manajemen pengguna. |
+| **CS Cabang** | Kirim pengaduan nasabah + lampiran, pantau status pengaduan cabangnya sendiri. |
+
+### Cara Memperoleh Akun
+
+**Tidak ada kata sandi bawaan di server produksi.** Akun Admin Pusat pertama dibuat
+langsung di server dengan kata sandi yang diketik petugas dan tidak pernah tersimpan
+di dalam kode:
+
+```powershell
+php artisan admin:buat --superadmin
+```
+
+Pada lingkungan **pengembangan** (`APP_ENV=local`), `php artisan migrate:fresh --seed`
+membuat akun uji `admin` / `admin123` dan CS contoh `cs.palu` / `cs12345`. Kedua akun
+ini **tidak pernah dibuat di luar lingkungan pengembangan**, dan seeder tidak akan
+menimpa kata sandi akun yang sudah ada.
 
 URL login sama untuk kedua peran: `http://127.0.0.1:8000/login`. Setelah login, Admin diarahkan ke `/` dan CS ke `/cs`. Akun CS lain dibuat Admin lewat menu **Manajemen Pengguna** (`/pengguna`) dan wajib terikat ke satu kantor cabang. Akun tidak dihapus, hanya **dinonaktifkan**.
 
@@ -331,6 +346,282 @@ Jurnal_Banksulteng/
    *(Atau menggunakan path PHP Laragon: `& "C:\laragon\bin\php\php-8.3.16-Win32-vs16-x64\php.exe" artisan serve`)*
 
 3. Buka browser di: **`http://127.0.0.1:8000/login`**
-4. Masuk dengan kredensial:
-   - **Username**: **`admin`**
-   - **Password**: **`admin123`**
+4. Masuk memakai akun yang dibuat pada langkah setup (lihat bagian 3).
+   Pada lingkungan pengembangan, seeder menyediakan akun uji `admin` / `admin123`.
+
+---
+
+## 🔒 8. Deploy & Pengerasan Keamanan
+
+Daftar periksa wajib sebelum aplikasi ini dijalankan di server yang dapat diakses
+pengguna lain. Selama masih di laptop pengembang, `.env.example` sudah memadai.
+
+### 8.1 Berkas konfigurasi
+
+Salin `.env.production.example` menjadi `.env` di server, lalu isi nilainya.
+Empat baris yang paling menentukan:
+
+| Kunci | Nilai wajib | Akibat bila salah |
+|:---|:---|:---|
+| `APP_ENV` | `production` | Laravel bersikap longgar terhadap galat. |
+| `APP_DEBUG` | `false` | Halaman galat menampilkan **seluruh isi `.env`**, termasuk kata sandi database, kepada siapa pun yang memicu error. |
+| `SESSION_SECURE_COOKIE` | `true` | Cookie sesi ikut terkirim lewat HTTP polos dan dapat disadap di jaringan kantor. |
+| `DB_USERNAME` | bukan `root` | Satu celah SQL menjadi kendali penuh atas seluruh basis data server. |
+
+### 8.2 Urutan pemasangan
+
+```powershell
+cp .env.production.example .env
+php artisan key:generate
+# Cadangkan APP_KEY dari .env ke brankas kata sandi SEKARANG, terpisah dari
+# cadangan basis data. NIK nasabah disimpan terenkripsi dengan kunci ini dan
+# tidak dapat dipulihkan tanpanya — lihat bagian 8.10.
+php artisan migrate --force
+php artisan db:seed --class=MasterSeeder --force   # hanya master data 41 cabang & 33 transaksi
+php artisan admin:buat --superadmin                # akun admin, kata sandi diketik petugas
+php artisan config:cache; php artisan route:cache; php artisan view:cache
+```
+
+Jangan menjalankan `php artisan db:seed` polos di server: gunakan `--class=MasterSeeder`
+seperti di atas agar akun contoh tidak ikut terbawa.
+
+Dan **jangan pernah menjalankan `php artisan key:generate` lagi** setelah server berisi
+data: kunci baru membuat seluruh NIK yang sudah tersimpan tidak terbaca.
+
+### 8.3 Pembatas percobaan login
+
+Sejak pengerasan ini, halaman login memiliki dua lapis pembatas:
+
+| Lapis | Aturan | Berkas |
+|:---|:---|:---|
+| Per akun | 5 percobaan gagal pada kombinasi username + alamat IP → dikunci 15 menit | `AuthController::pastikanBelumTerkunci()` |
+| Per alamat IP | 20 permintaan per menit ke endpoint login | `routes/web.php` (`throttle:20,1`) |
+
+Kata sandi yang terbukti benar langsung menolkan hitungan, sehingga penolakan karena
+akun nonaktif atau sesi ganda tidak pernah ikut mengunci akun. Kunci sengaja memakai
+**username + IP**, bukan username saja, agar pihak luar tidak dapat mengunci akun Admin
+Pusat dari jauh. Konsekuensinya, serangan tebak kata sandi yang tersebar dari banyak
+alamat IP belum tertutup sepenuhnya — lapis penutupnya adalah MFA.
+
+### 8.4 Rekam Jejak Audit
+
+Setiap kejadian penting ditulis ke tabel `audit_trails` oleh `App\Services\AuditTrailService`
+— satu-satunya penulis tabel itu. Yang terekam saat ini:
+
+| Aksi | Pemicu |
+|:---|:---|
+| `jurnal.dibuat` / `jurnal.diubah` / `jurnal.dihapus` | `JurnalObserver`. Perubahan hanya mencatat kolom yang benar-benar berubah, lengkap dengan nilai sebelum dan sesudah. |
+| `jurnal.reset_massal` | Penghapusan seluruh jurnal, beserta nama berkas cadangannya. |
+| `pengaduan.diterima` / `pengaduan.ditolak` | Keputusan Admin Pusat, beserta alasan penolakan. |
+| `lampiran.dibuka` | Siapa membuka berkas KTP nasabah, kapan, dari alamat IP mana. |
+| `login.gagal` / `login.terkunci` | Percobaan masuk yang gagal dan penguncian akun. |
+
+Setiap baris menyimpan pelaku (id + salinan username), alamat IP, peramban, serta
+nilai lama dan baru. **Baris jejak tidak pernah ikut terhapus bersama datanya** —
+menghapus jurnal justru menyisakan jejak `jurnal.dihapus` berisi seluruh isi baris
+yang hilang.
+
+**Rantai hash.** Tiap baris menyegel hash baris sebelumnya
+(`hash_sekarang = sha256(hash_sebelumnya | sidik jari baris)`). Menyunting atau
+menghapus satu baris langsung lewat phpMyAdmin akan memutus rantai pada baris
+sesudahnya. Rantai hanya berguna bila diperiksa:
+
+```powershell
+php artisan audit:periksa
+```
+
+Perintah ini menyebutkan baris mana yang bermasalah dan keluar dengan kode gagal
+bila rantainya putus.
+
+**Pemeriksaannya sudah dijadwalkan harian** (`routes/console.php`, pukul 01.00),
+dengan keluaran ditulis ke `storage/logs/audit-periksa.log`. Penjadwal Laravel
+hanya berjalan bila ada satu tugas sistem yang memanggilnya setiap menit. Di
+server Windows, buat satu tugas di **Task Scheduler** yang berulang tiap 1 menit:
+
+```powershell
+php artisan schedule:run
+```
+
+Tanpa tugas itu, jadwalnya tercatat tetapi tidak pernah dijalankan — periksa
+dengan `php artisan schedule:list`.
+
+> Catatan privasi: jejak audit ikut memuat nilai kolom seperti nomor rekening dan
+> nomor kartu. Aksesnya harus dibatasi seketat data aslinya.
+
+**Dua hal yang sengaja tidak ikut disegel hash**, keduanya ditemukan saat menguji
+rantai di MySQL (bukan di SQLite yang dipakai test):
+
+1. **Urutan kunci JSON.** Kolom `nilai_lama`/`nilai_baru` bertipe `json`, dan MySQL
+   menyimpannya dalam bentuk biner miliknya sendiri sambil **mengurutkan ulang kunci
+   objek**. Karena itu kuncinya diurutkan dulu sebelum dihash — kalau tidak, setiap
+   baris yang memuat lebih dari satu kolom akan dilaporkan "diubah" padahal tidak ada
+   yang menyentuhnya, dan alarm yang selalu berbunyi sama saja dengan tidak ada alarm.
+2. **Kolom `jurnal_id`.** Foreign key-nya memakai `nullOnDelete`, jadi basis data
+   sendiri yang mengosongkannya begitu jurnal terkait dihapus. Menyegelnya berarti
+   setiap penghapusan jurnal memutus rantai — tepat pada kejadian yang paling perlu
+   dipercaya. Tautan ke jurnalnya tetap tersegel lewat `auditable_type` +
+   `auditable_id`, yang tidak punya foreign key.
+
+### 8.5 Header Keamanan HTTP
+
+`App\Http\Middleware\HeaderKeamanan` memasang `X-Content-Type-Options: nosniff`,
+`X-Frame-Options: DENY`, `Referrer-Policy`, `Permissions-Policy`, dan
+`Content-Security-Policy` pada seluruh respons; `Strict-Transport-Security`
+menyusul otomatis begitu situs berjalan di atas HTTPS.
+
+`nosniff` yang paling penting di sini: lampiran disajikan `inline`, dan tanpa header
+itu peramban boleh menebak ulang tipe berkas KTP lalu memperlakukannya sebagai HTML.
+
+CSP masih memuat `'unsafe-inline'` karena hampir seluruh view memakai `<script>` dan
+style sebaris. Meski begitu, skrip dari domain luar, `<object>`, penyematan halaman
+dalam frame, dan pengiriman formulir ke domain lain sudah tertutup. Menghapus
+`'unsafe-inline'` menuntut nonce pada setiap blok skrip — pekerjaan tersendiri.
+
+### 8.6 Penghapusan Seluruh Data Jurnal
+
+Tombol **Hapus Semua Data** kini hanya tampil dan hanya dapat dijalankan oleh
+**Admin Utama**. Sebelum menghapus, sistem meminta **kata sandi akun** diketik ulang
+dan menulis **cadangan Excel otomatis** ke `storage/app/private/cadangan/`.
+Tindakannya dicatat pada jejak audit lengkap dengan jumlah baris dan nama cadangan.
+
+### 8.7 Kebijakan Kata Sandi
+
+Satu aturan berlaku di kedua pintu pembuatan akun — form **Manajemen Pengguna**
+dan perintah `admin:buat` — dan hanya ditulis sekali di `App\Rules\KataSandi`:
+
+| Aturan | Nilai |
+|:---|:---|
+| Panjang minimum | 12 karakter |
+| Isi | wajib memuat sedikitnya satu huruf dan satu angka |
+
+Sebelumnya form web menerima 6 karakter sementara perintah server menuntut 12,
+sehingga akun Admin Pusat yang dibuat lewat web bisa jauh lebih lemah daripada
+yang dibuat di server, padahal keduanya membuka pintu yang sama.
+
+Pemeriksaan terhadap daftar kata sandi bocor (HaveIBeenPwned) sengaja tidak
+dipakai: aturan itu memanggil API lewat internet, dan bila server bank tidak
+punya jalur keluar, pembuatan akun ikut gagal.
+
+### 8.8 Lingkup Data Lintas Cabang
+
+Endpoint `GET /api/duplikat/periksa` menerima nama nasabah dan nomor resi apa pun,
+sehingga jawaban yang rinci membuatnya dapat dipakai satu akun cabang untuk
+memetakan keluhan cabang lain hanya dengan mencoba banyak kombinasi.
+
+Karena itu jawabannya dibedakan menurut peran:
+
+| Peran | Yang diterima |
+|:---|:---|
+| **Admin Pusat** | Panel lengkap: nomor tiket, cabang asal, tanggal, nominal, status, tautan rincian, jumlah catatan. |
+| **CS Cabang** | Hanya **ada** atau **tidak ada** — tanpa jumlah, tanpa kartu rincian, dan tanpa membedakan tanggal transaksi yang sama persis dari yang berbeda. |
+
+Peringatan lintas cabang tetap muncul bagi CS (nasabah yang sama bisa mengadu
+lewat cabang lain), tetapi rinciannya hanya ada pada Admin Pusat yang memang
+berwenang melihat lintas cabang.
+
+### 8.9 Penyamaran Nomor pada Layar Daftar
+
+Nomor rekening kini tampil sebagai `••••1234` pada seluruh **layar daftar** —
+Data Keluhan, Pengaduan Masuk, Daftar Pengaduan CS, dan Beranda CS. Jumlah titiknya
+tetap empat, tidak mengikuti panjang aslinya, supaya panjang nomor pun tidak terbaca.
+Aturannya hanya ditulis sekali di `App\Support\Penyamaran`.
+
+| Tempat | Yang tampil |
+|:---|:---|
+| Layar daftar | `••••1234` |
+| Panel rincian satu kasus | nomor utuh |
+| Dokumen cetak (`resources/views/cetak/*`) | nomor utuh |
+
+Alasannya: satu layar daftar memuat puluhan nasabah sekaligus, sehingga nomor yang
+tercetak penuh ikut terbawa setiap kali layar difoto, dibagikan lewat berbagi layar,
+atau sekadar terlihat orang yang lewat. Di panel rincian, petugas memang sedang
+menangani satu kasus tertentu.
+
+**Dua perubahan pendukung, dan tanpa keduanya penyamaran ini hanya menghibur mata:**
+
+1. Atribut `data-search` pada setiap baris tabel Data Keluhan tidak lagi memuat
+   nomor rekening dan nomor kartu. Atribut itu tercetak di sumber halaman, jadi
+   nomor lengkap di sana membatalkan penyamaran di kolom sebelahnya. Pencarian
+   nomor rekening/kartu tetap bekerja lewat sisi server — cukup tekan Enter,
+   yang hilang hanya penyaringan seketika saat mengetik.
+2. Tombol aksi pada tabel dulu menanam **seluruh baris** jurnal di dalam atribut
+   `onclick`-nya. Sekarang tombol rincian hanya membawa `id` dan modalnya
+   mengambil data lewat `GET /api/jurnal/{id}` untuk baris yang benar-benar
+   dibuka; tombol lain memakai `Jurnal::bekalTombol()` yang tidak membawa nomor
+   rekening maupun nomor kartu.
+3. Panel keluhan berulang (`partials/panel_duplikat.blade.php`) dulu menanam
+   seluruh baris jurnal **dan** seluruh baris pengaduan — termasuk NIK dan nomor
+   HP — untuk sampai lima nasabah setiap kali panelnya muncul. Tombolnya kini
+   hanya membawa `data-jurnal-id` / `data-pengaduan-id`, dan modalnya mengambil
+   rincian lewat `GET /api/jurnal/{id}` atau `GET /api/pengaduan/{id}`. Endpoint
+   pengaduan berada di dalam grup `role:admin` dan tetap melewati `PengaduanPolicy`.
+
+> Ini tindakan **tampilan**, bukan kendali akses. Petugas yang melihat daftar tetap
+> berwenang membuka rinciannya; yang dikurangi adalah paparan yang tidak disengaja.
+
+NIK dan nomor HP **tidak** disamarkan: keduanya hanya muncul di panel rincian
+pengaduan, tempat petugas justru perlu mencocokkannya dengan lampiran KTP nasabah.
+
+### 8.10 Enkripsi NIK & Cadangan APP_KEY
+
+Kolom `pengaduans.no_ktp` disimpan **terenkripsi**. Salinan basis data yang bocor —
+lewat cadangan yang tertinggal, phpMyAdmin, atau berkas `.sql` yang dikirim ke pihak
+lain — karena itu tidak langsung menjadi daftar nomor identitas nasabah.
+
+Pembacaan dan penulisannya ditangani cast `encrypted` pada `App\Models\Pengaduan`,
+sehingga tidak ada kode lain yang berubah: form CS, panel rincian, dan dokumen cetak
+tetap menampilkan NIK utuh seperti biasa.
+
+**Hanya kolom ini yang aman dienkripsi.**
+
+| Kolom | Status | Alasan |
+|:---|:---|:---|
+| `no_ktp` | terenkripsi | Tidak dipakai indeks, pencarian, maupun deteksi duplikat. |
+| `no_hp` | polos | Ikut dicari di `Pengaduan::scopeCari()` — jalur penelusuran saat nasabah menelepon menyusul laporannya. |
+| `nama_nasabah`, `no_resi` | polos | Kunci deteksi keluhan berulang dan indeks `pengaduans_nama_resi_index`. |
+| `no_rekening`, `no_kartu` | polos | Ikut dicari, dan `no_resi` + `nama_nasabah` menjadi kunci `jurnal_unique_kombinasi`. |
+
+Mengenkripsi salah satu kolom pada baris "polos" akan mematikan pencarian atau
+anti-duplikat, bukan sekadar memperlambatnya.
+
+#### APP_KEY wajib dicadangkan terpisah
+
+> **Sejak migrasi `2026_09_14_000001` dijalankan, isi kolom `no_ktp` bergantung
+> sepenuhnya pada `APP_KEY`. Kunci yang hilang berarti NIK seluruh pengaduan tidak
+> dapat dipulihkan — cadangan basis data pun tidak menolong, karena isinya ikut
+> terenkripsi dengan kunci yang sama.**
+
+Karena itu, sebelum menjalankan migrasi di server:
+
+1. Salin nilai `APP_KEY` dari `.env` ke tempat penyimpanan rahasia milik bank
+   (brankas kata sandi atau amplop tersegel), **terpisah dari cadangan basis data**.
+   Menyimpan keduanya di satu tempat meniadakan gunanya enkripsi ini.
+2. Pastikan cadangan `.env` ikut dalam prosedur pemulihan server, bukan hanya
+   cadangan basis data.
+3. Jangan pernah menjalankan `php artisan key:generate` di server yang sudah berisi
+   data. Perintah itu mengganti kunci, dan seluruh NIK yang sudah tersimpan langsung
+   tidak terbaca.
+
+Bila enkripsi hendak dibatalkan, migrasinya dapat dijalankan mundur dan seluruh NIK
+kembali tersimpan polos:
+
+```powershell
+php artisan migrate:rollback --step=1
+```
+
+Jalur maju maupun mundurnya aman dijalankan berulang: baris yang sudah terenkripsi
+tidak dienkripsi dua kali, dan keduanya diuji di `tests/Feature/EnkripsiNikTest.php`.
+
+### 8.11 Yang belum dikerjakan
+
+Butir berikut sudah teridentifikasi namun **belum** ada di dalam kode:
+
+- Penyamaran NIK pada panel rincian pengaduan. Perlu disertai tombol "tampilkan
+  penuh" dan pencatatan jejak audit seperti `lampiran.dibuka`, agar tidak
+  menghalangi pencocokan dengan lampiran KTP.
+- Serangan tebak kata sandi yang tersebar dari banyak alamat IP belum tertutup.
+  Pembatas login mengunci per kombinasi username + alamat IP (bagian 8.3), jadi
+  percobaan yang datang dari banyak alamat berbeda tidak terkena batasnya.
+  Autentikasi dua faktor sempat dibangun lengkap untuk menutup celah ini, lalu
+  **dihapus atas permintaan pengguna** dan tidak akan dipasang kembali.
+- Menghapus `'unsafe-inline'` dari CSP; menuntut nonce pada setiap blok skrip.

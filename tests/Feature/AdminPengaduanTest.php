@@ -166,7 +166,8 @@ test('perubahan status jurnal disinkronkan ke status pengaduan cs', function () 
 test('reset seluruh data jurnal mengembalikan pengaduan tertaut ke status diterima', function () {
     $cabang = buatCabang();
     $cs = buatCs($cabang);
-    $admin = buatAdmin();
+    // Reset massal kini dibatasi Admin Utama dan meminta konfirmasi kata sandi
+    $admin = buatSuperAdmin();
     $transaksi = buatTransaksi();
     $pengaduan = buatPengaduan($cs, $transaksi);
 
@@ -179,8 +180,10 @@ test('reset seluruh data jurnal mengembalikan pengaduan tertaut ke status diteri
     ]);
     $pengaduan->update(['jurnal_id' => $jurnal->id, 'status' => PengaduanStatus::Selesai, 'diproses_at' => now(), 'selesai_at' => now()]);
 
-    $this->actingAs($admin)->delete(route('jurnal.reset_all'), ['delete_template' => false])
-        ->assertRedirect(route('jurnal.index'));
+    $this->actingAs($admin)->delete(route('jurnal.reset_all'), [
+        'delete_template' => false,
+        'password' => 'admin123',
+    ])->assertRedirect(route('jurnal.index'));
 
     $pengaduan->refresh();
     expect(Jurnal::count())->toBe(0)
@@ -220,8 +223,8 @@ test('admin dapat membuat akun cs dan menonaktifkannya', function () {
         'email' => 'cs.poso@banksulteng.co.id',
         'role' => 'cs',
         'master_cabang_id' => $cabang->id,
-        'password' => 'rahasia123',
-        'password_confirmation' => 'rahasia123',
+        'password' => 'rahasiaPoso2026',
+        'password_confirmation' => 'rahasiaPoso2026',
     ])->assertRedirect(route('admin.pengguna.index'));
 
     $this->assertDatabaseHas('users', ['username' => 'cs.poso', 'role' => 'cs', 'master_cabang_id' => $cabang->id, 'is_active' => true]);
@@ -238,6 +241,6 @@ test('admin dapat membuat akun cs dan menonaktifkannya', function () {
     // Akun CS tanpa cabang ditolak
     $this->actingAs($admin)->from(route('admin.pengguna.create'))->post(route('admin.pengguna.store'), [
         'name' => 'CS Tanpa Cabang', 'username' => 'cs.tanpa', 'email' => 'cs.tanpa@banksulteng.co.id',
-        'role' => 'cs', 'master_cabang_id' => '', 'password' => 'rahasia123', 'password_confirmation' => 'rahasia123',
+        'role' => 'cs', 'master_cabang_id' => '', 'password' => 'rahasiaPoso2026', 'password_confirmation' => 'rahasiaPoso2026',
     ])->assertSessionHasErrors('master_cabang_id');
 });

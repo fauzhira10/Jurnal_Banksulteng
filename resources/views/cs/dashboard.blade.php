@@ -84,7 +84,7 @@
                                             </td>
                                             <td class="px-4 py-3.5 align-middle">
                                                 <div class="font-semibold text-slate-800">{{ $p->nama_nasabah }}</div>
-                                                <div class="text-[0.71875rem] text-slate-500 font-mono mt-0.5">Rek: {{ $p->no_rekening }}</div>
+                                                <div class="text-[0.71875rem] text-slate-500 font-mono mt-0.5">Rek: {{ \App\Support\Penyamaran::nomor($p->no_rekening) }}</div>
                                             </td>
                                             <td class="px-4 py-3.5 align-middle">
                                                 <div class="text-[0.78125rem] font-medium text-slate-700 leading-snug">{{ $p->transaksi->jenis_transaksi ?? '-' }}</div>

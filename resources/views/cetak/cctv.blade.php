@@ -278,15 +278,8 @@
 </head>
 <body>
 
-    <!-- Tombol Navigasi Layar -->
-    <div class="no-print">
-        <button type="button" onclick="handleKembali()" class="btn btn-back">⬅ Kembali</button>
-        <div style="text-align: center;">
-            <span style="font-weight: bold; font-size: 13px; color: #1e293b; display: block;">📄 Cetak Formulir Permohonan Rekaman CCTV &mdash; No. Tiket: {{ $jurnal->no_tiket }}</span>
-            <span style="font-size: 11px; color: #0369a1; background: #e0f2fe; padding: 2px 8px; border-radius: 12px; font-weight: 600; display: inline-block; margin-top: 3px;">✏️ Nama & jabatan penanda tangan dapat diklik untuk diedit</span>
-        </div>
-        <button onclick="window.print()" class="btn btn-print">🖨️ Cetak Form CCTV</button>
-    </div>
+    <!-- Toolbar Aksi Layar & Studio TTD -->
+    @include('cetak.partials.ttd_toolbar_and_modal', ['judulForm' => 'Cetak Formulir Permohonan Rekaman CCTV'])
 
     <div class="form-wrapper">
         <table class="table-form">
@@ -428,53 +421,7 @@
             </tr>
 
             <!-- FOOTER BLOCK TANDA TANGAN (4 KOLOM) -->
-            <tr>
-                <td colspan="2" class="no-padding" style="padding: 0;">
-                    <table style="width: 100%; border-collapse: collapse; table-layout: fixed;">
-                        <tr>
-                            <td colspan="3" class="sig-header" style="width: 74%; border-right: 1px solid #000; border-bottom: 1px solid #000;">Di Selesaikan Oleh,</td>
-                            <td class="sig-header" style="width: 26%; border-bottom: 1px solid #000;">Di ketahui Oleh,</td>
-                        </tr>
-                        <!-- Ruang Kotak Tanda Tangan (Diperbesar ke Bawah) -->
-                        <tr>
-                            <td class="sig-space-cell" style="width: 24%; border-right: 1px solid #000;"></td>
-                            <td class="sig-space-cell" style="width: 26%; border-right: 1px solid #000;"></td>
-                            <td class="sig-space-cell" style="width: 24%; border-right: 1px solid #000;"></td>
-                            <td class="sig-space-cell" style="width: 26%;"></td>
-                        </tr>
-                        <!-- Baris Nama Pejabat (Rata Sejajar Horizontal & Editable) -->
-                        <tr>
-                            <td class="sig-name-cell" style="width: 24%; border-right: 1px solid #000;">
-                                <div class="sig-name editable-text" contenteditable="true" spellcheck="false" title="Klik untuk mengedit Nama">MUJADID</div>
-                            </td>
-                            <td class="sig-name-cell" style="width: 26%; border-right: 1px solid #000;">
-                                <div class="sig-name editable-text" contenteditable="true" spellcheck="false" title="Klik untuk mengedit Nama">AYU FEBRIANTI</div>
-                            </td>
-                            <td class="sig-name-cell" style="width: 24%; border-right: 1px solid #000;">
-                                <div class="sig-name editable-text" contenteditable="true" spellcheck="false" title="Klik untuk mengedit Nama">WACHYUNI MADARAYU</div>
-                            </td>
-                            <td class="sig-name-cell" style="width: 26%;">
-                                <div class="sig-name editable-text" contenteditable="true" spellcheck="false" title="Klik untuk mengedit Nama">DIANA, ST</div>
-                            </td>
-                        </tr>
-                        <!-- Baris Jabatan Pejabat (Editable) -->
-                        <tr>
-                            <td class="sig-title-cell" style="width: 24%; border-right: 1px solid #000;">
-                                <div class="sig-title editable-text" contenteditable="true" spellcheck="false" title="Klik untuk mengedit Jabatan">Staf Layanan Keluhan dan Monitoring Transaksi Kartu</div>
-                            </td>
-                            <td class="sig-title-cell" style="width: 26%; border-right: 1px solid #000;">
-                                <div class="sig-title editable-text" contenteditable="true" spellcheck="false" title="Klik untuk mengedit Jabatan">Pemimpin Unit Layanan Keluhan dan Monitoring Transaksi Kartu</div>
-                            </td>
-                            <td class="sig-title-cell" style="width: 24%; border-right: 1px solid #000;">
-                                <div class="sig-title editable-text" contenteditable="true" spellcheck="false" title="Klik untuk mengedit Jabatan">PINBAG E- CHANEL</div>
-                            </td>
-                            <td class="sig-title-cell" style="width: 26%;">
-                                <div class="sig-title editable-text" contenteditable="true" spellcheck="false" title="Klik untuk mengedit Jabatan">Pemimpin Divisi IT</div>
-                            </td>
-                        </tr>
-                    </table>
-                </td>
-            </tr>
+            @include('cetak.partials.ttd_block')
         </table>
     </div>
 

@@ -5,6 +5,10 @@
     $inputCls = 'w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm bg-white text-slate-800 placeholder-slate-400 transition-all duration-200 focus:border-brand-blue focus:ring-3 focus:ring-brand-blue/15 focus:outline-none';
     $labelCls = 'font-semibold text-[0.8125rem] text-slate-700 flex items-center gap-1';
     $roleAwal = old('role', $edit ? $user->role->value : \App\Enums\UserRole::Cs->value);
+    // Satu sumber kebijakan kata sandi, sama dengan yang divalidasi di server
+    // dan dipakai perintah admin:buat.
+    $minSandi = \App\Rules\KataSandi::PANJANG_MIN;
+    $ketSandi = \App\Rules\KataSandi::keterangan();
 @endphp
 
 @section('title', $edit ? 'Edit Pengguna' : 'Tambah Pengguna')
@@ -78,14 +82,19 @@
                         {{ $edit ? 'Ganti Kata Sandi (kosongkan jika tidak diubah)' : 'Kata Sandi' }}
                     </div>
 
+                    <div class="md:col-span-2 -mt-2 text-[0.71875rem] text-slate-500 normal-case font-normal tracking-normal">
+                        {{ $ketSandi }}. Akun ini membuka data pribadi nasabah, jadi hindari kata sandi
+                        yang dipakai di layanan lain.
+                    </div>
+
                     <div class="flex flex-col gap-1.5">
                         <label class="{{ $labelCls }}">Kata Sandi @unless($edit)<span class="text-rose-600 font-bold">*</span>@endunless</label>
-                        <input type="password" name="password" {{ $edit ? '' : 'required' }} minlength="6" placeholder="Minimal 6 karakter" class="{{ $inputCls }}" autocomplete="new-password">
+                        <input type="password" name="password" {{ $edit ? '' : 'required' }} minlength="{{ $minSandi }}" placeholder="{{ $ketSandi }}" class="{{ $inputCls }}" autocomplete="new-password">
                     </div>
 
                     <div class="flex flex-col gap-1.5">
                         <label class="{{ $labelCls }}">Konfirmasi Kata Sandi @unless($edit)<span class="text-rose-600 font-bold">*</span>@endunless</label>
-                        <input type="password" name="password_confirmation" {{ $edit ? '' : 'required' }} minlength="6" placeholder="Ulangi kata sandi" class="{{ $inputCls }}" autocomplete="new-password">
+                        <input type="password" name="password_confirmation" {{ $edit ? '' : 'required' }} minlength="{{ $minSandi }}" placeholder="Ulangi kata sandi" class="{{ $inputCls }}" autocomplete="new-password">
                     </div>
                 </div>
 

@@ -91,6 +91,7 @@
 <script>
 (function () {
     const wadah = document.getElementById('status_combobox');
+    const wrapper = document.getElementById('status_wrapper');
     const input = document.getElementById('status_input');
     const dropdown = document.getElementById('status_dropdown');
     const chevron = document.getElementById('status_chevron');
@@ -98,7 +99,7 @@
     const titik = document.getElementById('status_titik');
     const info = document.getElementById('status_info');
     const kosong = document.getElementById('status_no_match');
-    const daftar = Array.from(document.querySelectorAll('.status-item'));
+    const daftar = Array.from((wadah || document).querySelectorAll('.status-item'));
     if (!wadah || !input) return;
 
     const warna = {
@@ -145,12 +146,12 @@
         return daftar.filter(item => !item.classList.contains('hidden'));
     }
 
-    function saring() {
-        const kunci = nilaiBaku(input.value);
+    function saring(tampilkanSemua = false) {
+        const kunci = tampilkanSemua ? '' : nilaiBaku(input.value);
         let jumlah = 0;
 
         daftar.forEach(item => {
-            const cocok = kunci === '' || nilaiBaku(item.dataset.value).includes(kunci);
+            const cocok = kunci === '' || nilaiBaku(item.dataset.value).includes(kunci) || nilaiBaku(item.textContent).includes(kunci);
             item.classList.toggle('hidden', !cocok);
             if (cocok) jumlah++;
         });
@@ -173,12 +174,21 @@
         });
     }
 
-    function buka() {
+    function buka(tampilkanSemua = true) {
         dropdown.classList.remove('hidden');
         input.setAttribute('aria-expanded', 'true');
         chevron.classList.add('rotate-180');
-        saring();
+        saring(tampilkanSemua);
         perbaruiPenanda();
+
+        // Inisialisasi sorotan keyboard awal ke opsi yang saat ini aktif
+        const opsi = terlihat();
+        const currentBaku = nilaiBaku(input.value);
+        const idx = opsi.findIndex(item => nilaiBaku(item.dataset.value) === currentBaku);
+        if (idx >= 0) {
+            indeksAktif = idx;
+            sorotKeyboard();
+        }
     }
 
     function tutup() {
@@ -195,11 +205,38 @@
         tutup();
     }
 
-    input.addEventListener('focus', buka);
+    input.addEventListener('focus', function () {
+        buka(true);
+        setTimeout(() => {
+            try { input.select(); } catch (e) {}
+        }, 30);
+    });
+
+    input.addEventListener('click', function () {
+        if (dropdown.classList.contains('hidden')) {
+            buka(true);
+        }
+    });
+
+    if (wrapper) {
+        wrapper.addEventListener('click', function (e) {
+            if (e.target !== tombol && !tombol.contains(e.target)) {
+                if (dropdown.classList.contains('hidden')) {
+                    buka(true);
+                }
+                input.focus();
+            }
+        });
+    }
+
     input.addEventListener('input', function () {
-        saring();
+        saring(false);
         perbaruiPenanda();
-        if (dropdown.classList.contains('hidden')) buka();
+        if (dropdown.classList.contains('hidden')) {
+            dropdown.classList.remove('hidden');
+            input.setAttribute('aria-expanded', 'true');
+            chevron.classList.add('rotate-180');
+        }
     });
 
     input.addEventListener('keydown', function (e) {
@@ -207,13 +244,13 @@
 
         if (e.key === 'ArrowDown') {
             e.preventDefault();
-            if (dropdown.classList.contains('hidden')) { buka(); return; }
+            if (dropdown.classList.contains('hidden')) { buka(true); return; }
             if (opsi.length) { indeksAktif = (indeksAktif + 1) % opsi.length; sorotKeyboard(); }
         } else if (e.key === 'ArrowUp') {
             e.preventDefault();
+            if (dropdown.classList.contains('hidden')) { buka(true); return; }
             if (opsi.length) { indeksAktif = (indeksAktif - 1 + opsi.length) % opsi.length; sorotKeyboard(); }
         } else if (e.key === 'Enter') {
-            // Enter hanya menutup daftar / memilih sorotan, tidak mengirim formulir
             if (!dropdown.classList.contains('hidden')) {
                 e.preventDefault();
                 if (indeksAktif >= 0 && opsi[indeksAktif]) pilih(opsi[indeksAktif].dataset.value);
@@ -235,7 +272,15 @@
 
     tombol.addEventListener('click', function (e) {
         e.stopPropagation();
-        if (dropdown.classList.contains('hidden')) { buka(); input.focus(); } else { tutup(); }
+        if (dropdown.classList.contains('hidden')) {
+            buka(true);
+            input.focus();
+            setTimeout(() => {
+                try { input.select(); } catch (e) {}
+            }, 30);
+        } else {
+            tutup();
+        }
     });
 
     document.addEventListener('click', function (e) {

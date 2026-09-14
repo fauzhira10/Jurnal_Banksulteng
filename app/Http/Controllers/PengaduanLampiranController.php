@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Pengaduan;
 use App\Models\PengaduanLampiran;
+use App\Services\AuditTrailService;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
 
@@ -25,6 +26,13 @@ class PengaduanLampiranController extends Controller
         abort_unless($lampiran->path && $disk->exists($lampiran->path), 404, 'Berkas lampiran tidak ditemukan di penyimpanan.');
 
         $lampiran->setRelation('pengaduan', $pengaduan);
+
+        // Lampiran memuat foto KTP nasabah. Siapa membukanya, kapan, dan dari
+        // alamat mana termasuk yang wajib terekam — bukan hanya perubahan data.
+        AuditTrailService::catatAman('lampiran.dibuka', [
+            'objek' => $lampiran,
+            'keterangan' => "Membuka lampiran {$lampiran->label()} pada pengaduan {$pengaduan->nomor_tiket}.",
+        ]);
 
         return $disk->response(
             $lampiran->path,

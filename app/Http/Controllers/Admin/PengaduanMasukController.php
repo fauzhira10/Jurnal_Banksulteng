@@ -6,6 +6,7 @@ use App\Enums\PengaduanStatus;
 use App\Http\Controllers\Controller;
 use App\Models\MasterCabang;
 use App\Models\Pengaduan;
+use App\Services\AuditTrailService;
 use App\Services\DeteksiDuplikatService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
@@ -64,6 +65,28 @@ class PengaduanMasukController extends Controller
     /**
      * Detail pengaduan + panel tindak lanjut
      */
+    /**
+     * Rincian satu pengaduan dalam bentuk JSON, untuk modal riwayat pada panel
+     * keluhan berulang.
+     *
+     * Panel itu dulu menanam seluruh baris pengaduan di dalam atribut
+     * `data-pengaduan` setiap tombolnya, sehingga nomor rekening, nomor kartu,
+     * NIK, dan nomor HP hingga lima nasabah sekaligus tercetak di sumber halaman
+     * setiap kali panelnya muncul. Sekarang datanya diambil hanya untuk baris
+     * yang benar-benar dibuka petugas.
+     *
+     * Bentuk balasannya sengaja sama persis dengan `json_encode($pengaduan)`
+     * yang dulu tertanam, supaya skrip modalnya tidak perlu berubah.
+     */
+    public function detailJson(Pengaduan $pengaduan)
+    {
+        Gate::authorize('view', $pengaduan);
+
+        return response()->json(
+            $pengaduan->load('cabang:id,kode_cabang,nama_cabang')
+        );
+    }
+
     public function show(Pengaduan $pengaduan)
     {
         Gate::authorize('view', $pengaduan);
@@ -101,6 +124,12 @@ class PengaduanMasukController extends Controller
             'catatan_pusat' => $request->filled('catatan_pusat') ? trim($request->catatan_pusat) : $pengaduan->catatan_pusat,
         ]);
 
+        AuditTrailService::catat('pengaduan.diterima', [
+            'objek' => $pengaduan,
+            'baru' => ['status' => PengaduanStatus::Diterima->value],
+            'keterangan' => "Pengaduan {$pengaduan->nomor_tiket} dari {$pengaduan->labelCabang()} diterima Admin Pusat.",
+        ]);
+
         return redirect()
             ->route('admin.pengaduan.show', $pengaduan)
             ->with('success', "Pengaduan {$pengaduan->nomor_tiket} telah diterima. Silakan lanjutkan dengan memasukkannya ke Jurnal Keluhan.");
@@ -126,6 +155,12 @@ class PengaduanMasukController extends Controller
             'diterima_at' => $pengaduan->diterima_at ?? now(),
             'ditolak_at' => now(),
             'catatan_pusat' => trim($request->catatan_pusat),
+        ]);
+
+        AuditTrailService::catat('pengaduan.ditolak', [
+            'objek' => $pengaduan,
+            'baru' => ['status' => PengaduanStatus::Ditolak->value],
+            'keterangan' => "Pengaduan {$pengaduan->nomor_tiket} ditolak. Alasan: ".trim($request->catatan_pusat),
         ]);
 
         return redirect()

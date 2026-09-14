@@ -6,6 +6,7 @@ use App\Enums\UserRole;
 use App\Http\Controllers\Controller;
 use App\Models\MasterCabang;
 use App\Models\User;
+use App\Rules\KataSandi;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -183,7 +184,7 @@ class PenggunaController extends Controller
                 Rule::requiredIf(fn () => $request->input('role') === UserRole::Cs->value),
                 'nullable', 'exists:master_cabangs,id',
             ],
-            'password' => [$user ? 'nullable' : 'required', 'string', 'min:6', 'confirmed'],
+            'password' => KataSandi::aturan($user === null),
         ];
 
         $pesan = [
@@ -199,11 +200,8 @@ class PenggunaController extends Controller
             'role.in' => 'Peran pengguna tidak valid.',
             'master_cabang_id.required' => 'Cabang penempatan wajib dipilih untuk akun CS.',
             'master_cabang_id.exists' => 'Cabang yang dipilih tidak valid.',
-            'password.required' => 'Kata sandi wajib diisi.',
-            'password.min' => 'Kata sandi minimal :min karakter.',
-            'password.confirmed' => 'Konfirmasi kata sandi tidak sama.',
         ];
 
-        return $request->validate($rules, $pesan);
+        return $request->validate($rules, array_merge($pesan, KataSandi::pesan()));
     }
 }

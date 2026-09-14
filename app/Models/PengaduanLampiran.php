@@ -11,7 +11,20 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  */
 class PengaduanLampiran extends Model
 {
-    protected $guarded = ['id'];
+    /**
+     * `pengaduan_id` tidak perlu disebut: nilainya diisi relasi hasMany,
+     * bukan lewat pengisian massal.
+     *
+     * @var list<string>
+     */
+    protected $fillable = [
+        'jenis',
+        'nama_asli',
+        'path',
+        'sumber',
+        'mime',
+        'ukuran',
+    ];
 
     public function pengaduan(): BelongsTo
     {

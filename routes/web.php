@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\PejabatTtdController;
 use App\Http\Controllers\Admin\PengaduanMasukController;
 use App\Http\Controllers\Admin\PenggunaController;
 use App\Http\Controllers\AtmMonitoringController;
@@ -15,7 +16,11 @@ use Illuminate\Support\Facades\Route;
 // Rute Autentikasi (Hanya untuk Tamu / Guest)
 Route::middleware('guest')->group(function () {
     Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
-    Route::post('/login', [AuthController::class, 'login'])->name('login.post');
+    // throttle: pagar kasar per alamat IP terhadap endpoint login. Penguncian
+    // per akun (username + IP) ditangani AuthController::pastikanBelumTerkunci().
+    Route::post('/login', [AuthController::class, 'login'])
+        ->middleware('throttle:20,1')
+        ->name('login.post');
 });
 
 // ============================================================
@@ -65,8 +70,12 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     // Route Simpan Data Jurnal Keluhan
     Route::post('/jurnal/simpan', [JurnalController::class, 'store'])->name('jurnal.store');
 
-    // Route Reset / Kosongkan Seluruh Data Jurnal & Template
-    Route::delete('/jurnal/reset-all', [JurnalController::class, 'resetAllData'])->name('jurnal.reset_all');
+    // Route Reset / Kosongkan Seluruh Data Jurnal & Template.
+    // Dibatasi Admin Utama: aksi ini menghapus seluruh tabel jurnals sekaligus
+    // dan tidak dapat dibatalkan. Controller masih meminta konfirmasi kata sandi.
+    Route::delete('/jurnal/reset-all', [JurnalController::class, 'resetAllData'])
+        ->middleware('role:superadmin')
+        ->name('jurnal.reset_all');
 
     // Route Edit & Update Data Jurnal Keluhan
     Route::get('/jurnal/{id}/edit', [JurnalController::class, 'edit'])->name('jurnal.edit')->whereNumber('id');
@@ -94,6 +103,12 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     // Route API AJAX Rincian Jurnal Keluhan
     Route::get('/api/jurnal/{id}', [JurnalController::class, 'getDetailJurnal'])->name('api.jurnal.detail');
 
+    // Rincian satu pengaduan untuk modal riwayat pada panel keluhan berulang.
+    // Dipisah dari halaman /pengaduan-masuk/{id} karena hanya mengembalikan JSON.
+    Route::get('/api/pengaduan/{pengaduan}', [PengaduanMasukController::class, 'detailJson'])
+        ->name('api.pengaduan.detail')
+        ->whereNumber('pengaduan');
+
     // ---------- Pengaduan Masuk dari CS Cabang ----------
     Route::prefix('pengaduan-masuk')->name('admin.pengaduan.')->group(function () {
         Route::get('/', [PengaduanMasukController::class, 'index'])->name('index');
@@ -101,6 +116,19 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
         Route::post('/{pengaduan}/terima', [PengaduanMasukController::class, 'terima'])->name('terima')->whereNumber('pengaduan');
         Route::post('/{pengaduan}/tolak', [PengaduanMasukController::class, 'tolak'])->name('tolak')->whereNumber('pengaduan');
     });
+
+    // ---------- Master Pejabat & Tanda Tangan Digital ----------
+    Route::prefix('pejabat-ttd')->name('admin.pejabat-ttd.')->group(function () {
+        Route::get('/', [PejabatTtdController::class, 'index'])->name('index');
+        Route::post('/', [PejabatTtdController::class, 'store'])->name('store');
+        Route::put('/{id}', [PejabatTtdController::class, 'update'])->name('update')->whereNumber('id');
+        Route::delete('/{id}', [PejabatTtdController::class, 'destroy'])->name('destroy')->whereNumber('id');
+        Route::post('/{id}/set-default', [PejabatTtdController::class, 'setDefault'])->name('set_default')->whereNumber('id');
+    });
+
+    // API AJAX Pejabat & Snapshot TTD Jurnal
+    Route::get('/api/pejabat-ttd/slot/{slot}', [PejabatTtdController::class, 'apiBySlot'])->name('api.pejabat_ttd.slot')->whereNumber('slot');
+    Route::post('/api/jurnal/{id}/ttd', [PejabatTtdController::class, 'simpanTtdJurnal'])->name('api.jurnal.simpan_ttd')->whereNumber('id');
 
     // ---------- Manajemen Pengguna (Khusus Admin Utama / Super Admin) ----------
     Route::prefix('pengguna')->name('admin.pengguna.')->middleware('role:superadmin')->group(function () {

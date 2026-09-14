@@ -103,7 +103,7 @@
                                     </td>
                                     <td>
                                         <div class="font-semibold text-slate-800">{{ $p->nama_nasabah }}</div>
-                                        <div class="text-[0.71875rem] text-slate-500">Rek: <strong>{{ $p->no_rekening }}</strong> &bull; Resi: <strong>{{ $p->no_resi }}</strong></div>
+                                        <div class="text-[0.71875rem] text-slate-500">Rek: <strong title="Nomor lengkap ada pada rincian pengaduan">{{ \App\Support\Penyamaran::nomor($p->no_rekening) }}</strong> &bull; Resi: <strong>{{ $p->no_resi }}</strong></div>
                                         <div class="text-[0.71875rem] text-slate-500">{{ $p->kategoriLengkap() }}</div>
                                     </td>
                                     <td>

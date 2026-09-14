@@ -9,6 +9,7 @@ use App\Models\MasterCabang;
 use App\Models\MasterTransaksi;
 use App\Models\Pengaduan;
 use App\Observers\JurnalObserver;
+use App\Services\AuditTrailService;
 use App\Services\DeteksiDuplikatService;
 use App\Services\NomorTiketService;
 use Carbon\Carbon;
@@ -302,6 +303,14 @@ class JurnalController extends Controller
      *
      * Panel peringatannya dirender di sini sebagai HTML jadi, supaya tampilannya
      * hanya ditulis sekali di partials/panel_duplikat.blade.php.
+     *
+     * Jawaban untuk CS cabang sengaja dipangkas menjadi ADA atau TIDAK ADA.
+     * Endpoint ini menerima nama nasabah dan nomor resi apa pun, jadi jawaban
+     * yang rinci membuatnya dapat dipakai satu akun cabang untuk memetakan
+     * keluhan cabang lain — nomor tiket, cabang asal, tanggal, dan nominalnya —
+     * cukup dengan mencoba banyak kombinasi. Yang benar-benar dibutuhkan CS
+     * hanyalah tahu bahwa keluhan itu sudah tercatat di pusat; rinciannya ada
+     * pada Admin Pusat yang memang berwenang melihat lintas cabang.
      */
     public function cekDuplikat(Request $request)
     {
@@ -313,15 +322,26 @@ class JurnalController extends Controller
             $request->filled('abaikan_pengaduan') ? (int) $request->input('abaikan_pengaduan') : null
         );
 
-        // CS cabang tidak punya akses ke modul jurnal pusat, jadi panelnya ringkas:
-        // tanpa nomor rekening/kartu dan tanpa tautan ke data jurnal.
-        $ringkas = ! ($request->user()?->isAdmin() ?? false);
+        if (! ($request->user()?->isAdmin() ?? false)) {
+            $ada = $cek['tingkat'] !== DeteksiDuplikatService::AMAN;
+
+            // Tingkat KEMBAR ikut diratakan menjadi BERULANG: membedakannya sama
+            // saja dengan memberi tahu bahwa ada catatan bertanggal transaksi
+            // persis seperti yang sedang diketik. Jumlah dan token juga tidak
+            // dikirim — form CS memakai mode informatif yang tidak memerlukannya.
+            return response()->json([
+                'tingkat' => $ada ? DeteksiDuplikatService::BERULANG : DeteksiDuplikatService::AMAN,
+                'html' => $ada
+                    ? view('partials.panel_duplikat', ['duplikat' => $cek, 'ringkas' => true])->render()
+                    : '',
+            ]);
+        }
 
         return response()->json([
             'tingkat' => $cek['tingkat'],
             'jumlah' => $cek['jumlah'],
             'token' => $cek['token'],
-            'html' => view('partials.panel_duplikat', ['duplikat' => $cek, 'ringkas' => $ringkas])->render(),
+            'html' => view('partials.panel_duplikat', ['duplikat' => $cek])->render(),
         ]);
     }
 
@@ -432,15 +452,26 @@ class JurnalController extends Controller
             }
         }
 
-        $data = $request->except(['pengaduan_id', 'konfirmasi_duplikat']);
-        $data['nama_nasabah'] = $namaNorm;
-        $data['no_resi'] = $resiNorm;
-        $data['biaya_admin'] = $request->filled('biaya_admin') ? (float) $request->biaya_admin : 0;
-        $data['status'] = $this->normalisasiStatus($request->status);
-        $data['no_kartu'] = $request->filled('no_kartu') ? $request->no_kartu : '-';
-        $data['terminal_transaksi'] = $request->filled('terminal_transaksi') ? $request->terminal_transaksi : '-';
-        $data['permasalahan'] = $request->filled('permasalahan') ? strtoupper(trim($request->permasalahan)) : '-';
-        $data['keterangan_log'] = $request->filled('keterangan_log') ? trim($request->keterangan_log) : '-';
+        // Kolom disusun satu per satu, bukan dari $request->except(). Menyalin
+        // seluruh isi request membuat setiap kolom tabel dapat ditulis hanya
+        // dengan menambah input bernama sama pada permintaan.
+        $data = [
+            'nama_nasabah' => $namaNorm,
+            'no_resi' => $resiNorm,
+            'no_rekening' => $request->no_rekening,
+            'no_kartu' => $request->filled('no_kartu') ? $request->no_kartu : '-',
+            'master_cabang_id' => $request->master_cabang_id,
+            'master_transaksi_id' => $request->master_transaksi_id,
+            'terminal_transaksi' => $request->filled('terminal_transaksi') ? $request->terminal_transaksi : '-',
+            'nominal_transaksi' => $request->nominal_transaksi,
+            'biaya_admin' => $request->filled('biaya_admin') ? (float) $request->biaya_admin : 0,
+            'tgl_transaksi' => $request->tgl_transaksi,
+            'tgl_terima' => $request->tgl_terima,
+            'tgl_selesai' => $request->tgl_selesai,
+            'status' => $this->normalisasiStatus($request->status),
+            'permasalahan' => $request->filled('permasalahan') ? strtoupper(trim($request->permasalahan)) : '-',
+            'keterangan_log' => $request->filled('keterangan_log') ? trim($request->keterangan_log) : '-',
+        ];
 
         // Sinkronisasi channel yang dipilih dengan master transaksi
         if ($request->filled('channel') && $request->filled('master_transaksi_id')) {
@@ -611,12 +642,22 @@ class JurnalController extends Controller
             return $gagal;
         }
 
-        $data = $request->except('konfirmasi_duplikat');
-        $data['nama_nasabah'] = $namaNorm;
-        $data['no_resi'] = $resiNorm;
-        $data['biaya_admin'] = $request->filled('biaya_admin') ? (float) $request->biaya_admin : 0;
-        $data['status'] = $this->normalisasiStatus($request->status);
-        $data['no_kartu'] = $request->filled('no_kartu') ? $request->no_kartu : '-';
+        // Sama seperti store(): daftar kolom ditulis eksplisit agar tidak ada
+        // kolom yang ikut terbawa dari isi request.
+        $data = [
+            'nama_nasabah' => $namaNorm,
+            'no_resi' => $resiNorm,
+            'no_rekening' => $request->no_rekening,
+            'no_kartu' => $request->filled('no_kartu') ? $request->no_kartu : '-',
+            'master_cabang_id' => $request->master_cabang_id,
+            'master_transaksi_id' => $request->master_transaksi_id,
+            'nominal_transaksi' => $request->nominal_transaksi,
+            'biaya_admin' => $request->filled('biaya_admin') ? (float) $request->biaya_admin : 0,
+            'tgl_transaksi' => $request->tgl_transaksi,
+            'tgl_terima' => $request->tgl_terima,
+            'tgl_selesai' => $request->tgl_selesai,
+            'status' => $this->normalisasiStatus($request->status),
+        ];
 
         // Jurnal yang berasal dari pengaduan CS memakai nomor tiket pengaduan dan
         // tidak dapat diubah. Jurnal yang diinput langsung tetap diketik petugas,
@@ -657,9 +698,12 @@ class JurnalController extends Controller
     {
         $jurnal = Jurnal::findOrFail($id);
 
-        if (method_exists($jurnal, 'auditTrails')) {
-            $jurnal->auditTrails()->delete();
-        }
+        // Jejak audit milik jurnal ini sengaja TIDAK ikut dihapus. Justru
+        // penghapusan itulah kejadian yang paling perlu terekam. Kolom
+        // audit_trails.jurnal_id bersifat nullOnDelete, sehingga barisnya
+        // bertahan dengan tautan terlepas, sedangkan auditable_id tetap
+        // menyimpan id jurnal yang dihapus. JurnalObserver::deleted() juga
+        // merekam seluruh isi baris sebelum hilang.
 
         $namaNasabah = $jurnal->nama_nasabah;
         $noResi = $jurnal->no_resi;
@@ -1831,8 +1875,28 @@ class JurnalController extends Controller
      */
     public function resetAllData(Request $request)
     {
-        // 1. Hapus seluruh data transaksi di tabel jurnals
+        // Konfirmasi ulang kata sandi. Tombolnya berada di halaman yang sudah
+        // terbuka sepanjang hari kerja; tanpa ini, satu klik pada layar yang
+        // ditinggalkan tanpa terkunci sudah cukup menghapus seluruh jurnal.
+        $request->validate([
+            'password' => ['required', 'current_password'],
+        ], [
+            'password.required' => 'Masukkan kata sandi Anda untuk menghapus seluruh data jurnal.',
+            'password.current_password' => 'Kata sandi yang Anda masukkan tidak sesuai. Penghapusan dibatalkan.',
+        ]);
+
         $deletedCount = Jurnal::count();
+
+        // Cadangan dibuat lebih dulu. Penghapusan massal ini tidak dapat
+        // dibatalkan, jadi berkasnya harus sudah ada sebelum baris pertama hilang.
+        $berkasCadangan = $this->simpanCadanganJurnal();
+
+        AuditTrailService::catat('jurnal.reset_massal', [
+            'keterangan' => "Menghapus seluruh data jurnal keluhan ({$deletedCount} baris). Cadangan disimpan di: {$berkasCadangan}.",
+            'lama' => ['jumlah_baris' => $deletedCount, 'cadangan' => $berkasCadangan],
+        ]);
+
+        // 1. Hapus seluruh data transaksi di tabel jurnals
         Jurnal::query()->delete();
 
         // 1b. Mass delete tidak memicu observer → kembalikan pengaduan CS yang tertaut ke status "Diterima"
@@ -1864,7 +1928,7 @@ class JurnalController extends Controller
             }
         }
 
-        $message = "Berhasil! Seluruh data jurnal keluhan ({$deletedCount} data) telah dibersihkan dan sistem telah di-reset.";
+        $message = "Berhasil! Seluruh data jurnal keluhan ({$deletedCount} data) telah dibersihkan. Cadangan otomatis tersimpan sebagai {$berkasCadangan}.";
 
         if ($request->ajax() || $request->wantsJson()) {
             return response()->json([
@@ -1875,6 +1939,30 @@ class JurnalController extends Controller
         }
 
         return redirect()->route('jurnal.index')->with('success', $message);
+    }
+
+    /**
+     * Simpan seluruh jurnal ke berkas Excel di disk privat sebagai cadangan
+     * sebelum penghapusan massal. Mengembalikan nama berkasnya.
+     */
+    private function simpanCadanganJurnal(): string
+    {
+        $jurnals = Jurnal::with(['masterCabang', 'masterTransaksi'])->orderBy('id')->get();
+
+        $namaBerkas = 'cadangan-jurnal-'.now()->format('Ymd-His').'.xlsx';
+        $folder = storage_path('app/private/cadangan');
+
+        if (! is_dir($folder)) {
+            mkdir($folder, 0755, true);
+        }
+
+        $spreadsheet = $this->buildCleanExportSpreadsheet($jurnals);
+        $writer = IOFactory::createWriter($spreadsheet, 'Xlsx');
+        $writer->setPreCalculateFormulas(false);
+        $writer->save($folder.DIRECTORY_SEPARATOR.$namaBerkas);
+        $spreadsheet->disconnectWorksheets();
+
+        return $namaBerkas;
     }
 
     /**
