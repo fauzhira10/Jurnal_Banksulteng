@@ -55,6 +55,12 @@ class Pengaduan extends Model
     {
         return [
             'status' => PengaduanStatus::class,
+            // NIK disimpan terenkripsi: salinan basis data yang bocor tidak boleh
+            // langsung menjadi daftar nomor identitas nasabah. Kolom ini satu-satunya
+            // yang aman dienkripsi — nama_nasabah, no_resi, no_rekening dan no_kartu
+            // dipakai indeks unik serta deteksi keluhan berulang, sedangkan no_hp ikut
+            // dicari di scopeCari(); semuanya patah bila nilainya terenkripsi.
+            'no_ktp' => 'encrypted',
             'tgl_transaksi' => 'date',
             'nominal_transaksi' => 'decimal:2',
             'diterima_at' => 'datetime',

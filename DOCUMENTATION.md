@@ -373,6 +373,9 @@ Empat baris yang paling menentukan:
 ```powershell
 cp .env.production.example .env
 php artisan key:generate
+# Cadangkan APP_KEY dari .env ke brankas kata sandi SEKARANG, terpisah dari
+# cadangan basis data. NIK nasabah disimpan terenkripsi dengan kunci ini dan
+# tidak dapat dipulihkan tanpanya — lihat bagian 8.10.
 php artisan migrate --force
 php artisan db:seed --class=MasterSeeder --force   # hanya master data 41 cabang & 33 transaksi
 php artisan admin:buat --superadmin                # akun admin, kata sandi diketik petugas
@@ -381,6 +384,9 @@ php artisan config:cache; php artisan route:cache; php artisan view:cache
 
 Jangan menjalankan `php artisan db:seed` polos di server: gunakan `--class=MasterSeeder`
 seperti di atas agar akun contoh tidak ikut terbawa.
+
+Dan **jangan pernah menjalankan `php artisan key:generate` lagi** setelah server berisi
+data: kunci baru membuat seluruh NIK yang sudah tersimpan tidak terbaca.
 
 ### 8.3 Pembatas percobaan login
 
@@ -556,19 +562,63 @@ menangani satu kasus tertentu.
 NIK dan nomor HP **tidak** disamarkan: keduanya hanya muncul di panel rincian
 pengaduan, tempat petugas justru perlu mencocokkannya dengan lampiran KTP nasabah.
 
-### 8.10 Yang belum dikerjakan
+### 8.10 Enkripsi NIK & Cadangan APP_KEY
+
+Kolom `pengaduans.no_ktp` disimpan **terenkripsi**. Salinan basis data yang bocor —
+lewat cadangan yang tertinggal, phpMyAdmin, atau berkas `.sql` yang dikirim ke pihak
+lain — karena itu tidak langsung menjadi daftar nomor identitas nasabah.
+
+Pembacaan dan penulisannya ditangani cast `encrypted` pada `App\Models\Pengaduan`,
+sehingga tidak ada kode lain yang berubah: form CS, panel rincian, dan dokumen cetak
+tetap menampilkan NIK utuh seperti biasa.
+
+**Hanya kolom ini yang aman dienkripsi.**
+
+| Kolom | Status | Alasan |
+|:---|:---|:---|
+| `no_ktp` | terenkripsi | Tidak dipakai indeks, pencarian, maupun deteksi duplikat. |
+| `no_hp` | polos | Ikut dicari di `Pengaduan::scopeCari()` — jalur penelusuran saat nasabah menelepon menyusul laporannya. |
+| `nama_nasabah`, `no_resi` | polos | Kunci deteksi keluhan berulang dan indeks `pengaduans_nama_resi_index`. |
+| `no_rekening`, `no_kartu` | polos | Ikut dicari, dan `no_resi` + `nama_nasabah` menjadi kunci `jurnal_unique_kombinasi`. |
+
+Mengenkripsi salah satu kolom pada baris "polos" akan mematikan pencarian atau
+anti-duplikat, bukan sekadar memperlambatnya.
+
+#### APP_KEY wajib dicadangkan terpisah
+
+> **Sejak migrasi `2026_09_14_000001` dijalankan, isi kolom `no_ktp` bergantung
+> sepenuhnya pada `APP_KEY`. Kunci yang hilang berarti NIK seluruh pengaduan tidak
+> dapat dipulihkan — cadangan basis data pun tidak menolong, karena isinya ikut
+> terenkripsi dengan kunci yang sama.**
+
+Karena itu, sebelum menjalankan migrasi di server:
+
+1. Salin nilai `APP_KEY` dari `.env` ke tempat penyimpanan rahasia milik bank
+   (brankas kata sandi atau amplop tersegel), **terpisah dari cadangan basis data**.
+   Menyimpan keduanya di satu tempat meniadakan gunanya enkripsi ini.
+2. Pastikan cadangan `.env` ikut dalam prosedur pemulihan server, bukan hanya
+   cadangan basis data.
+3. Jangan pernah menjalankan `php artisan key:generate` di server yang sudah berisi
+   data. Perintah itu mengganti kunci, dan seluruh NIK yang sudah tersimpan langsung
+   tidak terbaca.
+
+Bila enkripsi hendak dibatalkan, migrasinya dapat dijalankan mundur dan seluruh NIK
+kembali tersimpan polos:
+
+```powershell
+php artisan migrate:rollback --step=1
+```
+
+Jalur maju maupun mundurnya aman dijalankan berulang: baris yang sudah terenkripsi
+tidak dienkripsi dua kali, dan keduanya diuji di `tests/Feature/EnkripsiNikTest.php`.
+
+### 8.11 Yang belum dikerjakan
 
 Butir berikut sudah teridentifikasi namun **belum** ada di dalam kode:
 
 - Penyamaran NIK pada panel rincian pengaduan. Perlu disertai tombol "tampilkan
   penuh" dan pencatatan jejak audit seperti `lampiran.dibuka`, agar tidak
   menghalangi pencocokan dengan lampiran KTP.
-- Enkripsi kolom data pribadi di basis data. Hanya `pengaduans.no_ktp` yang aman
-  dienkripsi. `nama_nasabah`, `no_resi`, `no_rekening`, dan `no_kartu` dipakai indeks
-  unik, deteksi keluhan berulang, dan pencarian `LIKE`; `no_hp` juga ikut dicari di
-  `Pengaduan::scopeCari`, sehingga mengenkripsinya akan mematikan penelusuran
-  pengaduan lewat nomor HP nasabah — jalur yang dipakai saat nasabah menelepon
-  menyusul laporannya.
 - Serangan tebak kata sandi yang tersebar dari banyak alamat IP belum tertutup.
   Pembatas login mengunci per kombinasi username + alamat IP (bagian 8.3), jadi
   percobaan yang datang dari banyak alamat berbeda tidak terkena batasnya.
