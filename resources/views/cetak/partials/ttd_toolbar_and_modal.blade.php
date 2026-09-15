@@ -53,11 +53,6 @@
             </button>
         </div>
 
-        {{-- Tombol Simpan Snapshot Pilihan --}}
-        <button type="button" onclick="simpanPilihanTtd()" id="btnSimpanTtd" title="Simpan konfigurasi TTD ini ke data tiket" style="padding: 6px 12px; border: 1px solid #059669; border-radius: 6px; font-size: 11px; font-weight: bold; cursor: pointer; background: #ecfdf5; color: #059669; display: inline-flex; align-items: center; gap: 5px;">
-            💾 Simpan Pilihan
-        </button>
-
         {{-- Tombol Cetak --}}
         <button type="button" onclick="window.print()" class="btn btn-print" style="background-color: #1e3a8a; color: #ffffff; border: none; padding: 7px 16px; border-radius: 6px; font-weight: bold; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; font-size: 12px; box-shadow: 0 2px 4px rgba(30,58,138,0.2);">
             🖨️ Cetak Form Ini
@@ -74,7 +69,6 @@
     // Master data pejabat aktif
     const masterPejabatJson = @json($semuaPejabatData);
     const idJurnalAktif = {{ $jurnal->id }};
-    const routeSimpanTtd = "{{ route('api.jurnal.simpan_ttd', $jurnal->id) }}";
     const csrfToken = "{{ csrf_token() }}";
 
     // Data State Lokal untuk 4 Slot
@@ -265,55 +259,6 @@
         }
         updateGlobalVisuals();
         showToast('⚪ Seluruh tanda tangan dikosongkan (Mode TTD Basah).');
-    }
-
-    // 5. Simpan Snapshot Pilihan ke Database (AJAX)
-    function simpanPilihanTtd() {
-        const btn = document.getElementById('btnSimpanTtd');
-        const teksAsli = btn.innerHTML;
-        btn.innerHTML = '⏳ Menyimpan...';
-        btn.disabled = true;
-
-        for (let s = 1; s <= 4; s++) {
-            const nameEl = document.getElementById(`sigName_${s}`);
-            const titleEl = document.getElementById(`sigTitle_${s}`);
-            if (nameEl) ttdState[s].nama = nameEl.innerText.trim();
-            if (titleEl) ttdState[s].jabatan = titleEl.innerText.trim();
-        }
-
-        const payload = {
-            mode: Object.values(ttdState).every(s => s.is_kosong) ? 'manual' : 'digital',
-            slots: ttdState
-        };
-
-        fetch(routeSimpanTtd, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': csrfToken,
-                'Accept': 'application/json'
-            },
-            body: JSON.stringify(payload)
-        })
-        .then(res => res.json())
-        .then(data => {
-            btn.innerHTML = '✓ Tersimpan!';
-            btn.style.background = '#059669';
-            btn.style.color = '#ffffff';
-            showToast('✓ Konfigurasi tanda tangan berhasil disimpan permanen untuk tiket ini.');
-            setTimeout(() => {
-                btn.innerHTML = teksAsli;
-                btn.disabled = false;
-                btn.style.background = '#ecfdf5';
-                btn.style.color = '#059669';
-            }, 2500);
-        })
-        .catch(err => {
-            console.error(err);
-            btn.innerHTML = teksAsli;
-            btn.disabled = false;
-            alert('Gagal menyimpan konfigurasi TTD.');
-        });
     }
 
     function showToast(msg) {
