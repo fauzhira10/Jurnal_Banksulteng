@@ -135,6 +135,20 @@
             @endif
         </a>
 
+        <div class="text-[0.71875rem] uppercase tracking-wider text-slate-500 font-bold px-3 pt-4 pb-1">Keamanan</div>
+
+        {{-- Blockchain Jejak Audit (Block Explorer) --}}
+        <a href="{{ route('admin.blockchain.index') }}" class="{{ $navBase }} {{ request()->routeIs('admin.blockchain.*') ? $navActive : $navIdle }}">
+            <svg class="w-5 h-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="2" y="7" width="6" height="10" rx="1.5"></rect>
+                <rect x="16" y="7" width="6" height="10" rx="1.5"></rect>
+                <rect x="9" y="7" width="6" height="10" rx="1.5"></rect>
+                <line x1="8" y1="12" x2="9" y2="12"></line>
+                <line x1="15" y1="12" x2="16" y2="12"></line>
+            </svg>
+            <span>Blockchain Audit</span>
+        </a>
+
         @if(Auth::user()->isSuperAdmin())
         {{-- Menu 7: Manajemen Pengguna (Khusus Admin Utama / Super Admin) --}}
         <a href="{{ route('admin.pengguna.index') }}" class="{{ $navBase }} {{ request()->routeIs('admin.pengguna.*') ? $navActive : $navIdle }}">

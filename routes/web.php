@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\BlockchainController;
 use App\Http\Controllers\Admin\PejabatTtdController;
 use App\Http\Controllers\Admin\PengaduanMasukController;
 use App\Http\Controllers\Admin\PenggunaController;
@@ -129,6 +130,14 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     // API AJAX Pejabat & Snapshot TTD Jurnal
     Route::get('/api/pejabat-ttd/slot/{slot}', [PejabatTtdController::class, 'apiBySlot'])->name('api.pejabat_ttd.slot')->whereNumber('slot');
     Route::post('/api/jurnal/{id}/ttd', [PejabatTtdController::class, 'simpanTtdJurnal'])->name('api.jurnal.simpan_ttd')->whereNumber('id');
+
+    // ---------- Blockchain Jejak Audit (Block Explorer) ----------
+    Route::prefix('blockchain')->name('admin.blockchain.')->group(function () {
+        Route::get('/', [BlockchainController::class, 'index'])->name('index');
+        Route::get('/blok/{nomor}', [BlockchainController::class, 'show'])->name('show')->whereNumber('nomor');
+        Route::post('/tambang', [BlockchainController::class, 'tambang'])->name('tambang');
+        Route::post('/jangkarkan', [BlockchainController::class, 'jangkarkan'])->name('jangkarkan');
+    });
 
     // ---------- Manajemen Pengguna (Khusus Admin Utama / Super Admin) ----------
     Route::prefix('pengguna')->name('admin.pengguna.')->middleware('role:superadmin')->group(function () {
