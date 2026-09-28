@@ -31,3 +31,20 @@ Schedule::command('audit:periksa')
     ->dailyAt('01:00')
     ->withoutOverlapping()
     ->appendOutputTo(storage_path('logs/audit-periksa.log'));
+
+/*
+| Blockchain jejak audit (DOCUMENTATION.md bagian 8.11). Catatan audit baru
+| ditambang menjadi blok tiap sepuluh menit dan, bila ETH_JANGKAR_AKTIF=true,
+| langsung dijangkarkan ke Ethereum. Seluruh rantai blok diperiksa tiap malam,
+| termasuk pencocokan dengan Ethereum.
+*/
+
+Schedule::command('blockchain:tambang')
+    ->everyTenMinutes()
+    ->withoutOverlapping()
+    ->appendOutputTo(storage_path('logs/blockchain.log'));
+
+Schedule::command('blockchain:periksa --jangkar')
+    ->dailyAt('01:10')
+    ->withoutOverlapping()
+    ->appendOutputTo(storage_path('logs/blockchain-periksa.log'));

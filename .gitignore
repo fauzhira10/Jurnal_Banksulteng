@@ -26,3 +26,6 @@ Homestead.json
 Homestead.yaml
 Thumbs.db
 CLAUDE.md
+
+/blockchain/node_modules
+/blockchain/build

@@ -20,6 +20,7 @@ Projek **Jurnal_Banksulteng** adalah aplikasi web berbasis **Laravel 12/13** yan
 - **Deteksi Keluhan Berulang (Anti-Duplikat Bertingkat)**: Mencegah klaim ganda atas transaksi keluhan nasabah yang sama. Kombinasi **Nama Nasabah + No. Resi + Tanggal Transaksi** yang sama persis ditolak, sedangkan **Nama Nasabah + No. Resi** yang sama dengan tanggal berbeda hanya diperingatkan dan dapat dilanjutkan setelah petugas menyetujui. Peringatannya muncul sejak petugas mengetik, lengkap dengan rincian keluhan lama.
 - **Otomatisasi Channel & Biaya Admin**: Mempercepat pengisian form dengan mekanisme *auto-fill* berbasis AJAX saat jenis transaksi dipilih.
 - **Keamanan & Kepatuhan**: Rekam jejak audit (*audit trail*) berantai hash yang mencatat pembuatan, perubahan, dan penghapusan jurnal, keputusan atas pengaduan, pembukaan berkas KTP, serta percobaan login yang gagal. Keutuhannya dapat diperiksa dengan `php artisan audit:periksa`. Lihat bagian 8.4.
+- **Blockchain Jejak Audit**: Catatan audit ditambang menjadi blok berantai (merkle root + proof of work), lalu hash tiap blok dijangkarkan ke smart contract di Ethereum Sepolia, sehingga pemalsuan jejak audit, bahkan oleh pemegang akses basis data, tetap ketahuan. Lihat bagian 8.11.
 
 ---
 
@@ -55,6 +56,7 @@ Projek **Jurnal_Banksulteng** adalah aplikasi web berbasis **Laravel 12/13** yan
 | 13 | **Pusat Aksi di Modal Detail** | Pop-up modal rincian 16 field lengkap dengan tombol Edit Data dan Hapus Data berdampingan | **Selesai** | **100%** |
 | 14 | **Laporan Rekapitulasi Keluhan Bulanan** | Matriks 12 bulan (Jan-Des), tab drilldown bulanan, 8 kelompok klaim standar, dan export Excel identik | **Selesai** | **100%** |
 | 15 | **Monitoring Mesin ATM Bermasalah** | Peringkat terminal ATM berdasarkan jumlah keluhan terbanyak, KPI cards, filter cabang/periode, modal drill-down nasabah, dan export Excel | **Selesai** | **100%** |
+| 16 | **Blockchain Jejak Audit** | Blok berantai dengan merkle root & proof of work, Block Explorer dengan bukti Merkle, jangkar ke smart contract Ethereum Sepolia | **Selesai** (jangkar Sepolia menunggu dompet & deploy kontrak) | **95%** |
 
 ---
 
@@ -612,7 +614,124 @@ php artisan migrate:rollback --step=1
 Jalur maju maupun mundurnya aman dijalankan berulang: baris yang sudah terenkripsi
 tidak dienkripsi dua kali, dan keduanya diuji di `tests/Feature/EnkripsiNikTest.php`.
 
-### 8.11 Yang belum dikerjakan
+### 8.11 Blockchain Jejak Audit
+
+Rantai hash di bagian 8.4 menangkap penyuntingan satu baris, tetapi orang yang
+memegang akses penuh ke basis data dapat mengubah satu baris lalu **menghitung
+ulang seluruh hash sesudahnya**, dan rantainya terlihat utuh lagi. Blockchain ini
+menutup celah itu dalam dua lapis.
+
+**Lapis 1 — blockchain di dalam aplikasi** (`App\Services\BlockchainAuditService`,
+tabel `blok_audits`, satu-satunya penulis tabel itu):
+
+| Konsep | Wujudnya |
+|:---|:---|
+| Transaksi | Satu baris `audit_trails`. |
+| Blok | Paling banyak `BLOCKCHAIN_UKURAN_BLOK` catatan (bawaan 10). Blok #N memuat catatan dengan id di rentang (akhir blok N-1, akhir blok N]. |
+| Merkle root | Daun = hash tiap catatan yang **dihitung ulang dari isinya** (`AuditTrail::hitungHash`), bukan kolom `hash_sekarang`, sehingga mengubah isi sekaligus kolom hash-nya tetap ketahuan. Induk = `sha256(kiri . kanan)`; daun ganjil dipasangkan dengan dirinya sendiri (`App\Support\MerkleTree`). |
+| Rantai | Kepala blok menyegel `hash_sebelumnya` (hash blok N-1). Genesis (#0) menunjuk 64 angka nol dan tidak berisi catatan. |
+| Proof of work | `hash_blok = sha256(kepala | nonce)` wajib diawali `BLOCKCHAIN_KESULITAN` angka nol (bawaan 4, ≈65 ribu percobaan). |
+| Anti-fork | `nomor`, `hash_sebelumnya`, dan `hash_blok` masing-masing ber-indeks unik. |
+
+Catatan yang rantai hash-nya sudah rusak **tidak akan ditambang**. Penambang
+berhenti dengan galat agar data palsu tidak ikut tersegel dan terlihat sah.
+
+**Lapis 2 — jangkar Ethereum** (`App\Services\JangkarEthereumService`,
+`blockchain/jangkar.mjs`, kontrak `blockchain/contracts/JangkarAudit.sol`):
+tiap blok mengirim **hanya** nomor, hash blok, dan merkle root ke kontrak di
+Ethereum Sepolia. Kontrak hanya menerima tulisan dari dompet pemiliknya dan
+menolak menimpa nomor blok yang sudah tercatat. Pemalsu yang menambang ulang
+seluruh rantai di server akan lolos pemeriksaan Lapis 1, tetapi hash bloknya
+berbeda dengan yang tercatat di Ethereum. Skenario ini dipatok oleh tes
+`tests/Feature/BlockchainAuditTest.php`.
+
+> **Data nasabah tidak pernah dikirim ke Ethereum.** Data di blockchain publik
+> tidak dapat dihapus, jadi yang dikirim hanya hash, yang tidak dapat dibalik
+> menjadi data asli. Block Explorer juga tidak menampilkan `nilai_lama` /
+> `nilai_baru`.
+
+**Perintah:**
+
+```powershell
+php artisan blockchain:tambang            # tambang catatan baru + jangkarkan bila aktif
+php artisan blockchain:tambang --penuh    # hanya blok yang sudah penuh
+php artisan blockchain:periksa            # periksa rantai blok, PoW, merkle root
+php artisan blockchain:periksa --jangkar  # ... dan cocokkan dengan Ethereum
+```
+
+Keduanya sudah terjadwal di `routes/console.php`: penambangan tiap 10 menit
+(`storage/logs/blockchain.log`), pemeriksaan penuh setiap hari pukul 01.10
+(`storage/logs/blockchain-periksa.log`). Jadwal ini butuh Task Scheduler yang sama
+seperti bagian 8.4.
+
+**Block Explorer:** menu *Keamanan → Blockchain Audit* (`/blockchain`, role admin).
+Halamannya menampilkan status rantai, gambar lima blok terakhir, daftar blok,
+rincian kepala blok, pohon Merkle, isi blok beserta **bukti Merkle** per catatan,
+serta tombol *Tambang Blok*, *Jangkarkan ke Ethereum*, dan *Cocokkan dengan
+Ethereum*.
+
+#### Memasang jangkar Ethereum Sepolia
+
+Semua langkah memakai **testnet**. ETH Sepolia tidak bernilai uang dan bisa
+didapat gratis.
+
+1. **Dompet.** Pasang MetaMask, buat akun **baru khusus untuk proyek ini**, lalu
+   ekspor kunci privatnya (*Account details → Show private key*). Jangan pernah
+   memakai dompet yang berisi ETH asli, karena kunci ini disimpan polos di `.env`.
+2. **Saldo uji.** Minta ETH Sepolia dari faucet, misalnya Google Cloud Web3
+   Faucet atau faucet Alchemy / Infura. Sekitar 0,05 ETH cukup untuk ratusan blok.
+3. **RPC.** Pakai RPC publik `https://ethereum-sepolia-rpc.publicnode.com`, atau
+   buat kunci gratis di Alchemy / Infura bila RPC publik sedang lambat.
+4. **Isi `.env`:**
+   ```dotenv
+   ETH_RPC_URL=https://ethereum-sepolia-rpc.publicnode.com
+   ETH_KUNCI_PRIVAT=0x...kunci-privat-dompet-uji...
+   ```
+5. **Pasang pustaka dan periksa dompet:**
+   ```powershell
+   cd blockchain
+   npm install
+   node jangkar.mjs info        # harus menampilkan jaringan "sepolia" dan saldo > 0
+   ```
+6. **Deploy kontrak** (sekali saja):
+   ```powershell
+   node jangkar.mjs deploy
+   ```
+   Salin `alamat` dan `blok_eth` dari keluarannya ke `.env`, lalu aktifkan:
+   ```dotenv
+   ETH_ALAMAT_KONTRAK=0x...alamat...
+   ETH_BLOK_DEPLOY=...blok_eth...
+   ETH_JANGKAR_AKTIF=true
+   ```
+7. `php artisan config:clear`, lalu tekan *Jangkarkan ke Ethereum* di Block
+   Explorer atau jalankan `php artisan blockchain:tambang`. Setiap blok butuh
+   ±12–30 detik menunggu konfirmasi Sepolia.
+
+**Hal yang perlu diingat:**
+
+- **Satu kontrak untuk satu rantai blok.** Bila tabel `blok_audits` dikosongkan
+  (mis. `migrate:fresh`), blok baru akan memakai nomor yang sama dengan hash lain.
+  Kontrak lama akan menolaknya sebagai *konflik*, dan memang seharusnya begitu.
+  Deploy kontrak baru dan ganti `ETH_ALAMAT_KONTRAK`.
+- Status **konflik** tidak pernah dicoba ulang otomatis. Artinya blok di server
+  berbeda dengan yang sudah tercatat di Ethereum, sehingga harus ditelusuri.
+- Server bank tanpa jalur keluar ke internet cukup membiarkan
+  `ETH_JANGKAR_AKTIF=false`. Lapis 1 tetap berjalan penuh.
+- `node` harus ada di PATH proses PHP (atau isi `NODE_BIN` dengan jalur lengkapnya).
+- Batas yang jujur untuk dicatat di laporan: proof of work pada satu server
+  **tidak** memberi konsensus seperti jaringan blockchain publik, karena hanya
+  menaikkan biaya pemalsuan. Jaminan tidak-dapat-diubah yang sebenarnya datang
+  dari Lapis 2.
+
+**Skenario demo:**
+1. Buka Block Explorer. Semua blok **VALID**, dan *Cocokkan dengan Ethereum*
+   menunjukkan **Cocok**.
+2. Ubah satu baris `audit_trails` lewat phpMyAdmin, misalnya kolom `username`.
+3. Muat ulang. Blok terkait menjadi **RUSAK**, dan rinciannya menunjuk
+   `Catatan audit #N diubah setelah masuk blok`. Bukti Merkle catatan itu gagal.
+4. Kembalikan nilainya, dan blok kembali **VALID**. Hash hanya bergantung pada isi.
+
+### 8.12 Yang belum dikerjakan
 
 Butir berikut sudah teridentifikasi namun **belum** ada di dalam kode:
 
